@@ -5,7 +5,7 @@
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-
+        public required string Symbol { get; set; }
         public decimal C { get; set; } // Close
         public decimal H { get; set; } // High
         public decimal L { get; set; } // Low

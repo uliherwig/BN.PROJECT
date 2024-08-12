@@ -31,7 +31,7 @@ namespace BN.TRADER.AlpacaService
 
             foreach (var bar in barSet.Items)
             {
-                result.Add(bar.ToAlpacaBar());
+                result.Add(bar.ToAlpacaBar(symbol));
             }
 
             return result;
@@ -44,11 +44,12 @@ namespace BN.TRADER.AlpacaService
 
             var req = new LatestMarketDataRequest(symbol)
             {
-                Feed = MarketDataFeed.Iex
+                Feed = MarketDataFeed.Iex,
+
             };
             var latestBar = await client.GetLatestBarAsync(req);
 
-            return latestBar.ToAlpacaBar();
+            return latestBar.ToAlpacaBar(symbol);
         }
 
         // Trades

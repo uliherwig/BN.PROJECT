@@ -1,22 +1,60 @@
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 [PersistJobDataAfterExecution]
 [DisallowConcurrentExecution]
 public class AlpacaHistoryJob : IJob
 {
     private readonly ILogger<AlpacaHistoryJob> _logger;
+    private readonly IConfiguration _configuration;
+    private readonly IAlpacaDataService _alpacaDataService;
+    private readonly IDbRepository _dbRepository;
 
-    // Konstruktor für Dependency Injection
-    public AlpacaHistoryJob(ILogger<AlpacaHistoryJob> logger)
+
+    public AlpacaHistoryJob(
+        ILogger<AlpacaHistoryJob> logger,
+        IConfiguration configuration,
+        IAlpacaDataService alpacaDataService,
+        IDbRepository dbRepository)
     {
         _logger = logger;
+        _configuration = configuration;
+        _alpacaDataService = alpacaDataService;
+        _dbRepository = dbRepository;
     }
 
-    public Task Execute(IJobExecutionContext context)
+    public async Task Execute(IJobExecutionContext context)
     {
-        JobKey key = context.JobDetail.Key;   
+        JobKey key = context.JobDetail.Key;
 
-        _logger.LogInformation("Instance " + key + " History Job started");
+        var assetsAsString = _configuration.GetValue<string>("Alpaca:TRADED_ASSETS") ?? string.Empty;
+        if (string.IsNullOrEmpty(assetsAsString))
+            throw new Exception("No assets defined in configuration");
 
 
-        return Task.CompletedTask;
+        var assets = assetsAsString.Split(",").ToList();
+
+        foreach (var symbol in assets)
+        {
+            _logger.LogInformation("Asset: " + symbol);
+
+            var latestBar = await _dbRepository.GetLatestBar(symbol);
+
+            var startDate = latestBar == null ? new DateTime(2024, 1, 1) : latestBar.T.Date;
+
+            while (startDate < DateTime.Now.Date)
+            {
+                var endDate = startDate.AddDays(1);
+                var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate, BarTimeFrame.Minute);
+                _logger.LogInformation("Start: " + startDate.ToString() + "  Bars: " + bars.Count);
+                
+                await _dbRepository.AddBarsAsync(bars);
+
+                startDate = startDate.AddDays(1);
+            }
+        }
+
+        _logger.LogInformation("Instance " + key + " History Job end");
+
+
     }
 }

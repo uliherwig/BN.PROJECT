@@ -1,9 +1,3 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Quartz;
-using System.Threading;
-using System.Threading.Tasks;
-
 public class AlpacaHistoryService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
@@ -21,18 +15,16 @@ public class AlpacaHistoryService : IHostedService
             var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
             var scheduler = await schedulerFactory.GetScheduler();
 
-            // define the job and tie it to our HelloJob class
             var job = JobBuilder.Create<AlpacaHistoryJob>()
-                .WithIdentity("historyJob", "alpacaGroup")          
+                .WithIdentity("historyJob", "alpacaGroup")     
+                .SetJobData(new JobDataMap { { "key", "AlpacaHistoryJob" } })
                 .Build();
 
             var trigger = TriggerBuilder.Create()
-                .WithIdentity("alpacaTrigger", "alpacaGroup")
-                .StartNow()
-                .WithSimpleSchedule(x => x
-                    .WithIntervalInSeconds(3600)
-                    .RepeatForever())
-                .Build();
+               .WithIdentity("alpacaTrigger", "alpacaGroup")
+               .StartNow() // start immediately
+               .WithCronSchedule("0 0 1 * * ?") // Cron-job at 1:00 AM
+               .Build();
 
             await scheduler.ScheduleJob(job, trigger);
         }
@@ -40,7 +32,6 @@ public class AlpacaHistoryService : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        // Hier kannst du Logik zum Stoppen des Dienstes hinzufügen, falls erforderlich
         return Task.CompletedTask;
     }
 }

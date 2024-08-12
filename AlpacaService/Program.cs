@@ -49,14 +49,14 @@ static void ConfigureServices(IServiceCollection services)
 
     services.AddScoped<IDbRepository, DbRepository>();
 
-    // Quartz-Dienste hinzufügen
+    // Quartz-Services
     services.AddQuartz();
     services.AddQuartzHostedService(opt =>
     {
         opt.WaitForJobsToComplete = true;
     });
 
-    // Registriere den QuartzHostedService
+    // Register QuartzHostedService
     services.AddHostedService<AlpacaHistoryService>();
     services.AddHostedService<DatabaseMigrationService>();
 

@@ -2,10 +2,11 @@
 {
     public static class AlpacaAdapterExtensions
     {
-        public static AlpacaBar ToAlpacaBar(this IBar bar)
+        public static AlpacaBar ToAlpacaBar(this IBar bar, string symbol)
         {
             return new AlpacaBar
             {
+                Symbol = symbol,
                 C = bar.Close,
                 H = bar.High,
                 L = bar.Low,

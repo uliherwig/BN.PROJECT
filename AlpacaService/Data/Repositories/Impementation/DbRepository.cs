@@ -26,5 +26,23 @@
             await _context.Assets.AddRangeAsync(assets);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<AlpacaBar> GetLatestBar(string symbol)
+        {
+           return await _context.Bars.Where(b => b.Symbol == symbol).OrderByDescending(b => b.T).FirstOrDefaultAsync();
+          
+        }
+
+        public async Task<List<AlpacaBar>> GetHistoricalBars(string symbol, DateTime startDate, DateTime endDate)
+        {
+            return await _context.Bars.Where(b => b.Symbol == symbol && b.T > startDate && b.T < endDate).OrderBy(b => b.T).ToListAsync();
+
+        }
+
+        public async Task AddBarsAsync(List<AlpacaBar> bars)
+        {
+            await _context.Bars.AddRangeAsync(bars);
+            await _context.SaveChangesAsync();
+        }
     }
 }

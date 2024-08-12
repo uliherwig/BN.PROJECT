@@ -1,8 +1,3 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using System.Threading;
-using System.Threading.Tasks;
-
 public class DatabaseMigrationService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
