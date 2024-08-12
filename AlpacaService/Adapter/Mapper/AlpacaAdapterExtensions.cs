@@ -16,5 +16,15 @@
                 Vw = bar.Vwap
             };
         }
+
+        public static AlpacaAsset ToAlpacaAsset(this IAsset asset)
+        {
+            return new AlpacaAsset
+            {
+                AssetId = asset.AssetId,          
+                Name = asset.Name,
+                Symbol = asset.Symbol,
+            };
+        }
     }
 }

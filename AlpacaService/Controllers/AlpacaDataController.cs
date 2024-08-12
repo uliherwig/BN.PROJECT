@@ -14,7 +14,7 @@ namespace BN.TRADER.AlpacaService
         [HttpGet("historicalBars/{symbol}")]
         public async Task<IActionResult> GetHistoricalBarsBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
-            var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate);
+            var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate, BarTimeFrame.Minute);
             return Ok(bars);
         }
 
@@ -42,7 +42,7 @@ namespace BN.TRADER.AlpacaService
         [HttpPost("save-historicalBars/{symbol}")]
         public async Task<IActionResult> PostHistoricalBarsBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
-            var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate);
+            var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate, BarTimeFrame.Minute);
             return Ok(bars);
         }
     }

@@ -1,10 +1,10 @@
 ﻿namespace BN.TRADER.AlpacaService
 {
-    public class AlpacaRepository : IAlpacaRepository
+    public class DbRepository : IDbRepository
     {
         private readonly ApplicationDbContext _context;
 
-        public AlpacaRepository(ApplicationDbContext context)
+        public DbRepository(ApplicationDbContext context)
         {
             _context = context;
         }

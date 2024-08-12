@@ -18,12 +18,12 @@ namespace BN.TRADER.AlpacaService
             return Alpaca.Markets.Environments.Paper.GetAlpacaDataClient(new SecretKey(alpacaId, alpacaSecret));
         }
 
-        public async Task<List<AlpacaBar>> GetHistoricalBarsBySymbol(string symbol, DateTime startDate, DateTime endDate)
+        public async Task<List<AlpacaBar>> GetHistoricalBarsBySymbol(string symbol, DateTime startDate, DateTime endDate, BarTimeFrame timeFrame)
         {
             var result = new List<AlpacaBar>();
             var client = GetAlpacaDataClient();
 
-            var req = new HistoricalBarsRequest(symbol, startDate, endDate, BarTimeFrame.Minute)
+            var req = new HistoricalBarsRequest(symbol, startDate, endDate, timeFrame)
             {
                 Feed = MarketDataFeed.Iex
             };

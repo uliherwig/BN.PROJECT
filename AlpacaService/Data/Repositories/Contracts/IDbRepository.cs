@@ -1,6 +1,6 @@
 ﻿namespace BN.TRADER.AlpacaService
 {
-    public interface IAlpacaRepository
+    public interface IDbRepository
     {
         Task AddAssetsAsync(List<AlpacaAsset> assets);
 

@@ -5,9 +5,20 @@ var connectionString = builder.Configuration.GetConnectionString("PostgresConnec
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionJobFactory();
+});
+builder.Services.AddQuartzHostedService(opt =>
+{
+    opt.WaitForJobsToComplete = true;
+});
+
 ConfigureServices(builder.Services);
 
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -36,5 +47,17 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
 
-    services.AddScoped<IAlpacaRepository, AlpacaRepository>();
+    services.AddScoped<IDbRepository, DbRepository>();
+
+    // Quartz-Dienste hinzufügen
+    services.AddQuartz();
+    services.AddQuartzHostedService(opt =>
+    {
+        opt.WaitForJobsToComplete = true;
+    });
+
+    // Registriere den QuartzHostedService
+    services.AddHostedService<AlpacaHistoryService>();
+    services.AddHostedService<DatabaseMigrationService>();
+
 }

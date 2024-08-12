@@ -1,5 +1,9 @@
 # AlpacaService
 
+API implementation for trading and data retrieval from alpaca
+Manages historical data, where data is stored in a postgres db
+
+
 ## Version 2024.8.1
 
 alpaca api implementation for trading and data retrieval

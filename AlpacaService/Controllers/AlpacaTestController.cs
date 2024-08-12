@@ -5,11 +5,11 @@
     public class AlpacaTestController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;
-        private readonly IAlpacaRepository _alpacaRepository;
+        private readonly IDbRepository _alpacaRepository;
 
         public AlpacaTestController(
             IWebHostEnvironment env,
-            IAlpacaRepository alpacaRepository)
+            IDbRepository alpacaRepository)
         {
             _env = env;
             _alpacaRepository = alpacaRepository;

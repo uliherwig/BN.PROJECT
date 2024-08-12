@@ -2,7 +2,7 @@
 {
     public interface IAlpacaDataService
     {
-        Task<List<AlpacaBar>> GetHistoricalBarsBySymbol(string symbol, DateTime startDate, DateTime endDate);
+        Task<List<AlpacaBar>> GetHistoricalBarsBySymbol(string symbol, DateTime startDate, DateTime endDate, BarTimeFrame timeFrame);
 
         Task<AlpacaBar> GetLatestBarBySymbol(string symbol);
 
