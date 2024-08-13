@@ -45,6 +45,7 @@ namespace BN.TRADER.AlpacaService
             var req = new LatestMarketDataRequest(symbol)
             {
                 Feed = MarketDataFeed.Iex,
+                
 
             };
             var latestBar = await client.GetLatestBarAsync(req);

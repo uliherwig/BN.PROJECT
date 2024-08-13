@@ -3,9 +3,14 @@
 API implementation for trading and data retrieval from alpaca
 Manages historical data, where data is stored in a postgres db
 
+## Version 2024.8.3
+
+- extend alpaca api implementation for trading methods (orders/trades)
+- extend data layer for storing trading data
+
 ## Version 2024.8.2
 
-- hosted service for data retrieval
+- hosted service for periodical data retrieval
 - service updates historical data for specified assets
 
 ## Version 2024.8.1

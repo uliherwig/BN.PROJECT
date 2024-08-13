@@ -1,4 +1,6 @@
-﻿namespace BN.TRADER.AlpacaService
+﻿using static BN.TRADER.AlpacaService.BarsModel;
+
+namespace BN.TRADER.AlpacaService
 {
     public class DbRepository : IDbRepository
     {
@@ -42,6 +44,12 @@
         public async Task AddBarsAsync(List<AlpacaBar> bars)
         {
             await _context.Bars.AddRangeAsync(bars);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddOrderAsync(AlpacaOrder order)
+        {
+            await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
         }
     }

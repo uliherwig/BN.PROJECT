@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace BN.TRADER.AlpacaService
 {
     [ApiController]
@@ -5,10 +7,14 @@ namespace BN.TRADER.AlpacaService
     public class AlpacaTradingController : ControllerBase
     {
         private readonly IAlpacaTradingService _alpacaTradingService;
+        private readonly IDbRepository _dbRepository;
 
-        public AlpacaTradingController(IAlpacaTradingService alpacaTradingService)
+        public AlpacaTradingController(
+            IAlpacaTradingService alpacaTradingService,
+            IDbRepository dbRepository)
         {
             _alpacaTradingService = alpacaTradingService;
+            _dbRepository = dbRepository;
         }
 
         [HttpGet("account")]
@@ -32,22 +38,23 @@ namespace BN.TRADER.AlpacaService
             return Ok(asset);
         }
 
-        [HttpPost("order")]
-        public async Task<IActionResult> CreateOrder([FromBody] string symbol, int quantity, bool isBuy, bool isMarket, string timeInForceString)
+        [HttpPost("market-order")]
+        public async Task<IActionResult> CreateMarketOrder(string symbol, int quantity, bool isBuy)
         {
             OrderQuantity qty = quantity;
-            OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;
-            OrderType orderType = isMarket ? OrderType.Market : OrderType.Limit;
-            TimeInForce timeInForce = TimeInForce.Day;
-
-            var order = await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, orderType, timeInForce);
+            OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;   
+            var order = await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, OrderType.Market, TimeInForce.Day);
+            if(order != null)
+            {
+                await _dbRepository.AddOrderAsync(order);
+            }
             return Ok(order);
         }
 
         [HttpGet("orders")]
-        public async Task<IActionResult> GetAllOrders()
+        public async Task<IActionResult> GetAllOrders(OrderStatusFilter orderStatusFilter)
         {
-            var orders = await _alpacaTradingService.GetAllOrdersAsync();
+            var orders = await _alpacaTradingService.GetAllOrdersAsync(orderStatusFilter);
             return Ok(orders);
         }
 
@@ -68,7 +75,7 @@ namespace BN.TRADER.AlpacaService
         [HttpGet("positions")]
         public async Task<IActionResult> GetPositions()
         {
-            var positions = await _alpacaTradingService.GetPositions();
+            var positions = await _alpacaTradingService.GetAllOpenPositions();
             return Ok(positions);
         }
 
@@ -82,7 +89,7 @@ namespace BN.TRADER.AlpacaService
         [HttpDelete("position/{symbol}")]
         public async Task<IActionResult> ClosePosition(string symbol)
         {
-            var result = await _alpacaTradingService.ClosePosition(symbol);
+            var result = await _alpacaTradingService.ClosePositionOrder(symbol);
             return Ok(result);
         }
     }

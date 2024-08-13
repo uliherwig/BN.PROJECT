@@ -44,9 +44,9 @@ static void ConfigureServices(IServiceCollection services)
 
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
+
     services.AddScoped<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
-
     services.AddScoped<IDbRepository, DbRepository>();
 
     // Quartz-Services
@@ -58,6 +58,8 @@ static void ConfigureServices(IServiceCollection services)
 
     // Register QuartzHostedService
     services.AddHostedService<AlpacaHistoryService>();
+
+    // Register Database Migration Service
     services.AddHostedService<DatabaseMigrationService>();
 
 }

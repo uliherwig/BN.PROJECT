@@ -4,22 +4,22 @@ namespace BN.TRADER.AlpacaService
     {
         Task<IAccount> GetAccountAsync();
 
-        Task<List<IAsset>> GetAssetsAsync();
+        Task<List<AlpacaAsset>> GetAssetsAsync();
 
         Task<IAsset> GetAssetBySymbolAsync(string symbol);
 
-        Task<List<IOrder>> GetAllOrdersAsync();
+        Task<List<AlpacaOrder>> GetAllOrdersAsync(OrderStatusFilter orderStatusFilter);
 
-        Task<IOrder> GetOrderByIdAsync(string orderId);
+        Task<AlpacaOrder> GetOrderByIdAsync(string orderId);
 
         Task<bool> CancelOrderByIdAsync(Guid orderId);
 
-        Task<IOrder> CreateOrderAsync(string symbol, OrderQuantity qty, OrderSide side, OrderType orderType, TimeInForce timeInForce);
+        Task<AlpacaOrder> CreateOrderAsync(string symbol, OrderQuantity qty, OrderSide side, OrderType orderType, TimeInForce timeInForce);
 
-        Task<List<IPosition>> GetPositions();
+        Task<List<AlpacaPosition>> GetAllOpenPositions();
 
-        Task<IPosition> GetPositionsBySymbol(string symbol);
+        Task<AlpacaPosition> GetPositionsBySymbol(string symbol);
 
-        Task<IOrder> ClosePosition(string symbol);
+        Task<AlpacaOrder> ClosePositionOrder(string symbol);
     }
 }

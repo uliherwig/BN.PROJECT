@@ -22,8 +22,7 @@ public class AlpacaHistoryService : IHostedService
 
             var trigger = TriggerBuilder.Create()
                .WithIdentity("alpacaTrigger", "alpacaGroup")
-               .StartNow() // start immediately
-               .WithCronSchedule("0 0 1 * * ?") // Cron-job at 1:00 AM
+               .StartNow() 
                .Build();
 
             await scheduler.ScheduleJob(job, trigger);

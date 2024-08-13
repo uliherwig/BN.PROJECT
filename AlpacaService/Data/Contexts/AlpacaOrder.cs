@@ -3,66 +3,65 @@
     public class AlpacaOrder
     {
         [Key]
-        private Guid OrderId { get; }
+        public Guid OrderId {get; set; }
 
-        private String? ClientOrderId { get; }
+        public String? ClientOrderId {get; set; }
 
-        private DateTime? CreatedAtUtc { get; }
+        public DateTime? CreatedAtUtc {get; set; }
 
-        private DateTime? UpdatedAtUtc { get; }
+        public DateTime? UpdatedAtUtc {get; set; }
 
-        private DateTime? SubmittedAtUtc { get; }
+        public DateTime? SubmittedAtUtc {get; set; }
 
-        private DateTime? FilledAtUtc { get; }
+        public DateTime? FilledAtUtc {get; set; }
 
-        private DateTime? ExpiredAtUtc { get; }
+        public DateTime? ExpiredAtUtc {get; set; }
 
-        private DateTime? CancelledAtUtc { get; }
+        public DateTime? CancelledAtUtc {get; set; }
 
-        private DateTime? FailedAtUtc { get; }
+        public DateTime? FailedAtUtc {get; set; }
 
-        private DateTime? ReplacedAtUtc { get; }
+        public DateTime? ReplacedAtUtc {get; set; }
 
-        private Guid AssetId { get; }
+        public Guid AssetId {get; set; }
 
-        private String Symbol { get; }
+        public String Symbol {get; set; }
 
-        private Decimal? Notional { get; }
+        public Decimal? Notional {get; set; }
 
-        private Decimal? Quantity { get; }
+        public Decimal? Quantity {get; set; }
 
-        private Decimal FilledQuantity { get; }
+        public Decimal FilledQuantity {get; set; }
 
-        private Int64 IntegerQuantity { get; }
+        public Int64 IntegerQuantity {get; set; }
 
-        private Int64 IntegerFilledQuantity { get; }
+        public Int64 IntegerFilledQuantity {get; set; }
 
-        private OrderType OrderType { get; }
+        public OrderType OrderType {get; set; }
 
-        private OrderClass OrderClass { get; }
+        public OrderClass OrderClass {get; set; }
 
-        private OrderSide OrderSide { get; }
+        public OrderSide OrderSide {get; set; }
 
-        private TimeInForce TimeInForce { get; }
+        public TimeInForce TimeInForce {get; set; }
 
-        private Decimal? LimitPrice { get; }
+        public Decimal? LimitPrice {get; set; }
 
-        private Decimal? StopPrice { get; }
+        public Decimal? StopPrice {get; set; }
 
-        public Decimal? TrailOffsetInDollars { get; }
+        public Decimal? TrailOffsetInDollars {get; set; }
 
-        public Decimal? TrailOffsetInPercent { get; }
+        public Decimal? TrailOffsetInPercent {get; set; }
 
-        public Decimal? HighWaterMark { get; }
+        public Decimal? HighWaterMark {get; set; }
 
-        private Decimal? AverageFillPrice { get; }
+        public Decimal? AverageFillPrice {get; set; }
 
-        private OrderStatus OrderStatus { get; }
+        public OrderStatus OrderStatus {get; set; }
 
-        private Guid? ReplacedByOrderId { get; }
+        public Guid? ReplacedByOrderId {get; set; }
 
-        private Guid? ReplacesOrderId { get; }
+        public Guid? ReplacesOrderId {get; set; }
 
-        private IReadOnlyList<IOrder> Legs { get; }
     }
 }

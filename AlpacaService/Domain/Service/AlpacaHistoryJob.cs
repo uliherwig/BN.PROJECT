@@ -37,11 +37,12 @@ public class AlpacaHistoryJob : IJob
         {
             _logger.LogInformation("Asset: " + symbol);
 
-            var latestBar = await _dbRepository.GetLatestBar(symbol);
+            var latestBarFromDb = await _dbRepository.GetLatestBar(symbol);
+            var latestBarFromAlpaca = await _alpacaDataService.GetLatestBarBySymbol(symbol);
 
-            var startDate = latestBar == null ? new DateTime(2024, 1, 1) : latestBar.T.Date;
+            var startDate = latestBarFromDb == null ? new DateTime(2024, 1, 1) : latestBarFromDb.T;
 
-            while (startDate < DateTime.Now.Date)
+            while (startDate < latestBarFromAlpaca.T)
             {
                 var endDate = startDate.AddDays(1);
                 var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate, BarTimeFrame.Minute);

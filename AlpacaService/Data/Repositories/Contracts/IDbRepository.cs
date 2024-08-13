@@ -11,5 +11,7 @@
         Task<List<AlpacaBar>> GetHistoricalBars(string symbol, DateTime startDate, DateTime endDate);
 
         Task AddBarsAsync(List<AlpacaBar> bars);
+
+         Task AddOrderAsync(AlpacaOrder order);
     }
 }
