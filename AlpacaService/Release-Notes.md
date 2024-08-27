@@ -1,12 +1,29 @@
-# AlpacaService
+# BN.TRADER 
 
-API implementation for trading and data retrieval from alpaca
-Manages historical data, where data is stored in a postgres db
+BN.TRADER is a platform which combines brokerage operations with algorithmic trading.
+
+
+## to be done
+
+- add unit test project for alpaca service
+- add unit tests for alpaca service
+- implement code coverage tool coverlet
+- implement code coverage report generator 
+
+
+## Version 2024.8.4
+
+- identity service integration with keycloak 
+- create config for keycloak
+- startup config for keycloak via Rest API
+- api for user registration and login
 
 ## Version 2024.8.3
 
 - extend alpaca api implementation for trading methods (orders/trades)
 - extend data layer for storing trading data
+- extend asset model to include selection of assets for trading
+- implement api methods for upating asset data
 
 ## Version 2024.8.2
 

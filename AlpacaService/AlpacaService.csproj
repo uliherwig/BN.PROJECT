@@ -40,6 +40,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Include="C:\Projects\BN-Trading\BN.TRADER\AlpacaService\GlobalUsings.cs" Link="GlobalUsings.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="C:\Projects\BN-Trading\BN.TRADER\AlpacaService\.editorconfig" />
 	</ItemGroup>
 

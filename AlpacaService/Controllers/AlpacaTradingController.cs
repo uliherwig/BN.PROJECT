@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace BN.TRADER.AlpacaService
 {
     [ApiController]
@@ -27,7 +25,7 @@ namespace BN.TRADER.AlpacaService
         [HttpGet("assets")]
         public async Task<IActionResult> GetAssets()
         {
-            var assets = await _alpacaTradingService.GetAssetsAsync();
+            var assets = await _dbRepository.GetAssets();
             return Ok(assets);
         }
 
@@ -38,13 +36,20 @@ namespace BN.TRADER.AlpacaService
             return Ok(asset);
         }
 
+        [HttpPost("asset/{symbol}")]
+        public async Task<IActionResult> ToggleAssetSelected(string symbol)
+        {
+            var result = await _dbRepository.ToggleAssetSelected(symbol);
+            return Ok(result);
+        }
+
         [HttpPost("market-order")]
         public async Task<IActionResult> CreateMarketOrder(string symbol, int quantity, bool isBuy)
         {
             OrderQuantity qty = quantity;
-            OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;   
+            OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;
             var order = await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, OrderType.Market, TimeInForce.Day);
-            if(order != null)
+            if (order != null)
             {
                 await _dbRepository.AddOrderAsync(order);
             }

@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis.Elfie.Model;
-
 namespace BN.TRADER.AlpacaService
 {
     public class AlpacaTradingService : IAlpacaTradingService
@@ -29,7 +27,7 @@ namespace BN.TRADER.AlpacaService
 
         public async Task<List<AlpacaAsset>> GetAssetsAsync()
         {
-            var assets = await _tradingClient.ListAssetsAsync(new AssetsRequest());           
+            var assets = await _tradingClient.ListAssetsAsync(new AssetsRequest());
             return assets.Select(a => a.ToAlpacaAsset()).ToList();
         }
 
@@ -45,13 +43,13 @@ namespace BN.TRADER.AlpacaService
                 OrderStatusFilter = orderStatusFilter
             };
 
-            var orders = await _tradingClient.ListOrdersAsync(req);         
+            var orders = await _tradingClient.ListOrdersAsync(req);
             return orders.Select(order => order.ToAlpacaOrder()).ToList(); ;
         }
 
         public async Task<AlpacaOrder> GetOrderByIdAsync(string orderId)
         {
-            var order =  await _tradingClient.GetOrderAsync(orderId);
+            var order = await _tradingClient.GetOrderAsync(orderId);
             return order.ToAlpacaOrder();
         }
 
@@ -64,7 +62,7 @@ namespace BN.TRADER.AlpacaService
         {
             var req = new NewOrderRequest(symbol, qty, side, orderType, timeInForce);
             var order = await _tradingClient.PostOrderAsync(req);
-            var alpacaOrder =  order.ToAlpacaOrder();
+            var alpacaOrder = order.ToAlpacaOrder();
             return alpacaOrder;
         }
 
@@ -86,6 +84,5 @@ namespace BN.TRADER.AlpacaService
             var order = await _tradingClient.DeletePositionAsync(deletePositionRequest);
             return order.ToAlpacaOrder();
         }
-
     }
 }

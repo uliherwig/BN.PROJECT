@@ -17,7 +17,12 @@ The microservice archtecture uses DDD principles
 ### AlpacaService
 
 Alpaca Service - provides access to Alpaca API. 
-local usage - http://localhost:5130/swagger
+Port : 5130
+
+### IdentityService
+
+Identity Service - IAM Functionality
+Integration with Keycloak
 
 ### TradingStrategyService
 Trading Strategies Service - provides access to trading strategies.
@@ -34,8 +39,8 @@ The pipeline builds the docker image and pushes it to the docker hub.
 ## Installation
 
 local setup
-docker build -t bntraderapi .
-docker run -t -p 5130:5130 bntraderapi
+docker build -t alpacaservice .
+docker run -t -p 5130:5130 alpacaservice
 
 or use docker-compose
 

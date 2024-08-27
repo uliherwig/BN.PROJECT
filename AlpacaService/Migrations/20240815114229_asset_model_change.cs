@@ -5,25 +5,25 @@
 namespace BN.TRADER.AlpacaService.Migrations
 {
     /// <inheritdoc />
-    public partial class bars_symbol_added : Migration
+    public partial class asset_model_change : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Symbol",
-                table: "Bars",
-                type: "text",
+            migrationBuilder.AddColumn<bool>(
+                name: "IsSelected",
+                table: "Assets",
+                type: "boolean",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: false);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Symbol",
-                table: "Bars");
+                name: "IsSelected",
+                table: "Assets");
         }
     }
 }

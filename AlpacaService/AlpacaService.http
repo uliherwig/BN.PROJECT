@@ -1,6 +1,0 @@
-@AlpacaService_HostAddress = http://localhost:5268
-
-GET {{AlpacaService_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

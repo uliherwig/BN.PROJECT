@@ -1,11 +1,10 @@
-using System;
-
 namespace Alpaca.Markets
 {
     public class AlpacaPosition
     {
         [Key]
         public Guid AssetId { get; set; }
+
         public string Symbol { get; set; }
         public Exchange Exchange { get; set; }
         public AssetClass AssetClass { get; set; }

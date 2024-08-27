@@ -1,6 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
+var connectionString = builder.Configuration.GetConnectionString("AlpacaDbConnection");
+
+Console.WriteLine($"Connection String: {connectionString}");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -17,8 +19,6 @@ builder.Services.AddQuartzHostedService(opt =>
 ConfigureServices(builder.Services);
 
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -61,5 +61,4 @@ static void ConfigureServices(IServiceCollection services)
 
     // Register Database Migration Service
     services.AddHostedService<DatabaseMigrationService>();
-
 }

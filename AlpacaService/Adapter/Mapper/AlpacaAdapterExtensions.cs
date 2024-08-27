@@ -22,9 +22,10 @@
         {
             return new AlpacaAsset
             {
-                AssetId = asset.AssetId,          
+                AssetId = asset.AssetId,
                 Name = asset.Name,
                 Symbol = asset.Symbol,
+                IsSelected = false
             };
         }
 
