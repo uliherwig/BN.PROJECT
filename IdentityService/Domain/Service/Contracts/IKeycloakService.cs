@@ -2,6 +2,10 @@
 {
     public interface IKeycloakService
     {
-        Task<bool> Register(RegisterRequest registerRequest);
+        Task<SignInResponse> SignIn([FromBody] SignInRequest signInRequest);
+
+        Task<SignOutResponse> SignOut(SignOutRequest signOutRequest);
+
+        Task<SignInResponse> SignUp(SignUpRequest registerRequest);
     }
 }

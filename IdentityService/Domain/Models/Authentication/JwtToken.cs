@@ -1,7 +1,9 @@
 ﻿namespace BN.TRADER.IdentityService
 {
-    public class JwtTokenResponse
+    public class JwtToken
     {
+        public string Name { get; set; } = string.Empty;
+
         [JsonProperty("access_token")]
         public string? AccessToken { get; set; }
 

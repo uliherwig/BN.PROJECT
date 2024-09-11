@@ -10,12 +10,14 @@ BN.TRADER is a platform which combines brokerage operations with algorithmic tra
 - implement code coverage tool coverlet
 - implement code coverage report generator 
 
+## Version 2024.9.1
+
+- identity service refactioring
 
 ## Version 2024.8.4
 
 - identity service integration with keycloak 
 - create config for keycloak
-- startup config for keycloak via Rest API
 - api for user registration and login
 
 ## Version 2024.8.3

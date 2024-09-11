@@ -1,6 +1,3 @@
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services, builder.Configuration);
@@ -61,7 +58,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddSwaggerGen(c =>
     {
         // Standard Swagger setup
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "BN Project API", Version = "v1" });
 
         // Bearer token configuration
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -71,7 +68,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
             Scheme = "Bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
-            Description = "Please enter 'Bearer' [space] and then your valid token in the text input below.\n\nExample: \"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9\""
+            Description = ""
         });
 
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -92,4 +89,12 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHostedService<KeycloakConfigStartUp>();
     services.AddScoped<IKeycloakService, KeycloakService>();
     services.AddHttpClient();
+    services.AddHttpClient<KeycloakAuthorizeAttribute>();
+
+    services.AddSingleton<IConfiguration>(configuration);
+    services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
+    services.AddSingleton<IAuthorizationHandler, MinimumAgeAuthorizationHandler>();
+
+
+
 }
