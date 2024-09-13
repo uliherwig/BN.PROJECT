@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BN.TRADER.AlpacaService.Migrations
+namespace BN.PROJECT.AlpacaService.Migrations
 {
     /// <inheritdoc />
     public partial class initial_create : Migration

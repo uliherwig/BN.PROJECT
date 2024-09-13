@@ -1,5 +1,5 @@
 
-namespace BN.TRADER.IdentityService;
+namespace BN.PROJECT.IdentityService;
 
 // This attribute derives from the [Authorize] attribute, adding 
 // the ability to authorize a user based on a token from Keycloak.

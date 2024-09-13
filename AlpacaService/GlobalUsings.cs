@@ -1,7 +1,7 @@
 ﻿// GlobalUsings.cs
 
 global using Alpaca.Markets;
-global using BN.TRADER.AlpacaService;
+global using BN.PROJECT.AlpacaService;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 global using Newtonsoft.Json;

@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>7cf41a1f-b385-4555-a7c2-13988387eafb</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <RootNamespace>BN.TRADER.IdentityService</RootNamespace>
+    <RootNamespace>BN.PROJECT.IdentityService</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +18,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 	<ItemGroup>
-		<Compile Include="C:\Projects\BN-Trading\BN.TRADER\IdentityService\GlobalUsings.cs" Link="GlobalUsings.cs" />
+		<Compile Include="C:\Projects\BN-Trading\BN.PROJECT\IdentityService\GlobalUsings.cs" Link="GlobalUsings.cs" />
 	</ItemGroup>
 </Project>

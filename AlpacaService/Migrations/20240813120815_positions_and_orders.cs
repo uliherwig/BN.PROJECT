@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace BN.TRADER.AlpacaService.Migrations
+namespace BN.PROJECT.AlpacaService.Migrations
 {
     /// <inheritdoc />
     public partial class positions_and_orders : Migration

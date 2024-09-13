@@ -14,4 +14,4 @@ global using System.Security.Claims;
 global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.Extensions.Options;
 global using System.Net;
-global using BN.TRADER.IdentityService;
+global using BN.PROJECT.IdentityService;

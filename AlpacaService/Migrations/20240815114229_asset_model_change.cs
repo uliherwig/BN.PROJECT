@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace BN.TRADER.AlpacaService.Migrations
+namespace BN.PROJECT.AlpacaService.Migrations
 {
     /// <inheritdoc />
     public partial class asset_model_change : Migration

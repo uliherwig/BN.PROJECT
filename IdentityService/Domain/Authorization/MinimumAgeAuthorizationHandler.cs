@@ -1,5 +1,5 @@
 ﻿
-namespace BN.TRADER.IdentityService
+namespace BN.PROJECT.IdentityService
 {
     // This class contains logic for determining whether MinimumAgeRequirements in authorization
     // policies are satisfied or not

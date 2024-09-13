@@ -7,7 +7,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <RootNamespace>BN.TRADER.AlpacaServiceTests</RootNamespace>
+    <RootNamespace>BN.PROJECT.AlpacaServiceTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿namespace BN.TRADER.IdentityService
+﻿namespace BN.PROJECT.IdentityService
 {
     internal class MinimumAgePolicyProvider : IAuthorizationPolicyProvider
     {

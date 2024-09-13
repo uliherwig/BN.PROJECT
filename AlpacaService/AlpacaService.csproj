@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>e33e5768-b886-4748-ac49-e49568e5590f</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<RootNamespace>BN.TRADER.AlpacaService</RootNamespace>
+		<RootNamespace>BN.PROJECT.AlpacaService</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -33,15 +33,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EditorConfigFiles Remove="C:\Projects\BN-Trading\BN.TRADER\AlpacaService\.editorconfig" />
+		<EditorConfigFiles Remove="C:\Projects\BN-Trading\BN.PROJECT\AlpacaService\.editorconfig" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Include="C:\Projects\BN-Trading\BN.TRADER\AlpacaService\GlobalUsings.cs" Link="GlobalUsings.cs" />
+	  <Compile Include="C:\Projects\BN-Trading\BN.PROJECT\AlpacaService\GlobalUsings.cs" Link="GlobalUsings.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="C:\Projects\BN-Trading\BN.TRADER\AlpacaService\.editorconfig" />
+		<None Include="C:\Projects\BN-Trading\BN.PROJECT\AlpacaService\.editorconfig" />
 	</ItemGroup>
 
 </Project>

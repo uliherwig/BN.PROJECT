@@ -1,6 +1,6 @@
-# BN.TRADER 
+# BN.PROJECT 
 
-BN.TRADER is a platform which combines brokerage operations with algorithmic trading.
+BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
 
 ## to be done

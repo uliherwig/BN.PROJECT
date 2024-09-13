@@ -1,5 +1,5 @@
 ﻿
-namespace BN.TRADER.IdentityService
+namespace BN.PROJECT.IdentityService
 {
     // This attribute derives from the [Authorize] attribute, adding 
     // the ability for a user to specify an 'age' paratmer. Since authorization

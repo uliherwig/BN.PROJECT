@@ -1,4 +1,4 @@
-﻿namespace BN.TRADER.AlpacaService
+﻿namespace BN.PROJECT.AlpacaService
 {
     [Route("api/[controller]")]
     [ApiController]

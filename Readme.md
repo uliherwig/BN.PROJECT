@@ -1,12 +1,12 @@
-# BN.TRADER 
+# BN.PROJECT 
 
 ## source code
 
-https://github.com/uliherwig/BN.TRADER
+https://github.com/uliherwig/BN.PROJECT
 
 ## Description
 
-BN.TRADER is a platform which combines brokerage operations with algorithmic trading.
+BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
 ## Archtecture
 
