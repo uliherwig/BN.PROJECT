@@ -24,8 +24,7 @@
             {
                 AssetId = asset.AssetId,
                 Name = asset.Name,
-                Symbol = asset.Symbol,
-                IsSelected = false
+                Symbol = asset.Symbol
             };
         }
 

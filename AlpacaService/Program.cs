@@ -1,11 +1,6 @@
+using System.Net.Http.Headers;
+
 var builder = WebApplication.CreateBuilder(args);
-
-var connectionString = builder.Configuration.GetConnectionString("AlpacaDbConnection");
-
-Console.WriteLine($"Connection String: {connectionString}");
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
 
 builder.Services.AddQuartz(q =>
 {
@@ -40,14 +35,15 @@ app.Run();
 
 static void ConfigureServices(IServiceCollection services)
 {
-    services.AddControllers();
+   
 
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
+    services.AddHttpClient();
+    services.AddHttpClient<DataServiceClient>();
 
     services.AddScoped<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
-    services.AddScoped<IDbRepository, DbRepository>();
 
     // Quartz-Services
     services.AddQuartz();
@@ -59,6 +55,6 @@ static void ConfigureServices(IServiceCollection services)
     // Register QuartzHostedService
     services.AddHostedService<AlpacaHistoryService>();
 
-    // Register Database Migration Service
-    services.AddHostedService<DatabaseMigrationService>();
+ services.AddControllers();
+
 }

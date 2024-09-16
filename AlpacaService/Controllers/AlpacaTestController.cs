@@ -5,14 +5,13 @@
     public class AlpacaTestController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;
-        private readonly IDbRepository _alpacaRepository;
+        private readonly DataServiceClient _dataServiceClient;
 
         public AlpacaTestController(
-            IWebHostEnvironment env,
-            IDbRepository alpacaRepository)
+            IWebHostEnvironment env, DataServiceClient dataServiceClient)
         {
             _env = env;
-            _alpacaRepository = alpacaRepository;
+            _dataServiceClient = dataServiceClient;
         }
 
         [HttpGet("historicalBars/{symbol}")]
@@ -30,17 +29,11 @@
             }
         }
 
-        [HttpGet("assets")]
-        public async Task<IActionResult> GetAssets()
-        {
-            var assets = await _alpacaRepository.GetAssets();
-            return Ok(assets);
-        }
 
         [HttpGet("save-assets")]
         public async Task<IActionResult> SaveAssets()
         {
-            string path = Path.Combine(_env.ContentRootPath, "Assets", "alpaca-assets.json");
+            string path = Path.Combine(_env.ContentRootPath, "Assets", "alpaca-assets.json");       
 
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
@@ -51,7 +44,7 @@
                     var assets = JsonConvert.DeserializeObject<List<AlpacaAsset>>(jsonString);
                     if (assets != null)
                     {
-                        await _alpacaRepository.AddAssetsAsync(assets);
+                        await _dataServiceClient.AddAssetsAsync(assets);
                     }
                     return Ok();
                 }

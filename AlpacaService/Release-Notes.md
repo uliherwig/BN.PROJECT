@@ -10,6 +10,10 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 - implement code coverage tool coverlet
 - implement code coverage report generator 
 
+## Version 2024.9.2
+
+- data service added. 
+
 ## Version 2024.9.1
 
 - identity service refactioring
@@ -37,7 +41,8 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 - alpaca api implementation for trading and data retrieval
 - data layer for storing historical data and assets
 - integration postgres db - code first approach
-	dotnet ef migrations add custom_migration_name
+	dotnet ef migrations add InitialCreate
 	dotnet ef database update
+
 - alpaca historical data storage to db for local investigations
 
