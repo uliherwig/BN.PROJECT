@@ -6,29 +6,61 @@ public class AccountController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<AccountController> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IKeycloakService _keycloakConfiguration;
+    private readonly IIdentityRepository _identityRepository;
+    private readonly IKeycloakServiceClient _keycloakServiceClient;
 
     public AccountController(
-        IConfiguration configuration, ILogger<AccountController> logger, IHttpClientFactory httpClientFactory, IKeycloakService keycloakConfiguration)
+        IConfiguration configuration, ILogger<AccountController> logger,
+        IIdentityRepository identityRepository,
+        IKeycloakServiceClient keycloakServiceClient)
     {
         _configuration = configuration;
         _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _keycloakConfiguration = keycloakConfiguration;
+        _identityRepository = identityRepository;
+        _keycloakServiceClient = keycloakServiceClient;
     }
 
     [HttpPost("sign-in")]
     public async Task<IActionResult> SignIn([FromBody] SignInRequest signInRequest)
     {
-        var response = await _keycloakConfiguration.SignIn(signInRequest);
+        var response = await _keycloakServiceClient.SignIn(signInRequest);
+
+        if ((bool)response.Success)
+        {
+            var user = await _identityRepository.GetUserByNameAsync(signInRequest.Username);
+            if (user != null)
+            {
+                var session = new Session
+                {
+                    SessionId = Guid.NewGuid(),
+                    UserId = user.UserId,
+                    CreatedAt = DateTime.UtcNow,
+                    LastActive = DateTime.UtcNow,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                    SignedOutAt = DateTime.MinValue
+                };
+                await _identityRepository.AddSessionAsync(session);
+            }
+        }
         return Ok(response);
     }
 
     [HttpPost("sign-out")]
     public async Task<IActionResult> Logout([FromBody] SignOutRequest signOutRequest)
     {
-        var response = await _keycloakConfiguration.SignOut(signOutRequest);
+        var response = await _keycloakServiceClient.SignOut(signOutRequest);
+        if ((bool)response.Success)
+        {
+            var claims = JwtTokenDecoder.DecodeJwtToken(signOutRequest.RefreshToken);
+            var userId = new Guid( claims["sub"]);
+            var session = await _identityRepository.GetSessionByUserIdAsync(userId);
+            if (session != null)
+            {
+                session.SignedOutAt = DateTime.UtcNow;
+                session.LastActive = DateTime.UtcNow;        
+                await _identityRepository.UpdateSessionAsync(session);
+            }
+        }
         return Ok(response);
     }
 
@@ -36,50 +68,53 @@ public class AccountController : ControllerBase
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
-        var httpClient = _httpClientFactory.CreateClient();
 
-        var authority = _configuration["Keycloak:Authority"] ?? string.Empty;
-        var clientId = _configuration["Keycloak:ClientId"] ?? string.Empty;
-        var clientSecret = _configuration["Keycloak:ClientSecret"] ?? string.Empty;
-
-        var url = $"{authority}/protocol/openid-connect/token";
-
-        var parameters = new Dictionary<string, string>
-            {
-                { "client_id", clientId },
-                { "client_secret", clientSecret },
-                { "grant_type", "refresh_token" },
-                { "refresh_token", refreshTokenRequest.RefreshToken }
-            };
-
-        var content = new FormUrlEncodedContent(parameters);
-        var response = await httpClient.PostAsync(url, content);
-
-        if (response.IsSuccessStatusCode)
+        var response = await _keycloakServiceClient.RefreshToken(refreshTokenRequest);
+        if (!string.IsNullOrEmpty(response.RefreshToken))
         {
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var tokenResponse = JsonConvert.DeserializeObject<JwtToken>(responseContent);
-            return Ok(tokenResponse);
-        }
-        else
-        {
-            var errorContent = await response.Content.ReadAsStringAsync();
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            var claims = JwtTokenDecoder.DecodeJwtToken(response.RefreshToken);
+            var userId = new Guid(claims["sub"]);
+            var session = await _identityRepository.GetSessionByUserIdAsync(userId);
+            if (session != null)
             {
-                return Unauthorized(errorContent);
+                session.ExpiresAt = DateTime.UtcNow.AddMinutes(5);
+                session.LastActive = DateTime.UtcNow;
+                await _identityRepository.UpdateSessionAsync(session);
             }
-            return BadRequest(errorContent);
         }
+        return Ok(response);
     }
 
     [HttpPost("sign-up")]
     public async Task<IActionResult> SignUp([FromBody] SignUpRequest signUpRequest)
     {
-        var response = await _keycloakConfiguration.SignUp(signUpRequest);
-        return Ok(response);
+        var response = await _keycloakServiceClient.SignUp(signUpRequest);
+
+        if (response != null)
+        {
+            if (response.Success == true)
+            {
+                var user = new User
+                {
+                    UserId = new Guid(response.UserId),
+                    Username = signUpRequest.Username,
+                    Email = signUpRequest.Email,
+                    FirstName = signUpRequest.FirstName,
+                    LastName = signUpRequest.LastName,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsEmailVerified = false
+                };
+                await _identityRepository.AddUserAsync(user);
+            }
+
+            return Ok(response);
+        }
+        return BadRequest();
+
     }
 
-    [Authorize]
+    [KeycloakAuthorize("admin")]
     [HttpGet("test-auth")]
     public IActionResult TestAuthorization()
     {

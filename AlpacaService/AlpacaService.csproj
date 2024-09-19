@@ -12,42 +12,34 @@
 	<ItemGroup>
 		<PackageReference Include="Alpaca.Markets" Version="7.0.6" />
 		<PackageReference Include="Alpaca.Markets.Extensions" Version="7.0.0" />
+		<PackageReference Include="IdentityModel" Version="7.0.0" />
+		<PackageReference Include="IdentityModel.AspNetCore" Version="4.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
-		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.3">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.0" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+
 		<PackageReference Include="Quartz" Version="3.12.0" />
 		<PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.12.0" />
 		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.12.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<EditorConfigFiles Remove="C:\Projects\BN-Trading\BN.PROJECT\AlpacaService\.editorconfig" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Include="C:\Projects\BN-Trading\BN.PROJECT\AlpacaService\GlobalUsings.cs" Link="GlobalUsings.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="C:\Projects\BN-Trading\BN.PROJECT\AlpacaService\.editorconfig" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Infrastructure\Services\" />
+		<Compile Include=".\GlobalUsings.cs" Link="GlobalUsings.cs" />
 	</ItemGroup>
 
 </Project>

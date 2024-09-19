@@ -35,8 +35,6 @@ app.Run();
 
 static void ConfigureServices(IServiceCollection services)
 {
-   
-
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
     services.AddHttpClient();
@@ -54,7 +52,5 @@ static void ConfigureServices(IServiceCollection services)
 
     // Register QuartzHostedService
     services.AddHostedService<AlpacaHistoryService>();
-
- services.AddControllers();
-
+    services.AddControllers();
 }

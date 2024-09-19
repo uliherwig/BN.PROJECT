@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Authentication;
+using Newtonsoft.Json.Linq;
+
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services, builder.Configuration);
@@ -21,12 +24,27 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<IdentityDbContext>();
+    context.Database.Migrate();
+}
 
 app.Run();
 
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
+    var connectionString = configuration.GetConnectionString("IdentityDbConnection");
+
+    services.AddDbContext<IdentityDbContext>(options =>
+        options.UseNpgsql(connectionString));
+
     services.AddControllers();
     services.AddHttpContextAccessor();
 
@@ -37,18 +55,19 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     })
     .AddJwtBearer(options =>
     {
-        options.Authority = $"{configuration["Keycloak:Authority"]}";   // "http://localhost:8089/realms/bn-algo-trade";
+        options.Authority = $"{configuration["Keycloak:Authority"]}";
         options.MetadataAddress = $"{configuration["Keycloak:Host"]}/realms/{configuration["Keycloak:Realm"]}/.well-known/openid-configuration";
         options.Audience = configuration["Keycloak:Realm"];
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             NameClaimType = ClaimTypes.Name,
-            RoleClaimType = ClaimTypes.Role,
+            RoleClaimType = "roles",
             ValidateIssuer = true,
             ValidIssuers = [$"{configuration["Keycloak:Authority"]}"],
             ValidateAudience = true,
             ValidAudiences = ["account"],
+            AuthenticationType = "Bearer"
         };
     });
     services.AddAuthorization();
@@ -86,15 +105,17 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
             }
         });
     });
-    services.AddHostedService<KeycloakConfigStartUp>();
-    services.AddScoped<IKeycloakService, KeycloakService>();
+    //services.AddHostedService<KeycloakConfigStartUp>();
+
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
+    services.AddHttpClient<IKeycloakServiceClient, KeycloakServiceClient>();
+    services.AddHostedService<SeedDatabaseService>();
+    //services.AddSingleton<IConfiguration>(configuration);
+    //services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
+    //services.AddSingleton<IAuthorizationHandler, MinimumAgeAuthorizationHandler>();
 
-    services.AddSingleton<IConfiguration>(configuration);
-    services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
-    services.AddSingleton<IAuthorizationHandler, MinimumAgeAuthorizationHandler>();
-
+    services.AddScoped<IIdentityRepository, IdentityRepository>();
 
 
 }

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Hosting;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("BNProjectDbConnection");
@@ -23,8 +25,14 @@ app.UseRouting();
 app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<BNProjectDbContext>();
+    context.Database.Migrate();
+}
 
 app.Run();
 static void ConfigureServices(IServiceCollection services)
@@ -35,9 +43,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddSwaggerGen();
 
     services.AddScoped<IAlpacaRepository, AlpacaRepository>();
-    //services.AddScoped<AlpacaService>();
-    services.AddAutoMapper(typeof(Program).Assembly);
+    services.AddScoped<IIdentityRepository, IdentityRepository>();
 
-    // Register Database Migration Service
-    services.AddHostedService<DatabaseMigrationService>();
+
 }

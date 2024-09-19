@@ -10,6 +10,11 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 - implement code coverage tool coverlet
 - implement code coverage report generator 
 
+## Version 2024.9.3
+
+- storage of identity data (users, sessions) moved to identity service
+- keycloak role handling implemented
+
 ## Version 2024.9.2
 
 - data service added. 

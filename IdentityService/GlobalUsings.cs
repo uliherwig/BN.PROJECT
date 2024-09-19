@@ -14,4 +14,7 @@ global using System.Security.Claims;
 global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.Extensions.Options;
 global using System.Net;
+global using Microsoft.EntityFrameworkCore;
+global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel.DataAnnotations.Schema;
 global using BN.PROJECT.IdentityService;
