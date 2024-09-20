@@ -1,4 +1,6 @@
-﻿namespace BN.PROJECT.DataService;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace BN.PROJECT.AlpacaService;
 
 public interface IAlpacaRepository
 {
@@ -19,4 +21,11 @@ public interface IAlpacaRepository
     Task<AlpacaOrder> GetOrderAsync(int id);
 
     Task UpdateOrderAsync(AlpacaOrder order);
+
+    Task AddUserSettingsAsync(UserSettings userSettings);
+
+    Task<UserSettings> GetUserSettingsAsync(string userId);
+
+    Task UpdateUserSettingsAsync(UserSettings userSettings);
+    Task DeleteUserSettingsAsync(UserSettings userSettings);
 }

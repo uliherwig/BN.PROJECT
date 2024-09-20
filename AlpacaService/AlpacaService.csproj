@@ -42,4 +42,8 @@
 		<Compile Include=".\GlobalUsings.cs" Link="GlobalUsings.cs" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Domain\Models\" />
+	</ItemGroup>
+
 </Project>

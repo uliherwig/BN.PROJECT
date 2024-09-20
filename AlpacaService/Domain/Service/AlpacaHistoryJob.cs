@@ -8,18 +8,18 @@ namespace BN.PROJECT.AlpacaService
         private readonly ILogger<AlpacaHistoryJob> _logger;
         private readonly IConfiguration _configuration;
         private readonly IAlpacaDataService _alpacaDataService;
-        private readonly DataServiceClient _dataServiceClient;
+        private readonly IAlpacaRepository _alpacaRepository;
 
         public AlpacaHistoryJob(
             ILogger<AlpacaHistoryJob> logger,
             IConfiguration configuration,
             IAlpacaDataService alpacaDataService,
-            DataServiceClient dataServiceClient)
+            IAlpacaRepository alpacaRepository)
         {
             _logger = logger;
             _configuration = configuration;
             _alpacaDataService = alpacaDataService;
-            _dataServiceClient = dataServiceClient;
+            _alpacaRepository = alpacaRepository;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -38,7 +38,7 @@ namespace BN.PROJECT.AlpacaService
             {
                 _logger.LogInformation("Asset: " + symbol);
 
-                var latestBarFromDb = await _dataServiceClient.GetLatestBar(symbol);
+                var latestBarFromDb = await _alpacaRepository.GetLatestBar(symbol);
                 var latestBarFromAlpaca = await _alpacaDataService.GetLatestBarBySymbol(symbol);
 
                 var startDate = latestBarFromDb == null ? new DateTime(2024, 1, 1) : latestBarFromDb.T;
@@ -51,7 +51,7 @@ namespace BN.PROJECT.AlpacaService
 
                     if (bars.Count > 0)
                     {
-                        await _dataServiceClient.AddBarsAsync(bars);
+                        await _alpacaRepository.AddBarsAsync(bars);
                     }
 
                     startDate = startDate.AddDays(1);

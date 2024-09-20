@@ -5,12 +5,13 @@ namespace BN.PROJECT.AlpacaService
     public class AlpacaTradingController : ControllerBase
     {
         private readonly IAlpacaTradingService _alpacaTradingService;
+        private readonly IAlpacaRepository _alpacaRepository;
 
         public AlpacaTradingController(
-            IAlpacaTradingService alpacaTradingService)
+            IAlpacaTradingService alpacaTradingService, IAlpacaRepository alpacaRepository)
         {
             _alpacaTradingService = alpacaTradingService;
-        
+            _alpacaRepository = alpacaRepository;
         }
 
         [HttpGet("account")]
@@ -20,39 +21,32 @@ namespace BN.PROJECT.AlpacaService
             return Ok(account);
         }
 
-        //[HttpGet("assets")]
-        //public async Task<IActionResult> GetAssets()
-        //{
-        //    var assets = await _dbRepository.GetAssets();
-        //    return Ok(assets);
-        //}
+        [HttpGet("assets")]
+        public async Task<IActionResult> GetAssets()
+        {
+            var assets = await _alpacaRepository.GetAssets();
+            return Ok(assets);
+        }
 
         [HttpGet("asset/{symbol}")]
         public async Task<IActionResult> GetAssetBySymbol(string symbol)
         {
             var asset = await _alpacaTradingService.GetAssetBySymbolAsync(symbol);
             return Ok(asset);
+        }   
+
+        [HttpPost("market-order")]
+        public async Task<IActionResult> CreateMarketOrder(string symbol, int quantity, bool isBuy)
+        {
+            OrderQuantity qty = quantity;
+            OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;
+            var order = await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, OrderType.Market, TimeInForce.Day);
+            if (order != null)
+            {
+                await _alpacaRepository.AddOrderAsync(order);
+            }
+            return Ok(order);
         }
-
-        //[HttpPost("asset/{symbol}")]
-        //public async Task<IActionResult> ToggleAssetSelected(string symbol)
-        //{
-        //    var result = await _dbRepository.ToggleAssetSelected(symbol);
-        //    return Ok(result);
-        //}
-
-        //[HttpPost("market-order")]
-        //public async Task<IActionResult> CreateMarketOrder(string symbol, int quantity, bool isBuy)
-        //{
-        //    OrderQuantity qty = quantity;
-        //    OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;
-        //    var order = await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, OrderType.Market, TimeInForce.Day);
-        //    if (order != null)
-        //    {
-        //        await _dbRepository.AddOrderAsync(order);
-        //    }
-        //    return Ok(order);
-        //}
 
         [HttpGet("orders")]
         public async Task<IActionResult> GetAllOrders(OrderStatusFilter orderStatusFilter)

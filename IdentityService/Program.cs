@@ -1,13 +1,9 @@
-using Microsoft.AspNetCore.Authentication;
-using Newtonsoft.Json.Linq;
-
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -18,11 +14,9 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-// Enable Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello World!");
 
 app.UseEndpoints(endpoints =>
 {
@@ -55,6 +49,8 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     })
     .AddJwtBearer(options =>
     {
+
+       
         options.Authority = $"{configuration["Keycloak:Authority"]}";
         options.MetadataAddress = $"{configuration["Keycloak:Host"]}/realms/{configuration["Keycloak:Realm"]}/.well-known/openid-configuration";
         options.Audience = configuration["Keycloak:Realm"];

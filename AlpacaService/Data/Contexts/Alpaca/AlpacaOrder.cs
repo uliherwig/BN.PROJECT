@@ -1,4 +1,4 @@
-﻿namespace BN.PROJECT.DataService;
+﻿namespace BN.PROJECT.AlpacaService;
 
 public class AlpacaOrder
 {

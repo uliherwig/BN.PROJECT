@@ -31,6 +31,13 @@ public class KeycloakServiceClient : IKeycloakServiceClient
         _realm = _configuration["Keycloak:Realm"] ?? string.Empty;
         _clientId = _configuration["Keycloak:ClientId"] ?? string.Empty;
         _clientSecret = _configuration["Keycloak:ClientSecret"] ?? string.Empty;
+
+        _logger.LogInformation("KeycloakServiceClient initialized.");
+        _logger.LogInformation($"Authority: {_authority}");
+        _logger.LogInformation($"Realm: {_realm}");
+        _logger.LogInformation($"ClientId: {_clientId}");
+        _logger.LogInformation($"ClientSecret: {_clientSecret}");
+        _logger.LogInformation($"Host: {_configuration["Keycloak:Host"]}");
     }
 
 

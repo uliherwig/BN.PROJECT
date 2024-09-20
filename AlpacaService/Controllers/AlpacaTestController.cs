@@ -5,13 +5,13 @@
     public class AlpacaTestController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;
-        private readonly DataServiceClient _dataServiceClient;
+        private readonly IAlpacaRepository _alpacaRepository;
 
         public AlpacaTestController(
-            IWebHostEnvironment env, DataServiceClient dataServiceClient)
+            IWebHostEnvironment env, IAlpacaRepository alpacaRepository)
         {
             _env = env;
-            _dataServiceClient = dataServiceClient;
+            _alpacaRepository = alpacaRepository;
         }
 
         [HttpGet("historicalBars/{symbol}")]
@@ -29,7 +29,6 @@
             }
         }
 
-
         [HttpGet("save-assets")]
         public async Task<IActionResult> SaveAssets()
         {
@@ -44,7 +43,7 @@
                     var assets = JsonConvert.DeserializeObject<List<AlpacaAsset>>(jsonString);
                     if (assets != null)
                     {
-                        await _dataServiceClient.AddAssetsAsync(assets);
+                        await _alpacaRepository.AddAssetsAsync(assets);
                     }
                     return Ok();
                 }

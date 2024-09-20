@@ -1,4 +1,4 @@
-namespace BN.PROJECT.IdentityService;
+namespace BN.PROJECT.AlpacaService;
 
 public class JwtTokenDecoder
 {
