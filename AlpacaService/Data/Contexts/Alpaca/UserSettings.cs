@@ -3,7 +3,7 @@
 public class UserSettings
 {
     [Key]
-    public Guid UserId { get; set; }
+    public string Email { get; set; }
 
     public string Symbols { get; set; }
 

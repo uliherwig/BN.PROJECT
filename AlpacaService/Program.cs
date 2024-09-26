@@ -1,3 +1,4 @@
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddQuartz(q =>
@@ -9,6 +10,17 @@ builder.Services.AddQuartzHostedService(opt =>
     opt.WaitForJobsToComplete = true;
 });
 
+
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    //.WriteTo.File("log.txt",
+    //    rollingInterval: RollingInterval.Day,
+    //    rollOnFileSizeLimit: true)
+    .WriteTo.Seq("http://localhost:9017")
+    .CreateLogger();
+builder.Host.UseSerilog(Log.Logger);
 ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
@@ -24,7 +36,6 @@ app.UseRouting();
 app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.UseEndpoints(endpoints =>
 {
@@ -105,7 +116,6 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
             }
         });
     });
- 
 
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
@@ -113,6 +123,8 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IAlpacaRepository, AlpacaRepository>();
     services.AddScoped<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
+    services.AddScoped<PositionManager>();
+    services.AddScoped<BacktestService>();
 
     // Quartz-Services
     services.AddQuartz();

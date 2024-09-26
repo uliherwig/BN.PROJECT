@@ -6,7 +6,7 @@ global using Microsoft.AspNetCore.Mvc;
 global using Newtonsoft.Json;
 global using Quartz;
 global using System.Text;
-
+global using Serilog;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.OpenApi.Models;

@@ -10,6 +10,14 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 - implement code coverage tool coverlet
 - implement code coverage report generator 
 
+## Version 2024.9.5
+
+- usersettings db change - user identified by email
+- backtest service added 
+- position manager added
+- backtest api for testing strategies
+- quote storage in db
+
 ## Version 2024.9.4
 
 - storage of alpaca data (bars) moved to alpaca service

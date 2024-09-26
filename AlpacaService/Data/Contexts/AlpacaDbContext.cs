@@ -6,6 +6,7 @@ public class AlpacaDbContext : DbContext
     public DbSet<AlpacaOrder> Orders { get; set; }
     public DbSet<AlpacaBar> Bars { get; set; }
     public DbSet<AlpacaPosition> Positions { get; set; }
+    public DbSet<AlpacaQuote> Quotes { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }
 
     public AlpacaDbContext(DbContextOptions<AlpacaDbContext> options)

@@ -3,6 +3,7 @@ using System;
 using BN.PROJECT.AlpacaService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.AlpacaService.Migrations
 {
     [DbContext(typeof(AlpacaDbContext))]
-    partial class AlpacaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240924074809_UserSettingsEmailPK")]
+    partial class UserSettingsEmailPK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,50 +248,6 @@ namespace BN.PROJECT.AlpacaService.Migrations
                     b.HasKey("AssetId");
 
                     b.ToTable("Positions");
-                });
-
-            modelBuilder.Entity("BN.PROJECT.AlpacaService.AlpacaQuote", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("AskExchange")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("AskPrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("AskSize")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("BidExchange")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("BidPrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("BidSize")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Tape")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("TimestampUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Quotes");
                 });
 
             modelBuilder.Entity("BN.PROJECT.AlpacaService.UserSettings", b =>

@@ -20,12 +20,12 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<AlpacaAsset> GetAsset(string symbol)
+    public async Task<AlpacaAsset?> GetAsset(string symbol)
     {
         return await _context.Assets.FirstOrDefaultAsync(a => a.Symbol == symbol);
     }
 
-    public async Task<AlpacaBar> GetLatestBar(string symbol)
+    public async Task<AlpacaBar?> GetLatestBar(string symbol)
     {
         return await _context.Bars.Where(b => b.Symbol == symbol).OrderByDescending(b => b.T).FirstOrDefaultAsync();
     }
@@ -41,6 +41,28 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<AlpacaQuote?> GetLatestQuote(string symbol)
+    {
+        var quotes = await _context.Quotes
+            .Where(b => b.Symbol == symbol)
+            .OrderByDescending(b => b.TimestampUtc)
+            .FirstOrDefaultAsync();
+        return quotes;
+    }
+
+    public async Task<List<AlpacaQuote>> GetHistoricalQuotes(string symbol, DateTime startDate, DateTime endDate)
+    {
+        return await _context.Quotes
+            .Where(b => b.Symbol == symbol && b.TimestampUtc > startDate && b.TimestampUtc < endDate)
+            .OrderBy(b => b.TimestampUtc).ToListAsync();
+    }
+
+    public async Task AddQuotesAsync(List<AlpacaQuote> quotes)
+    {
+        await _context.Quotes.AddRangeAsync(quotes);
+        await _context.SaveChangesAsync();
+    }
+
     // Create
     public async Task AddOrderAsync(AlpacaOrder order)
     {
@@ -49,7 +71,7 @@ public class AlpacaRepository : IAlpacaRepository
     }
 
     // Read
-    public async Task<AlpacaOrder> GetOrderAsync(int id)
+    public async Task<AlpacaOrder?> GetOrderAsync(int id)
     {
         return await _context.Orders.FindAsync(id);
     }
@@ -67,9 +89,9 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<UserSettings> GetUserSettingsAsync(string userId)
+    public async Task<UserSettings> GetUserSettingsAsync(string email)
     {
-        return await _context.UserSettings.FirstOrDefaultAsync(u => u.UserId == new Guid(userId));
+        return await _context.UserSettings.FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task UpdateUserSettingsAsync(UserSettings userSettings)

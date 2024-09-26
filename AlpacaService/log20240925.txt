@@ -1,0 +1,1600 @@
+2024-09-25 14:13:11.903 +02:00 [INF] Executed DbCommand (41ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_class c
+    JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname='public' AND
+          c.relname='__EFMigrationsHistory'
+)
+2024-09-25 14:13:11.955 +02:00 [INF] Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+2024-09-25 14:13:11.974 +02:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_class c
+    JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname='public' AND
+          c.relname='__EFMigrationsHistory'
+)
+2024-09-25 14:13:11.986 +02:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_class c
+    JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname='public' AND
+          c.relname='__EFMigrationsHistory'
+)
+2024-09-25 14:13:11.988 +02:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+2024-09-25 14:13:11.997 +02:00 [INF] No migrations were applied. The database is already up to date.
+2024-09-25 14:13:12.023 +02:00 [INF] User profile is available. Using 'C:\Users\uli-h\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2024-09-25 14:13:12.062 +02:00 [INF] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2024-09-25 14:13:12.063 +02:00 [INF] Quartz Scheduler created
+2024-09-25 14:13:12.064 +02:00 [INF] JobFactory set to: Quartz.Simpl.MicrosoftDependencyInjectionJobFactory
+2024-09-25 14:13:12.065 +02:00 [INF] RAMJobStore initialized.
+2024-09-25 14:13:12.066 +02:00 [INF] Quartz Scheduler 3.12.0.0 - 'QuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+2024-09-25 14:13:12.066 +02:00 [INF] Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+2024-09-25 14:13:12.067 +02:00 [INF] Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+2024-09-25 14:13:12.075 +02:00 [INF] Adding 0 jobs, 0 triggers.
+2024-09-25 14:13:12.184 +02:00 [INF] Now listening on: http://localhost:5130
+2024-09-25 14:13:12.185 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2024-09-25 14:13:12.186 +02:00 [INF] Hosting environment: Development
+2024-09-25 14:13:12.187 +02:00 [INF] Content root path: C:\Projects\BN-Trading\BN.PROJECT\AlpacaService
+2024-09-25 14:13:12.188 +02:00 [INF] Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+2024-09-25 14:13:12.188 +02:00 [INF] Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+2024-09-25 14:13:12.211 +02:00 [INF] Instance alpacaGroup.historyJob History Job start
+2024-09-25 14:13:12.212 +02:00 [INF] Asset: SPY
+2024-09-25 14:13:12.492 +02:00 [INF] Executed DbCommand (76ms) [Parameters=[@__symbol_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0
+ORDER BY b."T" DESC
+LIMIT 1
+2024-09-25 14:13:13.093 +02:00 [INF] Instance alpacaGroup.historyJob History Job end
+2024-09-25 14:13:18.085 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5130/swagger/index.html - null null
+2024-09-25 14:13:18.295 +02:00 [INF] Request finished HTTP/1.1 GET http://localhost:5130/swagger/index.html - 200 null text/html;charset=utf-8 215.0728ms
+2024-09-25 14:13:18.324 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5130/_vs/browserLink - null null
+2024-09-25 14:13:18.324 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5130/_framework/aspnetcore-browser-refresh.js - null null
+2024-09-25 14:13:18.335 +02:00 [INF] Request finished HTTP/1.1 GET http://localhost:5130/_framework/aspnetcore-browser-refresh.js - 200 13762 application/javascript; charset=utf-8 10.1267ms
+2024-09-25 14:13:18.362 +02:00 [INF] Request finished HTTP/1.1 GET http://localhost:5130/_vs/browserLink - 200 null text/javascript; charset=UTF-8 37.6711ms
+2024-09-25 14:13:18.399 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5130/swagger/v1/swagger.json - null null
+2024-09-25 14:13:18.502 +02:00 [INF] Request finished HTTP/1.1 GET http://localhost:5130/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 103.1374ms
+2024-09-25 14:14:39.741 +02:00 [INF] Request starting HTTP/1.1 POST http://localhost:5130/Backtest - application/json 205
+2024-09-25 14:14:39.745 +02:00 [WRN] Failed to determine the https port for redirect.
+2024-09-25 14:14:39.759 +02:00 [INF] CORS policy execution successful.
+2024-09-25 14:14:39.849 +02:00 [INF] Executing endpoint 'BN.PROJECT.AlpacaService.BacktestController.RunBacktest (AlpacaService)'
+2024-09-25 14:14:39.862 +02:00 [INF] Route matched with {action = "RunBacktest", controller = "Backtest"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] RunBacktest(BN.PROJECT.AlpacaService.BacktestSettings) on controller BN.PROJECT.AlpacaService.BacktestController (AlpacaService).
+2024-09-25 14:14:39.947 +02:00 [INF] Executed DbCommand (9ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:39.959 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:39.973 +02:00 [INF] STAMP:14:30  Open: 472,15, Close: 472,58, High: 473,64, Low: 470,49
+2024-09-25 14:14:39.982 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:39.990 +02:00 [INF] STAMP:14:23  Open: 470,43, Close: 468,72, High: 471,175, Low: 468,17
+2024-09-25 14:14:39.998 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.006 +02:00 [INF] STAMP:14:30  Open: 468,21, Close: 467,26, High: 470,95, Low: 467,05
+2024-09-25 14:14:40.014 +02:00 [INF] Executed DbCommand (8ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.022 +02:00 [INF] STAMP:14:17  Open: 467,26, Close: 467,92, High: 470,41, Low: 466,46
+2024-09-25 14:14:40.030 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.039 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.048 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.056 +02:00 [INF] STAMP:14:05  Open: 467,9, Close: 474,39, High: 474,74, Low: 467,9
+2024-09-25 14:14:40.064 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.072 +02:00 [INF] STAMP:14:30  Open: 471,94, Close: 473,81, High: 474,895, Low: 471,38
+2024-09-25 14:14:40.080 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.087 +02:00 [INF] STAMP:14:30  Open: 474,17, Close: 476,56, High: 477,44, Low: 473,87
+2024-09-25 14:14:40.095 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.103 +02:00 [INF] STAMP:14:30  Open: 477,55, Close: 476,33, High: 478,08, Low: 472,27
+2024-09-25 14:14:40.110 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.119 +02:00 [INF] STAMP:14:30  Open: 477,8, Close: 476,56, High: 478,58, Low: 475,24
+2024-09-25 14:14:40.127 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.135 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.144 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.153 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.161 +02:00 [INF] STAMP:14:30  Open: 475,28, Close: 474,92, High: 476,6, Low: 473,075
+2024-09-25 14:14:40.169 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.177 +02:00 [INF] STAMP:13:47  Open: 471,9, Close: 472,09, High: 472,78, Low: 469,875
+2024-09-25 14:14:40.185 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.193 +02:00 [INF] STAMP:14:30  Open: 474,11, Close: 476,2, High: 477,02, Low: 472,43
+2024-09-25 14:14:40.201 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.210 +02:00 [INF] STAMP:14:30  Open: 477,63, Close: 482,47, High: 482,69, Low: 476,96
+2024-09-25 14:14:40.218 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.228 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.237 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.246 +02:00 [INF] STAMP:14:30  Open: 484,005, Close: 483,42, High: 485,22, Low: 482,825
+2024-09-25 14:14:40.254 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.262 +02:00 [INF] STAMP:14:30  Open: 484,02, Close: 484,82, High: 485,1, Low: 482,905
+2024-09-25 14:14:40.270 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.278 +02:00 [INF] STAMP:14:30  Open: 487,81, Close: 485,03, High: 488,77, Low: 485,02
+2024-09-25 14:14:40.286 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.291 +02:00 [INF] STAMP:14:30  Open: 487,48, Close: 488,03, High: 488,295, Low: 485,39
+2024-09-25 14:14:40.299 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.305 +02:00 [INF] STAMP:14:30  Open: 487,535, Close: 487,21, High: 489,11, Low: 486,61
+2024-09-25 14:14:40.312 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.320 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.328 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.334 +02:00 [INF] STAMP:14:30  Open: 487,7, Close: 490,78, High: 491,41, Low: 487,17
+2024-09-25 14:14:40.341 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.347 +02:00 [INF] STAMP:14:30  Open: 490,67, Close: 489,92, High: 491,59, Low: 489,92
+2024-09-25 14:14:40.355 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.360 +02:00 [INF] STAMP:14:30  Open: 488,44, Close: 482,955, High: 489,08, Low: 482,955
+2024-09-25 14:14:40.368 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.374 +02:00 [INF] STAMP:14:30  Open: 484,73, Close: 491,75, High: 491,75, Low: 483,8
+2024-09-25 14:14:40.381 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.387 +02:00 [INF] STAMP:14:30  Open: 489,66, Close: 494,29, High: 496,04, Low: 489,34
+2024-09-25 14:14:40.394 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.402 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.410 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.416 +02:00 [INF] STAMP:14:30  Open: 493,69, Close: 492,47, High: 494,12, Low: 490,32
+2024-09-25 14:14:40.424 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.430 +02:00 [INF] STAMP:14:30  Open: 493,52, Close: 493,39, High: 494,315, Low: 492,08
+2024-09-25 14:14:40.437 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.443 +02:00 [INF] STAMP:14:30  Open: 496,275, Close: 498, High: 498,53, Low: 495,38
+2024-09-25 14:14:40.451 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.456 +02:00 [INF] STAMP:14:30  Open: 498,16, Close: 498,32, High: 498,69, Low: 497,31
+2024-09-25 14:14:40.463 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.470 +02:00 [INF] STAMP:14:30  Open: 498,85, Close: 501,07, High: 501,65, Low: 498,53
+2024-09-25 14:14:40.476 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.484 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.492 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.498 +02:00 [INF] STAMP:14:30  Open: 501,23, Close: 500,24, High: 503,49, Low: 500,24
+2024-09-25 14:14:40.505 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.510 +02:00 [INF] STAMP:14:06  Open: 494,13, Close: 493,86, High: 495,85, Low: 490,715
+2024-09-25 14:14:40.518 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.523 +02:00 [INF] STAMP:14:30  Open: 496,78, Close: 498,84, High: 499,065, Low: 494,425
+2024-09-25 14:14:40.531 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.536 +02:00 [INF] STAMP:14:30  Open: 499,3, Close: 501,97, High: 502,19, Low: 498,8
+2024-09-25 14:14:40.543 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.549 +02:00 [INF] STAMP:13:39  Open: 500,9, Close: 499,57, High: 502,85, Low: 498,98
+2024-09-25 14:14:40.556 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.564 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.572 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.580 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.585 +02:00 [INF] STAMP:14:30  Open: 497,735, Close: 496,745, High: 498,36, Low: 494,5
+2024-09-25 14:14:40.593 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.598 +02:00 [INF] STAMP:14:30  Open: 495,355, Close: 499,2, High: 499,2, Low: 493,57
+2024-09-25 14:14:40.606 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.612 +02:00 [INF] STAMP:14:30  Open: 504,02, Close: 507,26, High: 508,485, Low: 503,02
+2024-09-25 14:14:40.619 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.625 +02:00 [INF] STAMP:14:30  Open: 509,26, Close: 507,62, High: 510,1, Low: 507,1
+2024-09-25 14:14:40.632 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.640 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.649 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.655 +02:00 [INF] STAMP:14:30  Open: 508,29, Close: 505,98, High: 508,73, Low: 505,86
+2024-09-25 14:14:40.662 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.668 +02:00 [INF] STAMP:14:30  Open: 506,7, Close: 506,93, High: 507,15, Low: 504,86
+2024-09-25 14:14:40.675 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.681 +02:00 [INF] STAMP:14:30  Open: 505,355, Close: 505,23, High: 506,855, Low: 504,98
+2024-09-25 14:14:40.689 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.695 +02:00 [INF] STAMP:14:30  Open: 508,065, Close: 508,08, High: 509,74, Low: 505,405
+2024-09-25 14:14:40.703 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.709 +02:00 [INF] STAMP:14:30  Open: 508,975, Close: 512,71, High: 513,27, Low: 508,6
+2024-09-25 14:14:40.716 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.723 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.732 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.738 +02:00 [INF] STAMP:14:30  Open: 512,19, Close: 511,84, High: 514,17, Low: 511,84
+2024-09-25 14:14:40.745 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.751 +02:00 [INF] STAMP:14:30  Open: 510,225, Close: 507,46, High: 510,7, Low: 504,92
+2024-09-25 14:14:40.758 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.765 +02:00 [INF] STAMP:14:30  Open: 510,64, Close: 509,96, High: 512,05, Low: 508,47
+2024-09-25 14:14:40.773 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.778 +02:00 [INF] STAMP:14:23  Open: 512,71, Close: 515,12, High: 515,86, Low: 512,27
+2024-09-25 14:14:40.786 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.792 +02:00 [INF] STAMP:14:30  Open: 515,51, Close: 511,72, High: 518,18, Low: 511,135
+2024-09-25 14:14:40.799 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.807 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.815 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.821 +02:00 [INF] STAMP:13:30  Open: 510,395, Close: 511,46, High: 511,83, Low: 508,53
+2024-09-25 14:14:40.828 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.834 +02:00 [INF] STAMP:12:30  Open: 510,78, Close: 516,78, High: 517,37, Low: 510,78
+2024-09-25 14:14:40.841 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.847 +02:00 [INF] STAMP:13:30  Open: 517,04, Close: 515,95, High: 517,26, Low: 514,52
+2024-09-25 14:14:40.855 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.862 +02:00 [INF] STAMP:12:36  Open: 517,11, Close: 514,78, High: 517,18, Low: 511,82
+2024-09-25 14:14:40.870 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.876 +02:00 [INF] STAMP:13:23  Open: 511,55, Close: 509,84, High: 511,665, Low: 508,37
+2024-09-25 14:14:40.884 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.892 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.901 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.907 +02:00 [INF] STAMP:13:30  Open: 513,26, Close: 513,05, High: 515,43, Low: 512,45
+2024-09-25 14:14:40.914 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.921 +02:00 [INF] STAMP:13:30  Open: 512,155, Close: 515,67, High: 515,98, Low: 511,16
+2024-09-25 14:14:40.929 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.936 +02:00 [INF] STAMP:13:30  Open: 515,765, Close: 521,15, High: 521,15, Low: 515,13
+2024-09-25 14:14:40.943 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.951 +02:00 [INF] STAMP:13:30  Open: 523,49, Close: 522,08, High: 524,1, Low: 521,94
+2024-09-25 14:14:40.958 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.967 +02:00 [INF] STAMP:13:30  Open: 522,14, Close: 521,12, High: 522,59, Low: 520,98
+2024-09-25 14:14:40.974 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.983 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.992 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:40.999 +02:00 [INF] STAMP:13:30  Open: 519,785, Close: 519,82, High: 520,93, Low: 519,63
+2024-09-25 14:14:41.007 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.015 +02:00 [INF] STAMP:13:30  Open: 521,14, Close: 518,72, High: 521,56, Low: 518,45
+2024-09-25 14:14:41.022 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.028 +02:00 [INF] STAMP:13:30  Open: 521,72, Close: 523,27, High: 523,39, Low: 519,485
+2024-09-25 14:14:41.036 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.042 +02:00 [INF] STAMP:13:30  Open: 523,25, Close: 523,07, High: 524,6, Low: 522,78
+2024-09-25 14:14:41.049 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.057 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.066 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.076 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.085 +02:00 [INF] STAMP:13:30  Open: 523,71, Close: 522,17, High: 524,37, Low: 521,005
+2024-09-25 14:14:41.092 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.099 +02:00 [INF] STAMP:13:28  Open: 518,01, Close: 519,02, High: 519,02, Low: 516,51
+2024-09-25 14:14:41.106 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.112 +02:00 [INF] STAMP:13:30  Open: 517,705, Close: 519,79, High: 520,935, Low: 517,67
+2024-09-25 14:14:41.120 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.126 +02:00 [INF] STAMP:13:30  Open: 523,63, Close: 513,12, High: 523,85, Low: 512,76
+2024-09-25 14:14:41.134 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.140 +02:00 [INF] STAMP:13:30  Open: 514,07, Close: 518,54, High: 520,41, Low: 514,05
+2024-09-25 14:14:41.147 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.156 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.164 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.171 +02:00 [INF] STAMP:13:30  Open: 519,24, Close: 518,91, High: 520,14, Low: 517,95
+2024-09-25 14:14:41.178 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.184 +02:00 [INF] STAMP:13:30  Open: 520,555, Close: 519,34, High: 520,675, Low: 514,355
+2024-09-25 14:14:41.191 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.198 +02:00 [INF] STAMP:12:36  Open: 512,98, Close: 513,74, High: 516,135, Low: 512,09
+2024-09-25 14:14:41.205 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.211 +02:00 [INF] STAMP:13:30  Open: 515,68, Close: 518,1, High: 519,48, Low: 512,13
+2024-09-25 14:14:41.219 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.225 +02:00 [INF] STAMP:13:10  Open: 513,78, Close: 510,85, High: 515,75, Low: 509,16
+2024-09-25 14:14:41.232 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.242 +02:00 [INF] Executed DbCommand (8ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.249 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.256 +02:00 [INF] STAMP:12:36  Open: 515,06, Close: 504,19, High: 515,3, Low: 503,595
+2024-09-25 14:14:41.264 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.272 +02:00 [INF] STAMP:13:29  Open: 504,82, Close: 503,53, High: 506,49, Low: 502,26
+2024-09-25 14:14:41.279 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.286 +02:00 [INF] STAMP:13:30  Open: 506,08, Close: 500,59, High: 506,2, Low: 499,12
+2024-09-25 14:14:41.294 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.301 +02:00 [INF] STAMP:13:30  Open: 501,85, Close: 499,54, High: 504,1, Low: 498,57
+2024-09-25 14:14:41.309 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.315 +02:00 [INF] STAMP:13:30  Open: 499,44, Close: 494,96, High: 500,45, Low: 493,87
+2024-09-25 14:14:41.322 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.331 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.341 +02:00 [INF] Executed DbCommand (8ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.349 +02:00 [INF] STAMP:13:30  Open: 497,85, Close: 499,72, High: 502,36, Low: 495,45
+2024-09-25 14:14:41.357 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.364 +02:00 [INF] STAMP:13:30  Open: 501,86, Close: 505,65, High: 506,05, Low: 501,255
+2024-09-25 14:14:41.375 +02:00 [INF] Executed DbCommand (9ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.383 +02:00 [INF] STAMP:13:30  Open: 506,54, Close: 502,89, High: 507,34, Low: 502,89
+2024-09-25 14:14:41.391 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.399 +02:00 [INF] STAMP:13:30  Open: 499,1, Close: 507,81, High: 507,81, Low: 497,54
+2024-09-25 14:14:41.406 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.414 +02:00 [INF] STAMP:12:34  Open: 508,19, Close: 508,26, High: 509,88, Low: 505,75
+2024-09-25 14:14:41.423 +02:00 [INF] Executed DbCommand (8ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.432 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.441 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.449 +02:00 [INF] STAMP:13:30  Open: 510,26, Close: 510,06, High: 510,735, Low: 507,34
+2024-09-25 14:14:41.457 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.465 +02:00 [INF] STAMP:13:30  Open: 508,33, Close: 501,64, High: 509,52, Low: 501,06
+2024-09-25 14:14:41.472 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.482 +02:00 [INF] STAMP:12:53  Open: 500,97, Close: 500,35, High: 508,17, Low: 499,89
+2024-09-25 14:14:41.490 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.497 +02:00 [INF] STAMP:13:30  Open: 504,155, Close: 505,01, High: 505,86, Low: 499,6
+2024-09-25 14:14:41.504 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.510 +02:00 [INF] STAMP:12:32  Open: 510,53, Close: 511,25, High: 512,54, Low: 508,595
+2024-09-25 14:14:41.518 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.528 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.536 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.542 +02:00 [INF] STAMP:13:30  Open: 513,775, Close: 516,34, High: 516,59, Low: 513,3
+2024-09-25 14:14:41.550 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.556 +02:00 [INF] STAMP:13:30  Open: 517,55, Close: 517,255, High: 518,56, Low: 516,47
+2024-09-25 14:14:41.563 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.570 +02:00 [INF] STAMP:13:30  Open: 515,625, Close: 517,1, High: 517,69, Low: 515,33
+2024-09-25 14:14:41.577 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.583 +02:00 [INF] STAMP:13:30  Open: 517,435, Close: 520,56, High: 520,56, Low: 516,715
+2024-09-25 14:14:41.590 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.597 +02:00 [INF] STAMP:12:50  Open: 521,52, Close: 520,78, High: 522,62, Low: 519,67
+2024-09-25 14:14:41.604 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.611 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.619 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.625 +02:00 [INF] STAMP:13:30  Open: 522,615, Close: 520,61, High: 522,615, Low: 519,77
+2024-09-25 14:14:41.632 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.638 +02:00 [INF] STAMP:12:38  Open: 520,64, Close: 523,16, High: 523,83, Low: 520,615
+2024-09-25 14:14:41.646 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.652 +02:00 [INF] STAMP:13:30  Open: 525,77, Close: 529,09, High: 530,07, Low: 525,22
+2024-09-25 14:14:41.659 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.667 +02:00 [INF] STAMP:12:32  Open: 530,18, Close: 528,49, High: 531,445, Low: 528,49
+2024-09-25 14:14:41.674 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.680 +02:00 [INF] STAMP:13:30  Open: 528,93, Close: 529,24, High: 529,51, Low: 527,395
+2024-09-25 14:14:41.687 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.695 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.704 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.710 +02:00 [INF] STAMP:13:30  Open: 529,56, Close: 529,78, High: 531,56, Low: 529,17
+2024-09-25 14:14:41.717 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.723 +02:00 [INF] STAMP:13:30  Open: 529,31, Close: 531,15, High: 531,5, Low: 529,15
+2024-09-25 14:14:41.730 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.736 +02:00 [INF] STAMP:13:30  Open: 530,71, Close: 530,2, High: 531,34, Low: 527,6
+2024-09-25 14:14:41.743 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.749 +02:00 [INF] STAMP:13:30  Open: 532,96, Close: 525,98, High: 533,04, Low: 524,78
+2024-09-25 14:14:41.756 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.762 +02:00 [INF] STAMP:13:30  Open: 527,87, Close: 529,47, High: 530,24, Low: 526,89
+2024-09-25 14:14:41.769 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.776 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.784 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.792 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.798 +02:00 [INF] STAMP:13:30  Open: 530,32, Close: 529,79, High: 530,51, Low: 527,11
+2024-09-25 14:14:41.805 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.811 +02:00 [INF] STAMP:13:30  Open: 525,63, Close: 525,39, High: 527,3, Low: 525,39
+2024-09-25 14:14:41.819 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.825 +02:00 [INF] STAMP:13:30  Open: 524,31, Close: 522,42, High: 525,2, Low: 521,345
+2024-09-25 14:14:41.832 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.838 +02:00 [INF] STAMP:13:30  Open: 523,63, Close: 527,37, High: 527,45, Low: 518,44
+2024-09-25 14:14:41.845 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.853 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.861 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.867 +02:00 [INF] STAMP:13:30  Open: 529,05, Close: 527,82, High: 529,15, Low: 522,695
+2024-09-25 14:14:41.874 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.880 +02:00 [INF] STAMP:13:30  Open: 526,545, Close: 528,35, High: 529,125, Low: 524,97
+2024-09-25 14:14:41.887 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.893 +02:00 [INF] STAMP:13:30  Open: 530,79, Close: 534,17, High: 534,665, Low: 528,84
+2024-09-25 14:14:41.901 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.908 +02:00 [INF] STAMP:13:30  Open: 534,9, Close: 534,63, High: 535,405, Low: 532,7
+2024-09-25 14:14:41.915 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.921 +02:00 [INF] STAMP:13:30  Open: 533,3, Close: 534,01, High: 536,86, Low: 532,56
+2024-09-25 14:14:41.928 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.935 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.943 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.949 +02:00 [INF] STAMP:13:30  Open: 533,25, Close: 535,705, High: 535,94, Low: 532,615
+2024-09-25 14:14:41.956 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.962 +02:00 [INF] STAMP:13:30  Open: 534,08, Close: 537,01, High: 537,01, Low: 532,125
+2024-09-25 14:14:41.969 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.975 +02:00 [INF] STAMP:12:32  Open: 541,28, Close: 541,15, High: 544,03, Low: 540,36
+2024-09-25 14:14:41.982 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:41.988 +02:00 [INF] STAMP:13:30  Open: 543,12, Close: 542,45, High: 543,3, Low: 539,71
+2024-09-25 14:14:41.995 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.001 +02:00 [INF] STAMP:12:06  Open: 540,15, Close: 542,65, High: 542,79, Low: 539,87
+2024-09-25 14:14:42.008 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.015 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.023 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.029 +02:00 [INF] STAMP:13:30  Open: 542,075, Close: 547,02, High: 548,41, Low: 541,61
+2024-09-25 14:14:42.036 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.042 +02:00 [INF] STAMP:13:30  Open: 547,14, Close: 548,51, High: 548,54, Low: 546,755
+2024-09-25 14:14:42.049 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.057 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.063 +02:00 [INF] STAMP:13:30  Open: 549,425, Close: 546,68, High: 550,11, Low: 545,23
+2024-09-25 14:14:42.070 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.076 +02:00 [INF] STAMP:13:30  Open: 544,36, Close: 544,09, High: 545,63, Low: 543,05
+2024-09-25 14:14:42.083 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.091 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.098 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.104 +02:00 [INF] STAMP:13:30  Open: 544,37, Close: 542,74, High: 546,94, Low: 542,65
+2024-09-25 14:14:42.112 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.117 +02:00 [INF] STAMP:13:30  Open: 543,77, Close: 544,775, High: 545,2, Low: 542,505
+2024-09-25 14:14:42.124 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.130 +02:00 [INF] STAMP:13:13  Open: 543,6, Close: 545,04, High: 546,22, Low: 543,21
+2024-09-25 14:14:42.137 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.143 +02:00 [INF] STAMP:13:30  Open: 545,55, Close: 546,37, High: 546,805, Low: 544,635
+2024-09-25 14:14:42.150 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.156 +02:00 [INF] STAMP:13:30  Open: 547,105, Close: 544,11, High: 550,26, Low: 543,015
+2024-09-25 14:14:42.162 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.169 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.177 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.183 +02:00 [INF] STAMP:13:30  Open: 545,54, Close: 545,33, High: 545,87, Low: 542,53
+2024-09-25 14:14:42.190 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.195 +02:00 [INF] STAMP:13:30  Open: 543,74, Close: 548,3, High: 548,97, Low: 543,685
+2024-09-25 14:14:42.202 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.207 +02:00 [INF] STAMP:13:19  Open: 548,6, Close: 551,46, High: 551,825, Low: 548,6
+2024-09-25 14:14:42.213 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.221 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.227 +02:00 [INF] STAMP:13:30  Open: 551,77, Close: 554,29, High: 555,045, Low: 551,28
+2024-09-25 14:14:42.234 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.241 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.249 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.255 +02:00 [INF] STAMP:13:30  Open: 555,35, Close: 555,43, High: 556,23, Low: 554,25
+2024-09-25 14:14:42.262 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.270 +02:00 [INF] STAMP:13:30  Open: 556,355, Close: 555,81, High: 557,125, Low: 555,54
+2024-09-25 14:14:42.277 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.283 +02:00 [INF] STAMP:13:30  Open: 557,13, Close: 561,08, High: 561,665, Low: 556,795
+2024-09-25 14:14:42.290 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.296 +02:00 [INF] STAMP:12:35  Open: 562,24, Close: 556,42, High: 562,3, Low: 555,85
+2024-09-25 14:14:42.302 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.308 +02:00 [INF] STAMP:12:52  Open: 557,5, Close: 559,91, High: 563,64, Low: 557,17
+2024-09-25 14:14:42.314 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.322 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.331 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.335 +02:00 [INF] STAMP:13:30  Open: 562,18, Close: 561,53, High: 564,755, Low: 559,64
+2024-09-25 14:14:42.341 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.345 +02:00 [INF] STAMP:13:30  Open: 562,96, Close: 564,83, High: 565,145, Low: 562,12
+2024-09-25 14:14:42.352 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.355 +02:00 [INF] STAMP:13:30  Open: 559,01, Close: 557,065, High: 560,48, Low: 556,62
+2024-09-25 14:14:42.361 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.364 +02:00 [INF] STAMP:13:30  Open: 558,61, Close: 552,84, High: 559,5, Low: 550,555
+2024-09-25 14:14:42.371 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.374 +02:00 [INF] STAMP:13:30  Open: 552,375, Close: 548,99, High: 553,99, Low: 547,955
+2024-09-25 14:14:42.380 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.388 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.396 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.398 +02:00 [INF] STAMP:13:30  Open: 552,97, Close: 554,65, High: 555,26, Low: 551,17
+2024-09-25 14:14:42.405 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.408 +02:00 [INF] STAMP:13:30  Open: 554,685, Close: 553,69, High: 556,605, Low: 553,295
+2024-09-25 14:14:42.414 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.417 +02:00 [INF] STAMP:12:13  Open: 549,31, Close: 542,4, High: 549,31, Low: 540,445
+2024-09-25 14:14:42.423 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.426 +02:00 [INF] STAMP:13:30  Open: 541,32, Close: 537,69, High: 547,445, Low: 537,455
+2024-09-25 14:14:42.432 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.435 +02:00 [INF] STAMP:13:30  Open: 542,37, Close: 544,345, High: 547,18, Low: 541,49
+2024-09-25 14:14:42.441 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.449 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.457 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.459 +02:00 [INF] STAMP:13:18  Open: 545,89, Close: 544,91, High: 547,05, Low: 542,96
+2024-09-25 14:14:42.466 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.468 +02:00 [INF] STAMP:13:30  Open: 546,25, Close: 539,9, High: 547,33, Low: 538,54
+2024-09-25 14:14:42.475 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.478 +02:00 [INF] STAMP:13:30  Open: 549,16, Close: 551,56, High: 553,43, Low: 547,635
+2024-09-25 14:14:42.485 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.488 +02:00 [INF] STAMP:13:30  Open: 552,59, Close: 543,18, High: 554,8, Low: 539,46
+2024-09-25 14:14:42.494 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.496 +02:00 [INF] STAMP:13:30  Open: 535,75, Close: 532,92, High: 536,92, Low: 528,6
+2024-09-25 14:14:42.503 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.510 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.518 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.521 +02:00 [INF] STAMP:12:23  Open: 510,44, Close: 518,64, High: 523,47, Low: 507,9
+2024-09-25 14:14:42.527 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.530 +02:00 [INF] STAMP:12:35  Open: 519,65, Close: 522,55, High: 529,665, Low: 517,99
+2024-09-25 14:14:42.537 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.539 +02:00 [INF] STAMP:13:30  Open: 528,54, Close: 518,5, High: 531,565, Low: 518,06
+2024-09-25 14:14:42.547 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.550 +02:00 [INF] STAMP:13:30  Open: 523,98, Close: 531,56, High: 531,58, Low: 521,895
+2024-09-25 14:14:42.556 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.559 +02:00 [INF] STAMP:12:40  Open: 528,63, Close: 532,92, High: 534,45, Low: 528,565
+2024-09-25 14:14:42.566 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.573 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.581 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.584 +02:00 [INF] STAMP:13:30  Open: 534,32, Close: 533,27, High: 535,68, Low: 531,04
+2024-09-25 14:14:42.590 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.592 +02:00 [INF] STAMP:13:30  Open: 536,585, Close: 542,04, High: 542,28, Low: 536,28
+2024-09-25 14:14:42.599 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.601 +02:00 [INF] STAMP:13:30  Open: 542,95, Close: 543,78, High: 544,94, Low: 540,19
+2024-09-25 14:14:42.608 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.610 +02:00 [INF] STAMP:12:58  Open: 549,03, Close: 552,97, High: 553,34, Low: 548,915
+2024-09-25 14:14:42.617 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.619 +02:00 [INF] STAMP:13:30  Open: 551,36, Close: 554,22, High: 555,02, Low: 551,36
+2024-09-25 14:14:42.626 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.633 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.641 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.643 +02:00 [INF] STAMP:13:30  Open: 554,75, Close: 559,11, High: 559,55, Low: 553,92
+2024-09-25 14:14:42.649 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.652 +02:00 [INF] STAMP:13:30  Open: 559,16, Close: 558,65, High: 560,815, Low: 557,325
+2024-09-25 14:14:42.658 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.661 +02:00 [INF] STAMP:13:30  Open: 559,765, Close: 560,81, High: 562,105, Low: 558,04
+2024-09-25 14:14:42.667 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.670 +02:00 [INF] STAMP:13:30  Open: 562,56, Close: 556,52, High: 563,14, Low: 555
+2024-09-25 14:14:42.677 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.679 +02:00 [INF] STAMP:13:30  Open: 559,59, Close: 562,04, High: 563,09, Low: 557,36
+2024-09-25 14:14:42.685 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.692 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.700 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.702 +02:00 [INF] STAMP:13:30  Open: 563,43, Close: 560,78, High: 563,9, Low: 559,06
+2024-09-25 14:14:42.709 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.711 +02:00 [INF] STAMP:13:30  Open: 559,46, Close: 561,565, High: 562,04, Low: 558,33
+2024-09-25 14:14:42.717 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.720 +02:00 [INF] STAMP:13:30  Open: 561,195, Close: 558,35, High: 561,62, Low: 555,09
+2024-09-25 14:14:42.726 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.728 +02:00 [INF] STAMP:13:19  Open: 560,29, Close: 559,3, High: 563,65, Low: 557,21
+2024-09-25 14:14:42.735 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.737 +02:00 [INF] STAMP:13:30  Open: 560,64, Close: 563,56, High: 564,19, Low: 557,185
+2024-09-25 14:14:42.744 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.751 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.759 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.767 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.769 +02:00 [INF] STAMP:12:56  Open: 560,83, Close: 552,16, High: 560,83, Low: 549,54
+2024-09-25 14:14:42.776 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.778 +02:00 [INF] STAMP:13:30  Open: 550,06, Close: 550,83, High: 554,43, Low: 549,47
+2024-09-25 14:14:42.785 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.787 +02:00 [INF] STAMP:13:30  Open: 551, Close: 549,44, High: 553,75, Low: 547,13
+2024-09-25 14:14:42.794 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.796 +02:00 [INF] STAMP:13:00  Open: 549,95, Close: 539,9, High: 551,57, Low: 539,465
+2024-09-25 14:14:42.803 +02:00 [INF] Executed DbCommand (7ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.810 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.818 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.820 +02:00 [INF] STAMP:13:30  Open: 544,68, Close: 546,44, High: 547,71, Low: 542,71
+2024-09-25 14:14:42.826 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.829 +02:00 [INF] STAMP:13:30  Open: 548,365, Close: 548,63, High: 549,15, Low: 543,47
+2024-09-25 14:14:42.835 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.837 +02:00 [INF] STAMP:13:20  Open: 549,17, Close: 554,79, High: 555,36, Low: 539,99
+2024-09-25 14:14:42.844 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.846 +02:00 [INF] STAMP:13:30  Open: 555,085, Close: 559,06, High: 559,36, Low: 552,81
+2024-09-25 14:14:42.853 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.855 +02:00 [INF] STAMP:13:30  Open: 559,71, Close: 561,8, High: 563,01, Low: 559,46
+2024-09-25 14:14:42.862 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.869 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.876 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.878 +02:00 [INF] STAMP:13:00  Open: 561,55, Close: 562,48, High: 563,09, Low: 559,94
+2024-09-25 14:14:42.885 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.887 +02:00 [INF] STAMP:13:30  Open: 565,11, Close: 563,15, High: 566,5, Low: 560,795
+2024-09-25 14:14:42.894 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.896 +02:00 [INF] STAMP:13:30  Open: 563,71, Close: 561,39, High: 568,63, Low: 560,88
+2024-09-25 14:14:42.902 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.905 +02:00 [INF] STAMP:13:30  Open: 571,04, Close: 570,45, High: 572,835, Low: 568,125
+2024-09-25 14:14:42.911 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.913 +02:00 [INF] STAMP:12:57  Open: 568,85, Close: 567,42, High: 569,29, Low: 565,23
+2024-09-25 14:14:42.920 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.927 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.934 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.936 +02:00 [INF] STAMP:12:56  Open: 568,9, Close: 569,47, High: 570,29, Low: 568,1
+2024-09-25 14:14:42.943 +02:00 [INF] Executed DbCommand (5ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.945 +02:00 [INF] STAMP:13:30  Open: 570,48, Close: 571,02, High: 571,34, Low: 567,64
+2024-09-25 14:14:42.951 +02:00 [INF] Executed DbCommand (5ms) [Parameters=[@__symbol_0='?', @__startDate_1='?' (DbType = DateTime), @__endDate_2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."C", b."H", b."L", b."N", b."O", b."Symbol", b."T", b."V", b."Vw"
+FROM "Bars" AS b
+WHERE b."Symbol" = @__symbol_0 AND b."T" > @__startDate_1 AND b."T" < @__endDate_2
+ORDER BY b."T"
+2024-09-25 14:14:42.957 +02:00 [INF] Executing OkObjectResult, writing value of type 'System.Boolean'.
+2024-09-25 14:14:42.963 +02:00 [INF] Executed action BN.PROJECT.AlpacaService.BacktestController.RunBacktest (AlpacaService) in 3097.3435ms
+2024-09-25 14:14:42.965 +02:00 [INF] Executed endpoint 'BN.PROJECT.AlpacaService.BacktestController.RunBacktest (AlpacaService)'
+2024-09-25 14:14:42.967 +02:00 [INF] Request finished HTTP/1.1 POST http://localhost:5130/Backtest - 200 null application/json; charset=utf-8 3226.2257ms

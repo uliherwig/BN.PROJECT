@@ -17,7 +17,6 @@ The microservice archtecture uses DDD principles
 ### AlpacaService
 
 Alpaca Service - provides access to Alpaca API. 
-Port : 5130
 
 ### IdentityService
 
@@ -26,11 +25,15 @@ Integration with Keycloak
 
 ### TradingStrategyService
 Trading Strategies Service - provides access to trading strategies.
+- BacktestService
+
+
+
 
 ## CI/CD
 
 The CI/CD pipeline is implemented with Github Actions. 
-The pipeline is triggered on push to the master branch. 
+The pipeline is triggered on push to the main branch. 
 The pipeline builds the docker image and pushes it to the docker hub.
 
 

@@ -70,17 +70,40 @@ namespace BN.PROJECT.AlpacaService
         }
 
         // Quotes
-        public async Task<List<IQuote>> GetQuotesBySymbol(string symbol, DateTime startDate, DateTime endDate)
+        public async Task<AlpacaQuote> GetLatestQuoteBySymbol(string symbol)
         {
+            var client = GetAlpacaDataClient();
+
+            var quote = await client.GetLatestQuoteAsync(new LatestMarketDataRequest(symbol)
+            {
+                Feed = MarketDataFeed.Iex
+            });
+            return quote.ToAlpacaQuote();
+        }
+
+        public async Task<List<AlpacaQuote>> GetQuotesBySymbol(string symbol, DateTime startDate, DateTime endDate)
+        {
+            var result = new List<AlpacaQuote>();
             var client = GetAlpacaDataClient();
 
             var quotesRequest = new HistoricalQuotesRequest(symbol, startDate, endDate)
             {
-                Feed = MarketDataFeed.Iex
+                Feed = MarketDataFeed.Iex,
             };
             var quoteSet = await client.GetHistoricalQuotesAsync(quotesRequest);
             var quotes = quoteSet.Items;
-            return quotes[symbol].ToList();
+            foreach (var quote in quotes[symbol].ToList())
+            {
+                result.Add(quote.ToAlpacaQuote());
+            }
+            _logger.LogInformation("Quotes: " + result.Count);
+            if (result.Count > 0)
+            {
+                _logger.LogInformation("Quotes START: " + result[0].TimestampUtc);
+                _logger.LogInformation("Quotes   END: " + result[999].TimestampUtc);
+            }
+
+            return result;
         }
     }
 }

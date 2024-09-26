@@ -11,20 +11,32 @@ public class AlpacaDataController : ControllerBase
         _alpacaDataService = alpacaDataService;
     }
 
-
-
-    [KeycloakAuthorize("user")]
-    [HttpGet("historicalBars/{symbol}")]
+    //[KeycloakAuthorize("user")]
+    [HttpGet("historical-bars/{symbol}")]
     public async Task<IActionResult> GetHistoricalBarsBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate, BarTimeFrame.Minute);
         return Ok(bars);
     }
 
-    [HttpGet("latestBar/{symbol}")]
+    [HttpGet("latest-bar/{symbol}")]
     public async Task<IActionResult> GetLatestBarBySymbol(string symbol)
     {
         var bar = await _alpacaDataService.GetLatestBarBySymbol(symbol);
+        return Ok(bar);
+    }
+
+    [HttpGet("historical-quotes/{symbol}")]
+    public async Task<IActionResult> GetHistoricalQuotesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var quotes = await _alpacaDataService.GetQuotesBySymbol(symbol, startDate, endDate);
+        return Ok(quotes);
+    }
+
+    [HttpGet("latest-quote/{symbol}")]
+    public async Task<IActionResult> GetLatestQuoteBySymbol(string symbol)
+    {
+        var bar = await _alpacaDataService.GetLatestQuoteBySymbol(symbol);
         return Ok(bar);
     }
 
@@ -33,13 +45,6 @@ public class AlpacaDataController : ControllerBase
     {
         var trades = await _alpacaDataService.GetTradesBySymbol(symbol, startDate, endDate);
         return Ok(trades);
-    }
-
-    [HttpGet("quotes/{symbol}")]
-    public async Task<IActionResult> GetQuotesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
-    {
-        var quotes = await _alpacaDataService.GetQuotesBySymbol(symbol, startDate, endDate);
-        return Ok(quotes);
     }
 
     [HttpPost("save-historicalBars/{symbol}")]

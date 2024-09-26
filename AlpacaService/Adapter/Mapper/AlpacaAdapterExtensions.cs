@@ -90,5 +90,22 @@
                 AssetChangePercent = position.AssetChangePercent
             };
         }
+
+        public static AlpacaQuote ToAlpacaQuote(this IQuote quote)
+        {
+            return new AlpacaQuote
+            {
+                Symbol = quote.Symbol,
+                AskPrice = quote.AskPrice,
+                AskSize = quote.AskSize,
+                BidPrice = quote.BidPrice,
+                BidSize = quote.BidSize,
+                TimestampUtc = quote.TimestampUtc,
+                BidExchange = quote.BidExchange,
+                AskExchange = quote.AskExchange,
+                Tape = quote.Tape
+            };
+        }
+
     }
 }

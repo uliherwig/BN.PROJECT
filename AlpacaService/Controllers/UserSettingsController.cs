@@ -28,33 +28,42 @@
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error adding user settings");
-                return StatusCode(500, "An error occurred while adding user settings");
             }
+            return Ok(false);
 
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetUserSettingsAsync(string userId)
+        [HttpGet("{email}")]
+        public async Task<IActionResult> GetUserSettingsAsync(string email)
         {
-            var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+            var userSettings = await _alpacaRepository.GetUserSettingsAsync(email);
             if (userSettings == null)
             {
                 return NotFound();
             }
 
             return Ok(userSettings);
+
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateUserSettingsAsync([FromBody] UserSettings userSettings)
         {
-            if (userSettings == null)
+            try
             {
-                return BadRequest("UserSettings cannot be null");
-            }
+                if (userSettings == null)
+                {
+                    return BadRequest("UserSettings cannot be null");
+                }
 
-            await _alpacaRepository.UpdateUserSettingsAsync(userSettings);
-            return NoContent();
+                await _alpacaRepository.UpdateUserSettingsAsync(userSettings);
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating user settings");
+            }
+            return Ok(false);
         }
 
         [HttpDelete]

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace BN.PROJECT.AlpacaService;
+﻿namespace BN.PROJECT.AlpacaService;
 
 public interface IAlpacaRepository
 {
@@ -15,6 +13,12 @@ public interface IAlpacaRepository
     Task<List<AlpacaBar>> GetHistoricalBars(string symbol, DateTime startDate, DateTime endDate);
 
     Task AddBarsAsync(List<AlpacaBar> bars);
+
+    Task<AlpacaQuote?> GetLatestQuote(string symbol);
+
+    Task<List<AlpacaQuote>> GetHistoricalQuotes(string symbol, DateTime startDate, DateTime endDate);
+
+    Task AddQuotesAsync(List<AlpacaQuote> quotes);
 
     Task AddOrderAsync(AlpacaOrder order);
 
