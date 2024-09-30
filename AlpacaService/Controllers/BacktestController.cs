@@ -17,25 +17,34 @@ public class BacktestController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> RunBacktest([FromBody] BacktestSettings backtestSettings)
     {
+        backtestSettings = new BacktestSettings
+        {
+            Symbol = "SPY",
+            TakeProfitFactor = 0.01,
+            StopLossFactor = 0.01,
+            StartDate = DateTime.Now.AddYears(-1),
+            EndDate = DateTime.Now,
+            Strategy = Strategy.Breakout,
+            TimeFrame = Core.TimeFrame.Day,
+            UserEmail = "johndoe@test.de"
+        };
         try
         {
-            //if (backtestSettings == null)
-            //{
-            //    return BadRequest("BacktestSettings cannot be null");
-            //}
-
-            backtestSettings = new BacktestSettings
+            if (backtestSettings == null)
             {
-                Symbol = "SPY",
-                TakeProfitFactor = 0.01,
-                StopLossFactor = 0.01,
-                StartDate = DateTime.Now.AddYears(-1),
-                EndDate = DateTime.Now,
-                Strategy = "Breakout",
-                TimeFrame = "1D",
-            };
+                return BadRequest("BacktestSettings cannot be null");
+            }
 
-            await _backtestService.RunBacktest(backtestSettings);
+            if (string.IsNullOrEmpty(backtestSettings.Symbol))
+            {
+                return BadRequest("Symbol cannot be null or empty");
+            }
+            // input validation can happen in UI 
+
+
+
+
+           var result =  await _backtestService.RunBacktest(backtestSettings);
             return Ok(true);
         }
         catch (Exception ex)

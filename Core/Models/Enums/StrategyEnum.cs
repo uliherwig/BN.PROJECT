@@ -1,0 +1,35 @@
+﻿namespace BN.PROJECT.Core;
+public enum Strategy
+{
+    Breakout,
+    MeanReversion,
+    Momentum,
+    Reversal,
+    TrendFollowing,
+    //ValueInvesting,
+    //GrowthInvesting,
+    //DividendInvesting,
+    //IndexInvesting,
+    //Arbitrage,
+    //PairTrading,
+    //EventDriven,
+    //Quantitative,
+    //Technical,
+    //Fundamental,
+    //Sentiment,
+    //MachineLearning,
+    //DeepLearning,
+    //ReinforcementLearning,
+    //GeneticAlgorithm,
+    //NeuralNetwork,
+    //DecisionTree,
+    //RandomForest,
+    //GradientBoosting,
+    //SupportVectorMachine,
+    //KNearestNeighbors,
+    //KMeans,
+    //HierarchicalClustering,
+    //DBSCAN,
+}
+
+

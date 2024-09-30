@@ -10,6 +10,20 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 - implement code coverage tool coverlet
 - implement code coverage report generator 
 
+## Version 2024.9.6
+
+- implement core library and strategy service
+- alpaca service backtest refactoring  
+- 1. validate testsettings
+- 2. get the historical data
+- 3. start the test - implement the strategy service client
+- 4. init message bus - start sending data
+- 5. implement the strategy service
+- 6. broker(alpaca) service controller - start backtest
+- 7. implement the services - 
+- 8. subscribe to datafeed from message bus 
+- 9. execute the strategy
+
 ## Version 2024.9.5
 
 - usersettings db change - user identified by email

@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlpacaServiceTests", "Alpac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityService", "IdentityService\IdentityService.csproj", "{4FADD768-D7F5-498B-BDB9-414B4BA275C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataService", "DataService\DataService.csproj", "{17D5A592-CCE4-4488-8233-B487AD232AB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StrategyService", "StrategyService\StrategyService.csproj", "{17D5A592-CCE4-4488-8233-B487AD232AB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CORE", "Core\CORE.csproj", "{1A380D1C-C06E-4297-8F3C-AA84CE625760}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{17D5A592-CCE4-4488-8233-B487AD232AB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17D5A592-CCE4-4488-8233-B487AD232AB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17D5A592-CCE4-4488-8233-B487AD232AB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A380D1C-C06E-4297-8F3C-AA84CE625760}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A380D1C-C06E-4297-8F3C-AA84CE625760}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A380D1C-C06E-4297-8F3C-AA84CE625760}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A380D1C-C06E-4297-8F3C-AA84CE625760}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

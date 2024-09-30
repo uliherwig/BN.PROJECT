@@ -41,32 +41,9 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddControllers();
     services.AddHttpContextAccessor();
+    //services.AddHealthChecks();
 
-    services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-
-       
-        options.Authority = $"{configuration["Keycloak:Authority"]}";
-        options.MetadataAddress = $"{configuration["Keycloak:Host"]}/realms/{configuration["Keycloak:Realm"]}/.well-known/openid-configuration";
-        options.Audience = configuration["Keycloak:Realm"];
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            NameClaimType = ClaimTypes.Name,
-            RoleClaimType = "roles",
-            ValidateIssuer = true,
-            ValidIssuers = [$"{configuration["Keycloak:Authority"]}"],
-            ValidateAudience = true,
-            ValidAudiences = ["account"],
-            AuthenticationType = "Bearer"
-        };
-    });
-    services.AddAuthorization();
+    services.AddKeyCloakAuthentication(configuration); 
 
     services.AddEndpointsApiExplorer();
 

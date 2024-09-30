@@ -10,8 +10,6 @@ builder.Services.AddQuartzHostedService(opt =>
     opt.WaitForJobsToComplete = true;
 });
 
-
-
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
@@ -54,36 +52,11 @@ app.Run();
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     var connectionString = configuration.GetConnectionString("AlpacaDbConnection");
-
     services.AddDbContext<AlpacaDbContext>(options =>
         options.UseNpgsql(connectionString));
 
     services.AddControllers();
     services.AddHttpContextAccessor();
-
-    services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.Authority = $"{configuration["Keycloak:Authority"]}";
-        options.MetadataAddress = $"{configuration["Keycloak:Host"]}/realms/{configuration["Keycloak:Realm"]}/.well-known/openid-configuration";
-        options.Audience = configuration["Keycloak:Realm"];
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            NameClaimType = ClaimTypes.Name,
-            RoleClaimType = "roles",
-            ValidateIssuer = true,
-            ValidIssuers = [$"{configuration["Keycloak:Authority"]}"],
-            ValidateAudience = true,
-            ValidAudiences = ["account"],
-            AuthenticationType = "Bearer"
-        };
-    });
-    services.AddAuthorization();
 
     services.AddEndpointsApiExplorer();
 
@@ -117,13 +90,15 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         });
     });
 
+    services.AddKeyCloakAuthentication(configuration);
+    services.AddMessageBus(configuration);
+
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
 
     services.AddScoped<IAlpacaRepository, AlpacaRepository>();
     services.AddScoped<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
-    services.AddScoped<PositionManager>();
     services.AddScoped<BacktestService>();
 
     // Quartz-Services
@@ -132,6 +107,8 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     {
         opt.WaitForJobsToComplete = true;
     });
+
+    services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
 
     // Register QuartzHostedService
     services.AddHostedService<AlpacaHistoryService>();

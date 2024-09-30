@@ -1,7 +1,6 @@
 ﻿// GlobalUsings.cs
 
 global using Alpaca.Markets;
-global using BN.PROJECT.AlpacaService;
 global using Microsoft.AspNetCore.Mvc;
 global using Newtonsoft.Json;
 global using Quartz;
@@ -22,3 +21,5 @@ global using System.Net;
 global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;
+global using BN.PROJECT.Core;
+global using BN.PROJECT.AlpacaService;

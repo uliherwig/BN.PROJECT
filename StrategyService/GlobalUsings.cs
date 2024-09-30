@@ -18,4 +18,4 @@ global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using BN.PROJECT.Core;
-global using BN.PROJECT.IdentityService;
+global using BN.PROJECT.StrategyService;
