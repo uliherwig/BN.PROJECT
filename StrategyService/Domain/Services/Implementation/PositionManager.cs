@@ -1,16 +1,18 @@
 namespace BN.PROJECT.StrategyService;
 
-public class PositionManager : IPositionManager
+public class PositionManager
 {
     private readonly List<Position> _positions = [];
 
     public Position CreatePosition(
+        Guid testId,
         string symbol,
         int quantity,
         Side side,
         decimal priceOpen,
         decimal stopLoss,
-        decimal takeProfit)
+        decimal takeProfit,
+        DateTime stampOpen)
     {
         var p = _positions.FirstOrDefault(p => p.Symbol == symbol && p.Side == side && p.PriceClose == 0);
         if (p != null)
@@ -21,13 +23,15 @@ public class PositionManager : IPositionManager
         var position = new Position
         {
             Id = Guid.NewGuid(),
+            TestId = testId,
             Symbol = symbol,
             Quantity = quantity,
             Side = side,
             PriceOpen = priceOpen,
             TakeProfit = takeProfit,
             StopLoss = stopLoss,
-            StampOpened = DateTime.UtcNow
+            StampOpened = stampOpen.ToUniversalTime(),
+            CloseSignal = "",
         };
 
         _positions.Add(position);
@@ -44,31 +48,29 @@ public class PositionManager : IPositionManager
 
         position.TakeProfit = newTakeProfit;
         position.StopLoss = newStopLoss;
+        position.CloseSignal = "Update ";
         return true;
     }
 
-    public bool ClosePosition(Guid id, decimal priceClose, string closeSignal)
+    public Position? GetPositionById(Guid id) => _positions.FirstOrDefault(p => p.Id == id);
+
+    public void ClosePosition(Guid id, DateTime stampClose, decimal priceClose, string closeSignal)
     {
         var position = _positions.FirstOrDefault(p => p.Id == id);
         if (position == null)
         {
-            return false;
+            return;
         }
 
         position.PriceClose = priceClose;
-        position.StampClosed = DateTime.UtcNow;
+        position.StampClosed = stampClose.ToUniversalTime();
         position.CloseSignal = closeSignal;
         position.ProfitLoss = (priceClose - position.PriceOpen) * position.Quantity * (position.Side == Side.Buy ? 1 : -1);
-        return true;
+        return;
     }
-
-    public List<Position> GetOpenPositionsBySide(Side side)
-    {
-        return _positions.Where(p => p.Side == side && p.PriceClose == 0).ToList();
-    }
-
-    public List<Position> GetAllPositions()
-    {
-        return _positions;
-    }
+    public List<Position> GetOpenPositionsBySide(Side side) => _positions.Where(p => p.Side == side && p.PriceClose == 0).ToList();
+    public List<Position> GetAllPositions() => _positions;
+    public List<Position> GetAllClosedPositions() => _positions.Where(p => p.PriceClose > 0).ToList();
+    public void ClearPositions() => _positions.Clear();
 }
+

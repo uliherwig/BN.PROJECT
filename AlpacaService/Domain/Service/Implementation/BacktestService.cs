@@ -21,35 +21,40 @@ public class BacktestService : IBacktestService
     }
 
     public async Task<string> RunBacktest(BacktestSettings testSettings)
-    {  
-        var topic = $"backtest-{testSettings.UserEmail.ToLower().Replace('@', '-').Replace('.', '-')}";
-      
-
-
-        var result = await _strategyServiceClient.StartStrategyAsync(testSettings);
-
-        if (result != "true")
+    {
+        var message = new StrategyMessage
         {
-            return "Error";
-        }
-        await _kafkaProducer.SendMessageAsync(topic, "start");
+
+            TestId = testSettings.Id,
+            Type = MessageType.StartTest,
+            Quotes = null,
+            TestSettings = testSettings
+        };
+        var m = message.ToJson();
+
+        await _kafkaProducer.SendMessageAsync("strategy", m);
+
+
+
 
         var symbol = testSettings.Symbol;
-        var startDate = new DateTime(2024, 1, 1);
-        var endDate = DateTime.UtcNow;
+        var startDate = new DateTime(2024, 9, 2);
+        var endDate = new DateTime(2024, 9, 7);
         var timeFrame = TimeSpan.FromDays(1);
 
-        var stamp = startDate.ToUniversalTime(); 
+        var stamp = startDate.ToUniversalTime();
 
         while (stamp < endDate)
         {
-            var bars = await _alpacaRepository.GetHistoricalBars(symbol, stamp, stamp.Add(timeFrame));
+
+            var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
+            var bars = await _alpacaRepository.GetHistoricalBars(symbol, stamp, stampEnd);
             if (bars.Count == 0)
             {
                 stamp = stamp.Add(timeFrame).ToUniversalTime();
                 continue;
             }
-        
+            var quotesDay = new List<Quote>();
             foreach (var bar in bars)
             {
                 var q = new Quote
@@ -59,13 +64,33 @@ public class BacktestService : IBacktestService
                     BidPrice = bar.C - 0.1m,
                     TimestampUtc = bar.T.ToUniversalTime()
                 };
-               
 
-                await _kafkaProducer.SendMessageAsync(topic, q.ToJson());
+                quotesDay.Add(q);
+
             }
+            message = new StrategyMessage
+            {
+
+                TestId = testSettings.Id,
+                Type = MessageType.Quotes,
+                Quotes = quotesDay
+            };
+
+            await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
+
             stamp = stamp.Add(timeFrame).ToUniversalTime();
         };
-        await _kafkaProducer.SendMessageAsync(topic, "stop");
+
+
+        message = new StrategyMessage
+        {
+
+            TestId = testSettings.Id,
+            Type = MessageType.StopTest,
+            Quotes = null
+        };
+
+        await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
         return "OK";
     }
 }

@@ -1,12 +1,8 @@
-﻿
-namespace BN.PROJECT.StrategyService
+﻿namespace BN.PROJECT.StrategyService;
+
+public interface IStrategyService
 {
-    public interface IStrategyService
-    {
-        Task BacktestWithBars(BacktestSettings testSettings);
-        Task EvaluateQuote(string message);
-        Task InitializeStrategyTest();
-        Task RunStrategyTest(BacktestSettings testSettings);
-        Task StopStrategyTest();
-    }
+    Task StartTest(BacktestSettings testSettings);
+    Task EvaluateQuotes(StrategyMessage message);
+    Task StopTest(StrategyMessage message);
 }

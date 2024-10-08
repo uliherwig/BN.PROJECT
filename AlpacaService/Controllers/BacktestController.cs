@@ -7,11 +7,16 @@ public class BacktestController : ControllerBase
     private readonly IAlpacaRepository _alpacaRepository;
     private readonly ILogger<UserSettingsController> _logger;
     private readonly BacktestService _backtestService;
-    public BacktestController(IAlpacaRepository alpacaRepository, ILogger<UserSettingsController> logger, BacktestService backtestService)
+    private readonly IStrategyServiceClient _strategyServiceClient;
+    public BacktestController(IAlpacaRepository alpacaRepository,
+        ILogger<UserSettingsController> logger, 
+        BacktestService backtestService,
+        IStrategyServiceClient strategyServiceClient)
     {
         _alpacaRepository = alpacaRepository;
         _logger = logger;
         _backtestService = backtestService;
+        _strategyServiceClient = strategyServiceClient;
     }
 
     [HttpPost]
@@ -22,12 +27,13 @@ public class BacktestController : ControllerBase
             Symbol = "SPY",
             TakeProfitFactor = 0.01,
             StopLossFactor = 0.01,
-            StartDate = DateTime.Now.AddYears(-1),
-            EndDate = DateTime.Now,
+            StartDate = new DateTime(2024, 9, 2).ToUniversalTime(),
+            EndDate = new DateTime(2024, 9, 7).ToUniversalTime(),
             Strategy = Strategy.Breakout,
             TimeFrame = Core.TimeFrame.Day,
             UserEmail = "johndoe@test.de"
         };
+
         try
         {
             if (backtestSettings == null)
@@ -42,10 +48,13 @@ public class BacktestController : ControllerBase
             // input validation can happen in UI 
 
 
-
-
-           var result =  await _backtestService.RunBacktest(backtestSettings);
-            return Ok(true);
+            var result = await _strategyServiceClient.StartStrategyAsync(backtestSettings);   
+            
+            if(result == "true")
+            {
+               await _backtestService.RunBacktest(backtestSettings);
+            }
+            return Ok(result);
         }
         catch (Exception ex)
         {

@@ -1,13 +1,11 @@
-using System.Configuration;
-
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("BNProjectDbConnection");
-
-Console.WriteLine($"Connection String: {connectionString}");
-
-builder.Services.AddDbContext<BNProjectDbContext>(options =>
-    options.UseNpgsql(connectionString));
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:9017")
+    .CreateLogger();
+builder.Host.UseSerilog(Log.Logger);
 
 ConfigureServices(builder.Services, builder.Configuration);
 
@@ -25,12 +23,27 @@ app.UseRouting();
 app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<StrategyDbContext>();
+    context.Database.Migrate();
+}
 
 app.Run();
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
+    var connectionString = configuration.GetConnectionString("BNProjectDbConnection");
+    services.AddDbContext<StrategyDbContext>(options =>
+        options.UseNpgsql(connectionString));
+
     services.AddControllers();
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
@@ -39,6 +52,10 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
-    services.AddScoped<IStrategyService, StrategyService>();
-    services.AddScoped<PositionManager>();
+    services.AddScoped<IStrategyRepository, StrategyRepository>(); 
+
+    //services.AddSingleton<ITestQueueService<string, string>>(new TestQueueService<string, string>(100));
+    services.AddSingleton<IStrategyService, StrategyService>();
+
+    services.AddHostedService<QuoteConsumerService>();
 }

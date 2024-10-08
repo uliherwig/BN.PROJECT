@@ -7,13 +7,14 @@ public class StrategyController : ControllerBase
 {
 
     private readonly ILogger<StrategyController> _logger;
-    private readonly IStrategyService _strategyService;
+    private readonly IStrategyRepository _strategyRepository;
 
 
-    public StrategyController(ILogger<StrategyController> logger, IStrategyService strategyService)
+    public StrategyController(ILogger<StrategyController> logger, 
+        IStrategyRepository strategyRepository)
     {
         _logger = logger;
-        _strategyService = strategyService;
+        _strategyRepository = strategyRepository;
     }
 
     [HttpGet]
@@ -31,11 +32,13 @@ public class StrategyController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> StartStrategy([FromBody] BacktestSettings backtestSettings)
+    public async Task<IActionResult> StartStrategy([FromBody] BacktestSettings testSettings)
     {
         try
         {
-            await _strategyService.RunStrategyTest(backtestSettings);
+            await _strategyRepository.AddBacktestAsync(testSettings);
+            //_testQueueService.Add(testSettings.Id, testSettings);
+            //_strategyService.InitializeStrategyTest(testSettings);
 
             return Ok(true);
         }
@@ -51,10 +54,24 @@ public class StrategyController : ControllerBase
         try
         {
             var email = "johndoe@test.de";
-            var topic = $"backtest-{email.Replace('@', '-').Replace('.', '-')}";
+            var topic = $"test_{email.Replace('@', '-').Replace('.', '-')}";
 
-            var kafkaDeleteMessagesService = new KafkaDeleteMessagesService();
-            await kafkaDeleteMessagesService.DeleteMessagesAsync(topic);
+            return Ok(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error starting strategy");
+        }
+        return Ok(false);
+    }
+
+    [HttpPost("results/{email}")]
+    public async Task<IActionResult> GetTestResults(string email)
+    {
+        try
+        {
+            //await _strategyService.CreateTestResult(email);
+
             return Ok(true);
         }
         catch (Exception ex)

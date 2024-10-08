@@ -26,7 +26,6 @@ public class AlpacaHistoryJob : IJob
     {
         JobKey key = context.JobDetail.Key;
 
-
         var assetsAsString = _configuration.GetValue<string>("Alpaca:TRADED_ASSETS") ?? string.Empty;
         if (string.IsNullOrEmpty(assetsAsString))
             throw new Exception("No assets defined in configuration");

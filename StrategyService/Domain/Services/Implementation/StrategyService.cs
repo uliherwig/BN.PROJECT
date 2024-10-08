@@ -2,386 +2,203 @@
 
 public class StrategyService : IStrategyService
 {
-
     private readonly ILogger<StrategyService> _logger;
-    private readonly PositionManager _positionManager;
-    private readonly IKafkaConsumerService _kafkaConsumerService;
-    private BacktestSettings _testSettings;
-    private TestProcessModel _tpm;
 
+    private ConcurrentDictionary<Guid, List<Position>> _positions = new ConcurrentDictionary<Guid, List<Position>>();
+    private ConcurrentDictionary<Guid, TestProcessModel> _testProcesses = new ConcurrentDictionary<Guid, TestProcessModel>();
+    private ConcurrentDictionary<Guid, BacktestSettings> _testSettings = new ConcurrentDictionary<Guid, BacktestSettings>();
 
-    public StrategyService(ILogger<StrategyService> logger,
-        PositionManager positionManager,
-        IKafkaConsumerService kafkaConsumerService)
+    public StrategyService(ILogger<StrategyService> logger)
     {
-        _positionManager = positionManager;
         _logger = logger;
-        _kafkaConsumerService = kafkaConsumerService;
     }
 
-    public async Task RunStrategyTest(BacktestSettings testSettings)
+    public Task StartTest(BacktestSettings testSettings)
     {
-        _testSettings = testSettings;
-        var topic = $"backtest-{testSettings.UserEmail.ToLower().Replace('@', '-').Replace('.', '-')}";
-
-        //var kafkaDeleteMessagesService = new KafkaDeleteMessagesService();
-        //await kafkaDeleteMessagesService.DeleteMessagesAsync(topic);
-
-        _kafkaConsumerService.Start(topic);
-        _kafkaConsumerService.MessageReceived += AddMessage;
-    }
-
-
-
-
-    public async Task InitializeStrategyTest()
-    {
-        _logger.LogInformation("Backtest started");
-        var h = new Quote { Symbol = _testSettings.Symbol, AskPrice = 0.0m, BidPrice = 0.0m, TimestampUtc = _testSettings.StartDate };
-        var l = new Quote { Symbol = _testSettings.Symbol, AskPrice = 10000.0m, BidPrice = 10000.0m, TimestampUtc = _testSettings.StartDate };
-        _tpm = new TestProcessModel
+        var tpm = new TestProcessModel
         {
-            Symbol = _testSettings.Symbol,
-            High = h,
-            Low = l,
-            StartDate = _testSettings.StartDate.ToUniversalTime(),
+            Symbol = testSettings.Symbol,
+            StartDate = DateTime.MinValue,
             EndDate = DateTime.UtcNow,
-            TimeFrame = TimeSpan.FromDays(1)
+            TimeFrame = TimeSpan.FromDays(1),
+            DifferenceHighLow = 0.0m,
+            IsIncreasing = false,
+            CurrentHigh = 10000.0m,
+            CurrentLow = 0.0m,
+            PrevHigh = 10000.0m,
+            PrevLow = 0.0m,
+            LastTimeFrameVolume = 0,
+            TimeFrameStart = DateTime.MinValue,
+            PrevTimeFrameStart = DateTime.MinValue,
+            TakeProfitPlus = 0.0m,
+            MarketCloseTime = new TimeSpan(19, 50, 0)
         };
-        return;
-
-
-
-        //while (stamp < endDate)
-        //{
-        //    var bars = new List<Bar>();
-        //    if (bars.Count == 0)
-        //    {
-        //        stamp = stamp.Add(timeFrame).ToUniversalTime();
-        //        continue;
-        //    }
-
-        //    var open = bars.First();
-        //    var close = bars.Last();
-        //    var high = bars.Max(b => b.H);
-        //    var low = bars.Min(b => b.L);
-
-        //    _logger.LogInformation($"#BT STAMP:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-
-        //    var innerStamp = open.T.ToUniversalTime();
-
-
-        //    //while (innerStamp < close.T)
-        //    //{
-
-        //    //    var innerBars = bars.Where(b => b.T > innerStamp && b.T < innerStamp.Add(innerTimeFrame)).ToList();
-
-        //    //    if (innerBars.Count == 0)
-        //    //    {
-        //    //        innerStamp = innerStamp.Add(innerTimeFrame).ToUniversalTime();
-        //    //        continue;
-        //    //    }
-
-        //    //    var innerOpen = innerBars.First();
-        //    //    var innerClose = innerBars.Last();
-        //    //    var innerHigh = innerBars.Max(b => b.H);
-        //    //    var innerLow = innerBars.Min(b => b.L);
-
-        //    //    _logger.LogInformation($"#BT ########### STAMP:{innerOpen.T.ToShortDateString()}:{innerOpen.T.ToShortTimeString()} HIGH: {innerHigh:F2} LOW: {innerLow:F2}  // Open: {innerOpen.O:F2}, Close: {innerClose.C:F2}");
-
-        //    //    innerStamp = innerStamp.Add(innerTimeFrame).ToUniversalTime();
-        //    //}
-
-        //    // check breakout high or low
-
-        //    foreach (var bar in bars)
-        //    {
-        //        if (bar.C > prevHigh)
-        //        {
-        //            var p = _positionManager.CreatePosition(symbol, 1, Side.Buy, bar.C, low, bar.C + 2);
-
-        //            _logger.LogInformation($"#BT BUY :{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-
-        //        }
-        //        if (bar.C < prevLow)
-        //        {
-        //            var p = _positionManager.CreatePosition(symbol, 1, Side.Sell, bar.C, high, bar.C - 2);
-        //            _logger.LogInformation($"#BT SELL:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-        //        }
-
-        //        var openPositionsLong = _positionManager.GetOpenPositionsBySide(Side.Buy);
-
-        //        foreach (var position in openPositionsLong)
-        //        {
-        //            if (bar.C > position.TakeProfit)
-        //            {
-        //                _positionManager.ClosePosition(position.Id, bar.C, "Take Profit");
-        //                _logger.LogInformation($"#BT CLOSE LONG TP:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-        //            }
-        //            else if (bar.C < position.StopLoss)
-        //            {
-        //                _positionManager.ClosePosition(position.Id, bar.C, "Stop Loss");
-        //                _logger.LogInformation($"#BT CLOSE LONG SL:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-        //            }
-        //        }
-
-        //        var openPositionsShort = _positionManager.GetOpenPositionsBySide(Side.Sell);
-        //        foreach (var position in openPositionsShort)
-        //        {
-        //            if (bar.C < position.TakeProfit)
-        //            {
-        //                _positionManager.ClosePosition(position.Id, bar.C, "Take Profit");
-        //                _logger.LogInformation($"#BT CLOSE SHORT TP:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-        //            }
-        //            else if (bar.C > position.StopLoss)
-        //            {
-        //                _positionManager.ClosePosition(position.Id, bar.C, "Stop Loss");
-        //                _logger.LogInformation($"#BT CLOSE SHORT SL:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-        //            }
-        //        }
-        //    }
-
-        //    prevHigh = high;
-        //    prevLow = low;
-
-        //    stamp = stamp.Add(timeFrame).ToUniversalTime();
-        //};
-        //var pos = _positionManager.GetAllPositions();
-
-        //var profit = pos.Sum(p => p.ProfitLoss);
-        //_logger.LogInformation($"#BT POSITIONS: {_positionManager.GetAllPositions().Count}  Profit: {profit}");
-
-
-
-    }
-    public async Task EvaluateQuote(string message)
-    {
-
-        var quote = JsonConvert.DeserializeObject<Quote>(message);
-        if (quote == null)
-        {
-            return;
-        }
-        var currentStamp = quote.TimestampUtc;
-        if (currentStamp - _testSettings.StartDate < TimeSpan.FromDays(3))
-        {
-            _tpm.High = quote.AskPrice > _tpm.High.AskPrice ? quote : _tpm.High;
-            _tpm.Low = quote.BidPrice < _tpm.Low.BidPrice ? quote : _tpm.Low;
-            if (_tpm.High.AskPrice - _tpm.Low.AskPrice < 2m)
-            {
-                _logger.LogInformation($"#BT NO BREAKOUT: {_tpm.High.TimestampUtc.ToShortDateString()}:{_tpm.High.TimestampUtc.ToShortTimeString()} HIGH: {_tpm.High.AskPrice:F2} LOW: {_tpm.Low.BidPrice:F2}");
-
-            }
-            return;
-        }
-        // todo
-        // check increase or decrease
-        _tpm.IsIncreasing = _tpm.High.TimestampUtc > _tpm.Low.TimestampUtc;
-
-        var dayHigh = _tpm.High.TimestampUtc.Day;
-        var dayLow = _tpm.Low.TimestampUtc.Day;
-        var day = currentStamp.Day;
-
-
-        // if breakout - adjust prevHigh and prevLow
-        // check breakout high if increase
-        if (quote.AskPrice > _tpm.High.AskPrice)
-        {
-
-            var p = _positionManager.CreatePosition(_tpm.Symbol, 1, Side.Buy, quote.AskPrice, _tpm.Low.BidPrice, quote.AskPrice + 2);
-            //if(p != null)
-            //{
-            //    _tpm.Positions.Add(p);
-            //}
-
-        }
-
-        // check breakout low if decrease
-        if (quote.BidPrice < _tpm.High.BidPrice)
-        {
-            var p = _positionManager.CreatePosition(_tpm.Symbol, 1, Side.Sell, quote.BidPrice, _tpm.High.AskPrice, quote.BidPrice - 2);
-            //if (p != null)
-            //{
-            //    _tpm.Positions.Add(p);
-            //}
-
-        }
-
-        var openPositionsLong = _positionManager.GetOpenPositionsBySide(Side.Buy);
-
-        foreach (var position in openPositionsLong)
-        {
-            if (_tpm.High.AskPrice > position.TakeProfit)
-            {
-                _positionManager.ClosePosition(position.Id, _tpm.High.BidPrice, "Take Profit");
-            }
-            else if (_tpm.High.BidPrice < position.StopLoss)
-            {
-                _positionManager.ClosePosition(position.Id, _tpm.High.BidPrice, "Stop Loss");
-            }
-        }
-
-        var openPositionsShort = _positionManager.GetOpenPositionsBySide(Side.Sell);
-        foreach (var position in openPositionsShort)
-        {
-            if (_tpm.Low.BidPrice < position.TakeProfit)
-            {
-                _positionManager.ClosePosition(position.Id, _tpm.Low.AskPrice, "Take Profit");
-            }
-            else if (_tpm.Low.AskPrice > position.StopLoss)
-            {
-                _positionManager.ClosePosition(position.Id, _tpm.Low.AskPrice, "Stop Loss");
-            }
-        }
-
-    }
-    public async Task StopStrategyTest()
-    {
-        _logger.LogInformation("Backtest stopped");
-        _kafkaConsumerService.Stop();
-    }
-    private async void AddMessage(string message)
-    {
-        if (message == "start")
-        {
-            _logger.LogInformation("Backtest started");
-            await InitializeStrategyTest();
-        }
-        else if (message == "stop")
-        {
-            await StopStrategyTest();
-        }
-        else
-        {
-            await EvaluateQuote(message);
-        }
+        _testProcesses.TryAdd(testSettings.Id, tpm);
+        _testSettings.TryAdd(testSettings.Id, testSettings);
+        _positions.TryAdd(testSettings.Id, new List<Position>());
+        return Task.CompletedTask;
     }
 
 
-    public async Task BacktestWithBars(BacktestSettings testSettings)
+    public Task EvaluateQuotes(StrategyMessage message)
     {
-        var symbol = testSettings.Symbol;
-        var startDate = new DateTime(2024, 1, 1);
-        var endDate = DateTime.UtcNow;
-        var timeFrame = TimeSpan.FromDays(1);
-        var innerTimeFrame = TimeSpan.FromHours(1);
-
-
-        var positions = new List<Position>();
-
-        var stamp = startDate.ToUniversalTime();
-        var end = stamp.Add(timeFrame).ToUniversalTime();
-        //var barsFirstTimeFrame = await _alpacaRepository.GetHistoricalBars(symbol, stamp, end);
-        //var prevHigh = barsFirstTimeFrame.Max(b => b.H);
-        //var prevLow = barsFirstTimeFrame.Min(b => b.T);
-        //stamp = stamp.Add(timeFrame);
-
-        var prevHigh = 10000.0m;
-        var prevLow = 0.0m;
-
-
-
-        while (stamp < endDate)
+        var testId = message.TestId;
+        var quotes = message.Quotes;
+        if (quotes == null)
         {
-            var bars = new List<Bar>();
-            if (bars.Count == 0)
+            return Task.CompletedTask;
+        }
+        var tpm = _testProcesses[testId];
+
+        if (tpm.StartDate == DateTime.MinValue)
+        {
+            var firstQuote = quotes.FirstOrDefault(q => q.AskPrice > 0 && q.BidPrice > 0);
+            if (firstQuote != null)
             {
-                stamp = stamp.Add(timeFrame).ToUniversalTime();
+                tpm.StartDate = firstQuote.TimestampUtc;
+                tpm.TimeFrameStart = new DateTime(tpm.StartDate.Year, tpm.StartDate.Month, tpm.StartDate.Day, 0, 0, 0);
+                tpm.PrevTimeFrameStart = tpm.TimeFrameStart;
+                tpm.CurrentHigh = firstQuote.AskPrice;
+                tpm.CurrentLow = firstQuote.BidPrice;
+            }
+        }
+   
+        foreach (var quote in quotes.Where(q => q.AskPrice > 0 && q.BidPrice > 0))
+        {
+            var currentStamp = quote.TimestampUtc;
+            tpm.TimeFrameStart = new DateTime(currentStamp.Year, currentStamp.Month, currentStamp.Day, 0, 0, 0);  // todo replace with method to get time frame stamp
+
+
+            if (tpm.TimeFrameStart > tpm.PrevTimeFrameStart)
+            {
+                tpm.LastTimeFrameVolume++;
+                tpm.PrevTimeFrameStart = tpm.TimeFrameStart;
+
+                if (tpm.CurrentHigh > tpm.PrevHigh || tpm.CurrentLow < tpm.PrevLow || tpm.LastTimeFrameVolume < 2)
+                {
+                    tpm.PrevHigh = tpm.CurrentHigh;
+                    tpm.PrevLow = tpm.CurrentLow;
+                }
+
+
+                tpm.TakeProfitPlus = (tpm.PrevHigh - tpm.PrevLow) / 2;
+                tpm.CurrentHigh = quote.AskPrice;
+                tpm.CurrentLow = quote.BidPrice;
+
+                _logger.LogInformation($"#BT {tpm.TimeFrameStart} DIFF: {(tpm.PrevHigh - tpm.PrevLow).ToString("#.000")}     HIGH:{tpm.PrevHigh.ToString("000.000")} LOW:{tpm.PrevLow.ToString("000.000")}");
+            }
+
+            if (currentStamp > tpm.TimeFrameStart && currentStamp < tpm.TimeFrameStart.Add(tpm.TimeFrame))
+            {
+                tpm.CurrentHigh = quote.AskPrice > tpm.CurrentHigh ? quote.AskPrice : tpm.CurrentHigh;
+                tpm.CurrentLow = quote.BidPrice < tpm.CurrentLow ? quote.BidPrice : tpm.CurrentLow;
+            }
+
+            if (tpm.PrevLow == 0)
+            {
                 continue;
             }
 
-            var open = bars.First();
-            var close = bars.Last();
-            var high = bars.Max(b => b.H);
-            var low = bars.Min(b => b.L);
+            var openPositionsLong = _positions[testId].Where(p => p.Side == Side.Buy).ToList();
+            var openPositionsShort = _positions[testId].Where(p => p.Side == Side.Sell).ToList();
 
-            _logger.LogInformation($"#BT STAMP:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-
-            var innerStamp = open.T.ToUniversalTime();
-
-
-            //while (innerStamp < close.T)
-            //{
-
-            //    var innerBars = bars.Where(b => b.T > innerStamp && b.T < innerStamp.Add(innerTimeFrame)).ToList();
-
-            //    if (innerBars.Count == 0)
-            //    {
-            //        innerStamp = innerStamp.Add(innerTimeFrame).ToUniversalTime();
-            //        continue;
-            //    }
-
-            //    var innerOpen = innerBars.First();
-            //    var innerClose = innerBars.Last();
-            //    var innerHigh = innerBars.Max(b => b.H);
-            //    var innerLow = innerBars.Min(b => b.L);
-
-            //    _logger.LogInformation($"#BT ########### STAMP:{innerOpen.T.ToShortDateString()}:{innerOpen.T.ToShortTimeString()} HIGH: {innerHigh:F2} LOW: {innerLow:F2}  // Open: {innerOpen.O:F2}, Close: {innerClose.C:F2}");
-
-            //    innerStamp = innerStamp.Add(innerTimeFrame).ToUniversalTime();
-            //}
-
-            // check breakout high or low
-
-            foreach (var bar in bars)
+            if (quote.AskPrice > tpm.PrevHigh)
             {
-                if (bar.C > prevHigh)
+                if (openPositionsLong.Count == 0)
                 {
-                    var p = _positionManager.CreatePosition(symbol, 1, Side.Buy, bar.C, low, bar.C + 2);
-
-                    _logger.LogInformation($"#BT BUY :{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-
-                }
-                if (bar.C < prevLow)
-                {
-                    var p = _positionManager.CreatePosition(symbol, 1, Side.Sell, bar.C, high, bar.C - 2);
-                    _logger.LogInformation($"#BT SELL:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-                }
-
-                var openPositionsLong = _positionManager.GetOpenPositionsBySide(Side.Buy);
-
-                foreach (var position in openPositionsLong)
-                {
-                    if (bar.C > position.TakeProfit)
-                    {
-                        _positionManager.ClosePosition(position.Id, bar.C, "Take Profit");
-                        _logger.LogInformation($"#BT CLOSE LONG TP:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-                    }
-                    else if (bar.C < position.StopLoss)
-                    {
-                        _positionManager.ClosePosition(position.Id, bar.C, "Stop Loss");
-                        _logger.LogInformation($"#BT CLOSE LONG SL:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-                    }
-                }
-
-                var openPositionsShort = _positionManager.GetOpenPositionsBySide(Side.Sell);
-                foreach (var position in openPositionsShort)
-                {
-                    if (bar.C < position.TakeProfit)
-                    {
-                        _positionManager.ClosePosition(position.Id, bar.C, "Take Profit");
-                        _logger.LogInformation($"#BT CLOSE SHORT TP:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-                    }
-                    else if (bar.C > position.StopLoss)
-                    {
-                        _positionManager.ClosePosition(position.Id, bar.C, "Stop Loss");
-                        _logger.LogInformation($"#BT CLOSE SHORT SL:{open.T.ToShortDateString()}:{open.T.ToShortTimeString()} HIGH: {high:F2} LOW: {low:F2}  // Open: {open.O:F2}, Close: {close.C:F2}");
-                    }
+                    var position = PositionExtensions.CreatePosition(testId, tpm.Symbol, 1, Side.Buy, quote.AskPrice, tpm.PrevLow, quote.AskPrice + tpm.TakeProfitPlus, quote.TimestampUtc);
+                    _positions[testId].Add(position);
                 }
             }
 
-            prevHigh = high;
-            prevLow = low;
+            // check breakout low if decrease
+            if (quote.BidPrice < tpm.PrevLow)
+            {
+                if (openPositionsShort.Count == 0)
+                {
+                    var position = PositionExtensions.CreatePosition(testId, tpm.Symbol, 1, Side.Sell, quote.BidPrice, tpm.PrevHigh, quote.BidPrice - tpm.TakeProfitPlus, quote.TimestampUtc);
+                    _positions[testId].Add(position);
+                }
+            }
 
-            stamp = stamp.Add(timeFrame).ToUniversalTime();
-        };
-        var pos = _positionManager.GetAllPositions();
+            foreach (var position in openPositionsLong)
+            {
+                var pos = _positions[testId].FirstOrDefault(p => p.Id == position.Id);
+                if (pos == null)
+                {
+                    continue;
+                }
+
+                if (quote.AskPrice > position.TakeProfit)
+                {
+                    pos.UpdateTakeProfitAndStopLoss(quote.AskPrice + 1m, quote.BidPrice - 1m);
+                }
+                else if (quote.AskPrice < position.StopLoss)
+                {
+                    pos.ClosePosition(quote.TimestampUtc, quote.BidPrice, "Stop Loss");
+                }                
+            }
+
+            foreach (var position in openPositionsShort)
+            {
+                var pos = _positions[testId].FirstOrDefault(p => p.Id == position.Id);
+                if (pos == null)
+                {
+                    continue;
+                }
+                if (quote.BidPrice < position.TakeProfit)
+                {
+                    pos.UpdateTakeProfitAndStopLoss(quote.BidPrice - 1m, quote.AskPrice + 1m);
+                }
+                else if (quote.BidPrice > position.StopLoss)
+                {
+                    pos.ClosePosition(quote.TimestampUtc, quote.AskPrice, "Stop Loss");
+                }
+            }
+
+            // close all positions at end of day
+
+            //if (quote.TimestampUtc.TimeOfDay > tpm.MarketCloseTime)
+            //{
+            //    var openPositionsLongEoD = _positionManager.GetOpenPositionsBySide(Side.Buy);
+            //    var openPositionsShortEoD = _positionManager.GetOpenPositionsBySide(Side.Sell);
+            //    foreach (var position in openPositionsLongEoD)
+            //    {
+            //        _positionManager.ClosePosition(position.Id, quote.TimestampUtc, quote.BidPrice, "End of Day");
+            //    }
+            //    foreach (var position in openPositionsShortEoD)
+            //    {
+            //        _positionManager.ClosePosition(position.Id, quote.TimestampUtc, quote.AskPrice, "End of Day");
+            //    }
+            //}
+        }
+        return Task.CompletedTask;
+    }
+    public Task StopTest(StrategyMessage message)
+    {
+        _logger.LogInformation("Backtest stopped");
+        var testId = message.TestId;
+
+        var pos = _positions[testId].ToList();
+
+        var overNight = pos.Where(p => p.StampOpened.Day != p.StampClosed.Day).ToList();
+        var profits = pos.Where(p => p.ProfitLoss > 0).ToList();
+        var losses = pos.Where(p => p.ProfitLoss < 0).ToList();
+
+        var buys = pos.Where(p => p.Side == Side.Buy).ToList();
+        var sells = pos.Where(p => p.Side == Side.Sell).ToList();
+
+
+        _logger.LogInformation($"#BT OVERNIGHT POSITIONS: {overNight.Count}  Profit: {overNight.Sum(p => p.ProfitLoss)}");
+        _logger.LogInformation($"#BT PROFIT POSITIONS: {profits.Count}  Profit: {profits.Sum(p => p.ProfitLoss)}");
+        _logger.LogInformation($"#BT LOSS POSITIONS: {losses.Count}  Loss: {losses.Sum(p => p.ProfitLoss)}");
+
+        _logger.LogInformation($"#BT BUY POSITIONS: {profits.Count}  Profit: {profits.Sum(p => p.ProfitLoss)}");
+        _logger.LogInformation($"#BT SELL POSITIONS: {losses.Count}  Profit: {losses.Sum(p => p.ProfitLoss)}");
 
         var profit = pos.Sum(p => p.ProfitLoss);
-        _logger.LogInformation($"#BT POSITIONS: {_positionManager.GetAllPositions().Count}  Profit: {profit}");
-
-
-
+        _logger.LogInformation($"#BT POSITIONS: {pos.Count}  Profit: {profit}");
+        _positions.TryRemove(testId, out _);
+        return Task.CompletedTask;
     }
-
 }

@@ -13,9 +13,6 @@ builder.Services.AddQuartzHostedService(opt =>
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
-    //.WriteTo.File("log.txt",
-    //    rollingInterval: RollingInterval.Day,
-    //    rollOnFileSizeLimit: true)
     .WriteTo.Seq("http://localhost:9017")
     .CreateLogger();
 builder.Host.UseSerilog(Log.Logger);

@@ -4,7 +4,8 @@ public class Position
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TestId { get; set; }
     public required string Symbol { get; set; }
     public int Quantity { get; set; }
     public Side Side { get; set; }
