@@ -38,9 +38,23 @@ public class BacktestService : IBacktestService
 
 
         var symbol = testSettings.Symbol;
-        var startDate = new DateTime(2024, 9, 2);
-        var endDate = new DateTime(2024, 9, 7);
-        var timeFrame = TimeSpan.FromDays(1);
+        var startDate = testSettings.StartDate;
+        var endDate = testSettings.EndDate;
+
+
+        var timeFrame = TimeSpan.FromMinutes(1);
+        switch(testSettings.TimeFrame)
+        {
+            case TradeInterval.Day:
+                timeFrame = TimeSpan.FromDays(1);
+                break;
+            case TradeInterval.Hour:
+                timeFrame = TimeSpan.FromHours(1);
+                break;
+            case TradeInterval.Minute:
+                timeFrame = TimeSpan.FromMinutes(1);
+                break;
+        }
 
         var stamp = startDate.ToUniversalTime();
 

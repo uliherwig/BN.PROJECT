@@ -38,6 +38,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     var connectionString = configuration.GetConnectionString("BNProjectDbConnection");
@@ -53,9 +54,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
     services.AddScoped<IStrategyRepository, StrategyRepository>(); 
-
-    //services.AddSingleton<ITestQueueService<string, string>>(new TestQueueService<string, string>(100));
     services.AddSingleton<IStrategyService, StrategyService>();
 
-    services.AddHostedService<QuoteConsumerService>();
+    services.AddHostedService<MessageConsumerService>();
 }

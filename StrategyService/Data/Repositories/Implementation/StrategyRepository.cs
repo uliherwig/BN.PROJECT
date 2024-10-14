@@ -12,6 +12,11 @@ public class StrategyRepository : IStrategyRepository
         _logger = logger;
     }
 
+    public async Task<List<BacktestSettings>> GetBacktestsByEmailAsync(string email)
+    {
+        return await _context.BacktestSettings.Where(s => s.UserEmail == email).OrderByDescending(s => s.TestStamp).ToListAsync();
+    }
+
     public async Task AddBacktestAsync(BacktestSettings backtestSettings)
     {
         try
@@ -24,6 +29,12 @@ public class StrategyRepository : IStrategyRepository
             _logger.LogError(e, "Error adding backtestsettings");
         }
     }
+
+    public async Task<List<Position>> GetPositionsByTestId(Guid testId)
+    {
+        return await _context.Positions.Where(p => p.TestId == testId).ToListAsync();
+    }
+
     public async Task AddPositionAsync(Position position)
     {
         try

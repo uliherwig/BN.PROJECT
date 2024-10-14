@@ -1,13 +1,13 @@
 ﻿namespace BN.PROJECT.StrategyService;
 
-public class QuoteConsumerService : IHostedService
+public class MessageConsumerService : IHostedService
 {
 
-    private readonly ILogger<QuoteConsumerService> _logger;
+    private readonly ILogger<MessageConsumerService> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    public QuoteConsumerService(
-        ILogger<QuoteConsumerService> logger,
+    public MessageConsumerService(
+        ILogger<MessageConsumerService> logger,
         IServiceProvider serviceProvider)
     {
         _logger = logger;

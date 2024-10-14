@@ -3,14 +3,16 @@
 public class StrategyService : IStrategyService
 {
     private readonly ILogger<StrategyService> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
     private ConcurrentDictionary<Guid, List<Position>> _positions = new ConcurrentDictionary<Guid, List<Position>>();
     private ConcurrentDictionary<Guid, TestProcessModel> _testProcesses = new ConcurrentDictionary<Guid, TestProcessModel>();
     private ConcurrentDictionary<Guid, BacktestSettings> _testSettings = new ConcurrentDictionary<Guid, BacktestSettings>();
 
-    public StrategyService(ILogger<StrategyService> logger)
+    public StrategyService(ILogger<StrategyService> logger, IServiceProvider serviceProvider)
     {
         _logger = logger;
+        _serviceProvider = serviceProvider;
     }
 
     public Task StartTest(BacktestSettings testSettings)
@@ -43,6 +45,11 @@ public class StrategyService : IStrategyService
     public Task EvaluateQuotes(StrategyMessage message)
     {
         var testId = message.TestId;
+        if (!_testProcesses.ContainsKey(testId))
+        {
+            return Task.CompletedTask;
+        }
+
         var quotes = message.Quotes;
         if (quotes == null)
         {
@@ -62,7 +69,7 @@ public class StrategyService : IStrategyService
                 tpm.CurrentLow = firstQuote.BidPrice;
             }
         }
-   
+
         foreach (var quote in quotes.Where(q => q.AskPrice > 0 && q.BidPrice > 0))
         {
             var currentStamp = quote.TimestampUtc;
@@ -99,8 +106,8 @@ public class StrategyService : IStrategyService
                 continue;
             }
 
-            var openPositionsLong = _positions[testId].Where(p => p.Side == Side.Buy).ToList();
-            var openPositionsShort = _positions[testId].Where(p => p.Side == Side.Sell).ToList();
+            var openPositionsLong = _positions[testId].Where(p => p.Side == Side.Buy && p.PriceClose == 0).ToList();
+            var openPositionsShort = _positions[testId].Where(p => p.Side == Side.Sell && p.PriceClose == 0).ToList();
 
             if (quote.AskPrice > tpm.PrevHigh)
             {
@@ -136,7 +143,7 @@ public class StrategyService : IStrategyService
                 else if (quote.AskPrice < position.StopLoss)
                 {
                     pos.ClosePosition(quote.TimestampUtc, quote.BidPrice, "Stop Loss");
-                }                
+                }
             }
 
             foreach (var position in openPositionsShort)
@@ -174,7 +181,7 @@ public class StrategyService : IStrategyService
         }
         return Task.CompletedTask;
     }
-    public Task StopTest(StrategyMessage message)
+    public async Task StopTest(StrategyMessage message)
     {
         _logger.LogInformation("Backtest stopped");
         var testId = message.TestId;
@@ -198,7 +205,17 @@ public class StrategyService : IStrategyService
 
         var profit = pos.Sum(p => p.ProfitLoss);
         _logger.LogInformation($"#BT POSITIONS: {pos.Count}  Profit: {profit}");
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            var strategyRepository = scope.ServiceProvider.GetRequiredService<IStrategyRepository>();
+            await strategyRepository.AddPositionsAsync(pos);
+        }
+
+
+
+        _testProcesses.TryRemove(testId, out _);
+        _testSettings.TryRemove(testId, out _);
         _positions.TryRemove(testId, out _);
-        return Task.CompletedTask;
+
     }
 }

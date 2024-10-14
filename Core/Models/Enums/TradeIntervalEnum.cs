@@ -1,12 +1,11 @@
 ﻿namespace BN.PROJECT.Core;
-public enum TimeFrame
+public enum TradeInterval
 {
     Minute,
     TenMinutes,
     Hour,
     Day,
-    Week,
-    Month
+
 }
 
 

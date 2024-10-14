@@ -22,31 +22,31 @@ public class BacktestController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> RunBacktest([FromBody] BacktestSettings backtestSettings)
     {
-        backtestSettings = new BacktestSettings
-        {
-            Symbol = "SPY",
-            TakeProfitFactor = 0.01,
-            StopLossFactor = 0.01,
-            StartDate = new DateTime(2024, 9, 2).ToUniversalTime(),
-            EndDate = new DateTime(2024, 9, 7).ToUniversalTime(),
-            Strategy = Strategy.Breakout,
-            TimeFrame = Core.TimeFrame.Day,
-            UserEmail = "johndoe@test.de"
-        };
+
+        backtestSettings.Id = Guid.NewGuid();
+        backtestSettings.StartDate = backtestSettings.StartDate.ToUniversalTime();
+        backtestSettings.EndDate = backtestSettings.EndDate.ToUniversalTime();
+        backtestSettings.TestStamp = DateTime.UtcNow;
+
+        //var  backtestSettings = new BacktestSettings
+        //{
+        //    Symbol = "SPY",
+        //    Name = "Test",
+        //    TakeProfitFactor = 0.01,
+        //    StopLossFactor = 0.01,
+        //    StartDate = new DateTime(2024, 9, 2).ToUniversalTime(),
+        //    EndDate = new DateTime(2024, 9, 7).ToUniversalTime(),
+        //    Strategy = Strategy.Breakout,
+        //    TimeFrame = Core.TimeFrame.Day,
+        //    UserEmail = "johndoe@test.de"
+        //};
 
         try
         {
             if (backtestSettings == null)
             {
                 return BadRequest("BacktestSettings cannot be null");
-            }
-
-            if (string.IsNullOrEmpty(backtestSettings.Symbol))
-            {
-                return BadRequest("Symbol cannot be null or empty");
-            }
-            // input validation can happen in UI 
-
+            } 
 
             var result = await _strategyServiceClient.StartStrategyAsync(backtestSettings);   
             
@@ -61,8 +61,5 @@ public class BacktestController : ControllerBase
             _logger.LogError(ex, "Error adding user settings");
         }
         return Ok(false);
-
     }
-
-
 }

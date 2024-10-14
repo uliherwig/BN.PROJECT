@@ -1,4 +1,4 @@
-namespace BN.PROJECT.AlpacaService;
+namespace BN.PROJECT.StrategyService;
 public class BrokerServiceClient
 {
     private readonly HttpClient _httpClient;

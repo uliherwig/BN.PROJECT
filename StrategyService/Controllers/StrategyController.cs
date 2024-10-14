@@ -5,10 +5,8 @@ namespace BN.PROJECT.StrategyService;
 [ApiController]
 public class StrategyController : ControllerBase
 {
-
     private readonly ILogger<StrategyController> _logger;
     private readonly IStrategyRepository _strategyRepository;
-
 
     public StrategyController(ILogger<StrategyController> logger, 
         IStrategyRepository strategyRepository)
@@ -37,25 +35,6 @@ public class StrategyController : ControllerBase
         try
         {
             await _strategyRepository.AddBacktestAsync(testSettings);
-            //_testQueueService.Add(testSettings.Id, testSettings);
-            //_strategyService.InitializeStrategyTest(testSettings);
-
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error starting strategy");
-        }
-        return Ok(false);
-    }
-    [HttpPost("delete")]
-    public async Task<IActionResult> DeleteMessages()
-    {
-        try
-        {
-            var email = "johndoe@test.de";
-            var topic = $"test_{email.Replace('@', '-').Replace('.', '-')}";
-
             return Ok(true);
         }
         catch (Exception ex)
@@ -65,18 +44,32 @@ public class StrategyController : ControllerBase
         return Ok(false);
     }
 
-    [HttpPost("results/{email}")]
-    public async Task<IActionResult> GetTestResults(string email)
+    [HttpGet("settings/{email}")]
+    public async Task<IActionResult> GetTestSettingsByEmail(string email)
     {
         try
         {
-            //await _strategyService.CreateTestResult(email);
-
-            return Ok(true);
+            var settings = await _strategyRepository.GetBacktestsByEmailAsync(email);
+            return Ok(settings);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error starting strategy");
+            _logger.LogError(ex, "Error GetTestSettingsByEmail");
+        }
+        return Ok(false);
+    }
+
+    [HttpGet("results/{testId}")]
+    public async Task<IActionResult> GetTestResultsByTestId(Guid testId)
+    {
+        try
+        {
+            var positions = await _strategyRepository.GetPositionsByTestId(testId);
+            return Ok(positions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error GetTestSettingsByEmail");
         }
         return Ok(false);
     }
