@@ -34,27 +34,13 @@ public class BacktestService : IBacktestService
 
         await _kafkaProducer.SendMessageAsync("strategy", m);
 
-
-
-
         var symbol = testSettings.Symbol;
-        var startDate = testSettings.StartDate;
-        var endDate = testSettings.EndDate;
+        var startDate = testSettings.StartDate.ToUniversalTime();
+        var endDate = testSettings.EndDate.ToUniversalTime();
 
 
-        var timeFrame = TimeSpan.FromMinutes(1);
-        switch(testSettings.TimeFrame)
-        {
-            case TradeInterval.Day:
-                timeFrame = TimeSpan.FromDays(1);
-                break;
-            case TradeInterval.Hour:
-                timeFrame = TimeSpan.FromHours(1);
-                break;
-            case TradeInterval.Minute:
-                timeFrame = TimeSpan.FromMinutes(1);
-                break;
-        }
+        // send quotes per day // breakout period is handled in strategy service
+        TimeSpan timeFrame = TimeSpan.FromDays(1);
 
         var stamp = startDate.ToUniversalTime();
 

@@ -43,7 +43,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHttpContextAccessor();
     //services.AddHealthChecks();
 
-    services.AddKeyCloakAuthentication(configuration); 
+    services.AddKeyCloakAuthentication(configuration);
 
     services.AddEndpointsApiExplorer();
 

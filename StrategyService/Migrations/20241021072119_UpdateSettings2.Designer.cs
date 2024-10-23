@@ -3,6 +3,7 @@ using System;
 using BN.PROJECT.StrategyService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.StrategyService.Migrations
 {
     [DbContext(typeof(StrategyDbContext))]
-    partial class StrategyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241021072119_UpdateSettings2")]
+    partial class UpdateSettings2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,9 +37,6 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<bool>("Bookmarked")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("BreakoutPeriod")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Broker")
                         .IsRequired()
                         .HasColumnType("text");
@@ -51,8 +51,8 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("StopLossPercent")
-                        .HasColumnType("numeric");
+                    b.Property<double>("StopLossPercent")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("StopLossStrategy")
                         .HasColumnType("integer");
@@ -64,14 +64,17 @@ namespace BN.PROJECT.StrategyService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("TakeProfitPercent")
-                        .HasColumnType("numeric");
+                    b.Property<double>("TakeProfitPercent")
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("TestStamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("TrailingStop")
-                        .HasColumnType("numeric");
+                    b.Property<int>("TimeFrame")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("TrailingStop")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("UserEmail")
                         .IsRequired()

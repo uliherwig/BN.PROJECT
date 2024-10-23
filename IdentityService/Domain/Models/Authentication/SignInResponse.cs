@@ -4,6 +4,6 @@ namespace BN.PROJECT.IdentityService
     {
         public bool? Success { get; set; }
         public string? Errors { get; set; }
-        public JwtToken? JwtToken { get; set; }      
+        public JwtToken? JwtToken { get; set; }
     }
 }

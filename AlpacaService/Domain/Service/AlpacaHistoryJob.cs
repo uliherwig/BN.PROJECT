@@ -90,10 +90,11 @@ public class AlpacaHistoryJob : IJob
                 {
                     await _alpacaRepository.AddQuotesAsync(quotes);
                     startDate = quotes.Last().TimestampUtc;
-                } else
+                }
+                else
                 {
                     startDate = startDate.AddDays(1);
-                }               
+                }
             }
         }
     }

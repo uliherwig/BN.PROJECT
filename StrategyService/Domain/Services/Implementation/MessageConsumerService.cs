@@ -1,8 +1,6 @@
 ﻿namespace BN.PROJECT.StrategyService;
-
 public class MessageConsumerService : IHostedService
 {
-
     private readonly ILogger<MessageConsumerService> _logger;
     private readonly IServiceProvider _serviceProvider;
 
@@ -23,7 +21,7 @@ public class MessageConsumerService : IHostedService
                 var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
 
                 kafkaConsumer.Start("strategy");
-                kafkaConsumer.MessageReceived += AddMessage;
+                kafkaConsumer.MessageReceived += ConsumeMessage;
             }
         }
         catch (Exception e)
@@ -31,7 +29,6 @@ public class MessageConsumerService : IHostedService
             _logger.LogError(e, "Error in QuoteConsumerService");
             return;
         }
-
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -39,23 +36,26 @@ public class MessageConsumerService : IHostedService
         return Task.CompletedTask;
     }
 
-    private async void AddMessage(string messageJson)
+    private async void ConsumeMessage(string messageJson)
     {
         var message = JsonConvert.DeserializeObject<StrategyMessage>(messageJson);
         _logger.LogInformation($"Nachricht empfangen: {message}");
 
         using (var scope = _serviceProvider.CreateScope())
         {
-            var strategyService = scope.ServiceProvider.GetRequiredService<IStrategyService>();
+            var strategyService = scope.ServiceProvider.GetRequiredService<IStrategyTestService>();
 
             if (message?.Type == MessageType.StartTest)
             {
-                await strategyService.StartTest(message.TestSettings);
+                await strategyService.StartTest(message);
             }
 
             if (message?.Type == MessageType.Quotes)
             {
-                await strategyService.EvaluateQuotes(message);
+                foreach (var quote in message.Quotes)
+                {
+                    await strategyService.EvaluateQuote(message.TestId, quote);
+                }
             }
 
             if (message?.Type == MessageType.StopTest)

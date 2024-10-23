@@ -1,14 +1,14 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
-});
-builder.Services.AddQuartzHostedService(opt =>
-{
-    opt.WaitForJobsToComplete = true;
-});
+//builder.Services.AddQuartz(q =>
+//{
+//    q.UseMicrosoftDependencyInjectionJobFactory();
+//});
+//builder.Services.AddQuartzHostedService(opt =>
+//{
+//    opt.WaitForJobsToComplete = true;
+//});
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

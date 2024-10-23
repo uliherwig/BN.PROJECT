@@ -1,18 +1,13 @@
 ﻿namespace BN.PROJECT.StrategyService;
 
-public class TestProcessModel
+public class StrategyProcessModel
 {
-    public string? Symbol { get; set; }
     public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public TimeSpan TimeFrame { get; set; }
-    public decimal DifferenceHighLow { get; set; }
-    public bool IsIncreasing { get; set; }
+    public TimeSpan BreakoutTimeSpan { get; set; }
     public long LastTimeFrameVolume { get; set; }
     public DateTime TimeFrameStart { get; set; }
     public DateTime PrevTimeFrameStart { get; set; }
     public decimal TakeProfitPlus { get; set; }
-    public bool AllowOvernight { get; set; }
     public TimeSpan MarketCloseTime { get; set; }
     public decimal CurrentLow { get; set; }
     public DateTime CurrentLowStamp { get; set; }

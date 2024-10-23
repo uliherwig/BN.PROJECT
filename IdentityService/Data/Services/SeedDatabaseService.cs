@@ -18,7 +18,7 @@ public class SeedDatabaseService : IHostedService
             var identityRepository = scope.ServiceProvider.GetRequiredService<IIdentityRepository>();
 
             var defaultUsersCreated = await identityRepository.GetUserByNameAsync("bn-admin") != null;
-            if(defaultUsersCreated)
+            if (defaultUsersCreated)
             {
                 return;
             }

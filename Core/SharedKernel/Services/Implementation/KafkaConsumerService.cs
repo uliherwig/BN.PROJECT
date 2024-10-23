@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace BN.PROJECT.Core;
 
 public class KafkaConsumerService : IKafkaConsumerService
@@ -7,7 +5,7 @@ public class KafkaConsumerService : IKafkaConsumerService
     private readonly ILogger<KafkaConsumerService> _logger;
     private readonly string _bootstrapServers = "localhost:9092";
     private string _topic = "kafka-demo";
-    private string _groupId = "BN.PROJECT"; 
+    private string _groupId = "BN.PROJECT";
     private CancellationTokenSource _cancellationTokenSource;
     private Task _consumingTask;
     public event Action<string> MessageReceived;
@@ -57,7 +55,7 @@ public class KafkaConsumerService : IKafkaConsumerService
                     var consumeResult = consumer.Consume(cancellationToken);
                     MessageReceived?.Invoke(consumeResult.Message.Value);
 
-                   // _logger.LogInformation($"Nachricht empfangen: {consumeResult.Message.Value}");
+                    // _logger.LogInformation($"Nachricht empfangen: {consumeResult.Message.Value}");
                 }
             }
             catch (OperationCanceledException)
@@ -83,7 +81,7 @@ public class KafkaConsumerService : IKafkaConsumerService
         using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrapServers }).Build())
         {
             await adminClient.DeleteTopicsAsync(new List<string> { topic }, null);
-          
+
         }
     }
 

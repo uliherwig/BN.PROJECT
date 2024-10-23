@@ -11,7 +11,7 @@ public class UserSettings
 
     public string AlpacaSecret { get; set; }
 
-  
+
 
 
 }

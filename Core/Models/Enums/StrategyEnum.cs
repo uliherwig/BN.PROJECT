@@ -1,6 +1,7 @@
 ﻿namespace BN.PROJECT.Core;
 public enum Strategy
 {
+    None,
     Breakout,
     MeanReversion,
     Momentum,

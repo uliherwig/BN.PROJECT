@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.AlpacaService
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AlpacaTestController : ControllerBase
     {
@@ -14,25 +14,25 @@
             _alpacaRepository = alpacaRepository;
         }
 
-        [HttpGet("historicalBars/{symbol}")]
+        [HttpGet("historical-bars/{symbol}")]
         public async Task<IActionResult> GetHistoricalBarsBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
-            string path = Path.Combine(_env.ContentRootPath, "Assets", "alpaca-bars.json");
-
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            try
             {
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
-                {
-                    var jsonString = await reader.ReadToEndAsync();
-                    return Ok(jsonString);
-                }
+                var bars = await _alpacaRepository.GetHistoricalBars(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
+                return Ok(bars);
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpGet("save-assets")]
         public async Task<IActionResult> SaveAssets()
         {
-            string path = Path.Combine(_env.ContentRootPath, "Assets", "alpaca-assets.json");       
+            string path = Path.Combine(_env.ContentRootPath, "Assets", "alpaca-assets.json");
 
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
             {

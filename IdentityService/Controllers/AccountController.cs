@@ -52,12 +52,12 @@ public class AccountController : ControllerBase
         if ((bool)response.Success)
         {
             var claims = JwtTokenDecoder.DecodeJwtToken(signOutRequest.RefreshToken);
-            var userId = new Guid( claims["sub"]);
+            var userId = new Guid(claims["sub"]);
             var session = await _identityRepository.GetSessionByUserIdAsync(userId);
             if (session != null)
             {
                 session.SignedOutAt = DateTime.UtcNow;
-                session.LastActive = DateTime.UtcNow;        
+                session.LastActive = DateTime.UtcNow;
                 await _identityRepository.UpdateSessionAsync(session);
             }
         }

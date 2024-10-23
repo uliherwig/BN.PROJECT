@@ -33,7 +33,7 @@ namespace BN.PROJECT.AlpacaService
         {
             var asset = await _alpacaTradingService.GetAssetBySymbolAsync(symbol);
             return Ok(asset);
-        }   
+        }
 
         [HttpPost("market-order")]
         public async Task<IActionResult> CreateMarketOrder(string symbol, int quantity, bool isBuy)

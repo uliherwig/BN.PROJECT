@@ -1,7 +1,3 @@
-using Azure;
-using IdentityModel.Client;
-using NuGet.Packaging.Signing;
-
 namespace BN.PROJECT.IdentityService;
 
 public class KeycloakServiceClient : IKeycloakServiceClient
@@ -269,7 +265,7 @@ public class KeycloakServiceClient : IKeycloakServiceClient
 
             var unixStamp = (long)result[0].createdTimestamp;
 
-            var dateTime = DateTimeOffset.FromUnixTimeSeconds(unixStamp/1000).UtcDateTime;
+            var dateTime = DateTimeOffset.FromUnixTimeSeconds(unixStamp / 1000).UtcDateTime;
 
             var user = new User
             {

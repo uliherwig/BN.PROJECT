@@ -1,5 +1,5 @@
 ﻿namespace BN.PROJECT.Core;
-public enum TradeInterval
+public enum BreakoutPeriod
 {
     Minute,
     TenMinutes,

@@ -29,6 +29,41 @@ public static class PositionExtensions
         return position;
     }
 
+    public static Position CreatePosition(
+      Guid testId,
+      string symbol,
+      int quantity,
+      Side side,
+      decimal priceOpen,
+      decimal stopLoss,
+      decimal takeProfit,
+      DateTime stampOpen,
+      decimal prevLow,
+      decimal prevHigh,
+      DateTime prevLowStamp,
+      DateTime prevHighStamp)
+    {
+        var position = new Position
+        {
+            Id = Guid.NewGuid(),
+            TestId = testId,
+            Symbol = symbol,
+            Quantity = quantity,
+            Side = side,
+            PriceOpen = priceOpen,
+            TakeProfit = takeProfit,
+            StopLoss = stopLoss,
+            StampOpened = stampOpen.ToUniversalTime(),
+            CloseSignal = "",
+            PrevHigh = prevHigh,
+            PrevLow = prevLow,
+            PrevHighStamp = prevHighStamp.ToUniversalTime(),
+            PrevLowStamp = prevLowStamp.ToUniversalTime()
+        };
+
+        return position;
+    }
+
     public static bool UpdateTakeProfitAndStopLoss(this Position position, decimal newTakeProfit, decimal newStopLoss)
     {
 

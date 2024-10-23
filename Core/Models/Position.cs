@@ -17,4 +17,8 @@ public class Position
     public DateTime StampOpened { get; set; }
     public DateTime StampClosed { get; set; }
     public string CloseSignal { get; set; } = "";
+    public decimal PrevLow { get; set; }
+    public DateTime PrevLowStamp { get; set; }
+    public decimal PrevHigh { get; set; }
+    public DateTime PrevHighStamp { get; set; }
 }

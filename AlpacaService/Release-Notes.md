@@ -10,9 +10,18 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 - implement code coverage tool coverlet
 - implement code coverage report generator 
 
+## Version 2024.10.3
+
+- settings extension
+- delete backtest by user
+- delete backtest by periodic task
+- implement backtest bookmarking
+- refactor strategy service
+- implement strategyTestService and strategyOperations
+
 ## Version 2024.10.2
 
-- test result storage in db
+- settings and position models extended
 - implement api for backtest results
 
 ## Version 2024.10.1

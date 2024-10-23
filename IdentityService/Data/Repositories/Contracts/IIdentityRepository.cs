@@ -16,7 +16,7 @@ public interface IIdentityRepository
 
     Task AddSessionAsync(Session session);
 
-    Task<Session> GetSessionByUserIdAsync(Guid sessionId); 
+    Task<Session> GetSessionByUserIdAsync(Guid sessionId);
 
     Task UpdateSessionAsync(Session session);
 
@@ -24,7 +24,7 @@ public interface IIdentityRepository
 
     Task AddUserRoleAsync(UserRole userRole);
 
-    Task<List<UserRole>> GetUserRolesByUserIdAsync(Guid userId); 
+    Task<List<UserRole>> GetUserRolesByUserIdAsync(Guid userId);
 
     Task UpdateUserRoleAsync(UserRole userRole);
 
@@ -36,5 +36,5 @@ public interface IIdentityRepository
 
     Task UpdateRoleAsync(Role role);
 
-    Task DeleteRoleAsync(Guid roleId);  
+    Task DeleteRoleAsync(Guid roleId);
 }

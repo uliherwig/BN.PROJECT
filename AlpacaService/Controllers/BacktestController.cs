@@ -9,7 +9,7 @@ public class BacktestController : ControllerBase
     private readonly BacktestService _backtestService;
     private readonly IStrategyServiceClient _strategyServiceClient;
     public BacktestController(IAlpacaRepository alpacaRepository,
-        ILogger<UserSettingsController> logger, 
+        ILogger<UserSettingsController> logger,
         BacktestService backtestService,
         IStrategyServiceClient strategyServiceClient)
     {
@@ -46,13 +46,13 @@ public class BacktestController : ControllerBase
             if (backtestSettings == null)
             {
                 return BadRequest("BacktestSettings cannot be null");
-            } 
+            }
 
-            var result = await _strategyServiceClient.StartStrategyAsync(backtestSettings);   
-            
-            if(result == "true")
+            var result = await _strategyServiceClient.StartStrategyAsync(backtestSettings);
+
+            if (result == "true")
             {
-               await _backtestService.RunBacktest(backtestSettings);
+                await _backtestService.RunBacktest(backtestSettings);
             }
             return Ok(result);
         }

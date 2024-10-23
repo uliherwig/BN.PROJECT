@@ -53,8 +53,18 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
-    services.AddScoped<IStrategyRepository, StrategyRepository>(); 
+    services.AddScoped<IStrategyRepository, StrategyRepository>();
     services.AddSingleton<IStrategyService, StrategyService>();
+    services.AddSingleton<IStrategyTestService, StrategyTestService>();
+    services.AddSingleton<IStrategyOperations, StrategyOperations>();
 
     services.AddHostedService<MessageConsumerService>();
+
+    // Quartz-Services
+    services.AddQuartz();
+    services.AddQuartzHostedService(opt =>
+    {
+        opt.WaitForJobsToComplete = true;
+    });
+    services.AddHostedService<BacktestCleanUpService>();
 }
