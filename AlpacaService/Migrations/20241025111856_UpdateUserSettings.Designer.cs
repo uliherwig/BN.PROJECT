@@ -3,6 +3,7 @@ using System;
 using BN.PROJECT.AlpacaService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.AlpacaService.Migrations
 {
     [DbContext(typeof(AlpacaDbContext))]
-    partial class AlpacaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241025111856_UpdateUserSettings")]
+    partial class UpdateUserSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,9 +182,6 @@ namespace BN.PROJECT.AlpacaService.Migrations
                     b.Property<DateTime?>("UpdatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("OrderId");
 
                     b.ToTable("Orders");
@@ -247,9 +247,6 @@ namespace BN.PROJECT.AlpacaService.Migrations
 
                     b.Property<decimal?>("UnrealizedProfitLossPercent")
                         .HasColumnType("numeric");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("AssetId");
 

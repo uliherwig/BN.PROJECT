@@ -73,16 +73,12 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<decimal>("TrailingStop")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("UserEmail")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("BacktestSettings");
+                    b.ToTable("Strategies");
                 });
 
             modelBuilder.Entity("BN.PROJECT.Core.Position", b =>

@@ -5,7 +5,7 @@ public class BacktestSettings
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; } = Guid.NewGuid();
-    public required string UserEmail { get; set; }
+    public required Guid UserId { get; set; }
     public required string Broker { get; set; } = "Alpaca";
     public required string Name { get; set; }
     public string Symbol { get; set; } = "SPY";

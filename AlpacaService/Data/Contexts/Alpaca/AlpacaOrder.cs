@@ -5,6 +5,8 @@ public class AlpacaOrder
     [Key]
     public Guid OrderId { get; set; }
 
+    public Guid UserId { get; set; }
+
     public String? ClientOrderId { get; set; }
 
     public DateTime? CreatedAtUtc { get; set; }

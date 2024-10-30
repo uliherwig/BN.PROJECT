@@ -48,12 +48,18 @@ public class BacktestController : ControllerBase
                 return BadRequest("BacktestSettings cannot be null");
             }
 
+
             var result = await _strategyServiceClient.StartStrategyAsync(backtestSettings);
+            if (Enum.TryParse(result, out ErrorCode errorCode))
+            {
+                return BadRequest(errorCode);
+            }
 
             if (result == "true")
             {
                 await _backtestService.RunBacktest(backtestSettings);
             }
+
             return Ok(result);
         }
         catch (Exception ex)

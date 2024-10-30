@@ -4,7 +4,7 @@ public class AlpacaPosition
 {
     [Key]
     public Guid AssetId { get; set; }
-
+    public Guid UserId { get; set; }
     public string Symbol { get; set; }
     public Exchange Exchange { get; set; }
     public AssetClass AssetClass { get; set; }

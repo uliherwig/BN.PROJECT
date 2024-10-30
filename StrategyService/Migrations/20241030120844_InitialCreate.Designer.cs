@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.StrategyService.Migrations
 {
     [DbContext(typeof(StrategyDbContext))]
-    [Migration("20241018063547_UpdatePositions")]
-    partial class UpdatePositions
+    [Migration("20241030120844_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,12 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<bool>("AllowOvernight")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("Bookmarked")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("BreakoutPeriod")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Broker")
                         .IsRequired()
                         .HasColumnType("text");
@@ -48,8 +54,11 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("StopLossFactor")
-                        .HasColumnType("double precision");
+                    b.Property<decimal>("StopLossPercent")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("StopLossStrategy")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Strategy")
                         .HasColumnType("integer");
@@ -58,28 +67,21 @@ namespace BN.PROJECT.StrategyService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("TakeProfitFactor")
-                        .HasColumnType("double precision");
+                    b.Property<decimal>("TakeProfitPercent")
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("TestStamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("TimeFrame")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("TrailingStop")
+                        .HasColumnType("numeric");
 
-                    b.Property<double>("TrailingStop")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("UserEmail")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("BacktestSettings");
+                    b.ToTable("Strategies");
                 });
 
             modelBuilder.Entity("BN.PROJECT.Core.Position", b =>

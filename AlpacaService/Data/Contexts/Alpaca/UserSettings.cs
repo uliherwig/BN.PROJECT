@@ -3,15 +3,11 @@
 public class UserSettings
 {
     [Key]
-    public string Email { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public required string UserId { get; set; }
 
-    public string Symbols { get; set; }
+    public required string AlpacaKey { get; set; }
 
-    public string AlpacaKey { get; set; }
-
-    public string AlpacaSecret { get; set; }
-
-
-
+    public required string AlpacaSecret { get; set; }
 
 }

@@ -89,9 +89,9 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<UserSettings> GetUserSettingsAsync(string email)
+    public async Task<UserSettings?> GetUserSettingsAsync(string userId)
     {
-        return await _context.UserSettings.FirstOrDefaultAsync(u => u.Email == email);
+        return await _context.UserSettings.FirstOrDefaultAsync(u => u.UserId == userId);
     }
 
     public async Task UpdateUserSettingsAsync(UserSettings userSettings)

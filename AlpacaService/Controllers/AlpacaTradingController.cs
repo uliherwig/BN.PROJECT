@@ -1,93 +1,110 @@
-namespace BN.PROJECT.AlpacaService
+using Confluent.Kafka;
+using System.Configuration;
+
+namespace BN.PROJECT.AlpacaService;
+
+[ApiController]
+[Route("[controller]")]
+public class AlpacaTradingController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class AlpacaTradingController : ControllerBase
+    private readonly IAlpacaTradingService _alpacaTradingService;
+    private readonly IAlpacaRepository _alpacaRepository;
+
+    public AlpacaTradingController(
+        IAlpacaTradingService alpacaTradingService, IAlpacaRepository alpacaRepository)
     {
-        private readonly IAlpacaTradingService _alpacaTradingService;
-        private readonly IAlpacaRepository _alpacaRepository;
+        _alpacaTradingService = alpacaTradingService;
+        _alpacaRepository = alpacaRepository;
+    }
 
-        public AlpacaTradingController(
-            IAlpacaTradingService alpacaTradingService, IAlpacaRepository alpacaRepository)
+    [HttpGet("account/{userId}")]
+    public async Task<IActionResult> GetAccount(string userId)
+    {
+        if(string.IsNullOrEmpty(userId))
         {
-            _alpacaTradingService = alpacaTradingService;
-            _alpacaRepository = alpacaRepository;
+            return BadRequest(new { Message = "UserId cannot be null" });
+        }
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        if (userSettings == null)
+        {
+            return NotFound(new { Message = "NoCredentials" });
         }
 
-        [HttpGet("account")]
-        public async Task<IActionResult> GetAccount()
+        var account = await _alpacaTradingService.GetAccountAsync(userSettings);
+        if (account == null)
         {
-            var account = await _alpacaTradingService.GetAccountAsync();
-            return Ok(account);
+            return NotFound(new { Message = "WrongCredentials" });
         }
 
-        [HttpGet("assets")]
-        public async Task<IActionResult> GetAssets()
-        {
-            var assets = await _alpacaRepository.GetAssets();
-            return Ok(assets);
-        }
+        return Ok(account);
+    }
 
-        [HttpGet("asset/{symbol}")]
-        public async Task<IActionResult> GetAssetBySymbol(string symbol)
-        {
-            var asset = await _alpacaTradingService.GetAssetBySymbolAsync(symbol);
-            return Ok(asset);
-        }
+    [HttpGet("assets")]
+    public async Task<IActionResult> GetAssets()
+    {
+        var assets = await _alpacaRepository.GetAssets();
+        return Ok(assets);
+    }
 
-        [HttpPost("market-order")]
-        public async Task<IActionResult> CreateMarketOrder(string symbol, int quantity, bool isBuy)
-        {
-            OrderQuantity qty = quantity;
-            OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;
-            var order = await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, OrderType.Market, TimeInForce.Day);
-            if (order != null)
-            {
-                await _alpacaRepository.AddOrderAsync(order);
-            }
-            return Ok(order);
-        }
+    [HttpGet("asset/{symbol}")]
+    public async Task<IActionResult> GetAssetBySymbol(string symbol)
+    {
+        var asset = await _alpacaTradingService.GetAssetBySymbolAsync(symbol);
+        return Ok(asset);
+    }
 
-        [HttpGet("orders")]
-        public async Task<IActionResult> GetAllOrders(OrderStatusFilter orderStatusFilter)
+    [HttpPost("market-order")]
+    public async Task<IActionResult> CreateMarketOrder(string userId, string symbol, int quantity, bool isBuy)
+    {
+        OrderQuantity qty = quantity;
+        OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;
+        var order = await _alpacaTradingService.CreateOrderAsync(userId, symbol, qty, side, OrderType.Market, TimeInForce.Day);
+        if (order != null)
         {
-            var orders = await _alpacaTradingService.GetAllOrdersAsync(orderStatusFilter);
-            return Ok(orders);
+            await _alpacaRepository.AddOrderAsync(order);
         }
+        return Ok(order);
+    }
 
-        [HttpGet("order/{orderId}")]
-        public async Task<IActionResult> GetOrderById(string orderId)
-        {
-            var order = await _alpacaTradingService.GetOrderByIdAsync(orderId);
-            return Ok(order);
-        }
+    [HttpGet("orders")]
+    public async Task<IActionResult> GetAllOrders(string userId, OrderStatusFilter orderStatusFilter)
+    {
+        var orders = await _alpacaTradingService.GetAllOrdersAsync(userId, orderStatusFilter);
+        return Ok(orders);
+    }
 
-        [HttpDelete("order/{orderId}")]
-        public async Task<IActionResult> CancelOrderById(Guid orderId)
-        {
-            var result = await _alpacaTradingService.CancelOrderByIdAsync(orderId);
-            return Ok(result);
-        }
+    [HttpGet("order/{orderId}")]
+    public async Task<IActionResult> GetOrderById(string userId, string orderId)
+    {
+        var order = await _alpacaTradingService.GetOrderByIdAsync(userId, orderId);
+        return Ok(order);
+    }
 
-        [HttpGet("positions")]
-        public async Task<IActionResult> GetPositions()
-        {
-            var positions = await _alpacaTradingService.GetAllOpenPositions();
-            return Ok(positions);
-        }
+    [HttpDelete("order/{orderId}")]
+    public async Task<IActionResult> CancelOrderById(string userId, Guid orderId)
+    {
+        var result = await _alpacaTradingService.CancelOrderByIdAsync(userId, orderId);
+        return Ok(result);
+    }
 
-        [HttpGet("position/{symbol}")]
-        public async Task<IActionResult> GetPositionsBySymbol(string symbol)
-        {
-            var position = await _alpacaTradingService.GetPositionsBySymbol(symbol);
-            return Ok(position);
-        }
+    [HttpGet("positions")]
+    public async Task<IActionResult> GetPositions(string userId)
+    {
+        var positions = await _alpacaTradingService.GetAllOpenPositions(userId);
+        return Ok(positions);
+    }
 
-        [HttpDelete("position/{symbol}")]
-        public async Task<IActionResult> ClosePosition(string symbol)
-        {
-            var result = await _alpacaTradingService.ClosePositionOrder(symbol);
-            return Ok(result);
-        }
+    [HttpGet("position/{symbol}")]
+    public async Task<IActionResult> GetPositionsBySymbol(string userId, string symbol)
+    {
+        var position = await _alpacaTradingService.GetPositionsBySymbol(userId, symbol);
+        return Ok(position);
+    }
+
+    [HttpDelete("position/{symbol}")]
+    public async Task<IActionResult> ClosePosition(string userId, string symbol)
+    {
+        var result = await _alpacaTradingService.ClosePositionOrder(userId, symbol);
+        return Ok(result);
     }
 }

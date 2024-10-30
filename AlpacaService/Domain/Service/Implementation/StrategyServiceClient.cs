@@ -23,8 +23,9 @@ public class StrategyServiceClient : IStrategyServiceClient
             var json = JsonConvert.SerializeObject(testSettings);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync($"/strategy", content);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+        
+            var result = await response.Content.ReadAsStringAsync();
+            return result;
         }
         catch (Exception e)
         {

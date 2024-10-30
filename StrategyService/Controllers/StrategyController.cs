@@ -16,7 +16,7 @@ public class StrategyController : ControllerBase
     }
 
     [HttpGet("{testId}")]
-    public async Task<IActionResult> GetStrategy(Guid testId)
+    public async Task<IActionResult> GetStrategyById(Guid testId)
     {
         try
         {
@@ -30,11 +30,27 @@ public class StrategyController : ControllerBase
         return Ok(false);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> StartStrategy([FromBody] BacktestSettings testSettings)
+    [HttpGet("{name}/{userId}")]
+    public async Task<IActionResult> GetStrategyNameExists(string name, Guid userId)
     {
         try
         {
+            var strategies = await _strategyRepository.GetBacktestsByUserIdAsync(userId, false);
+            var result = strategies.Any(s => s.Name == name);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting strategy");
+        }
+        return Ok(false);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddStrategy([FromBody] BacktestSettings testSettings)
+    {
+        try
+        { 
             await _strategyRepository.AddBacktestAsync(testSettings);
             return Ok(true);
         }
@@ -89,12 +105,12 @@ public class StrategyController : ControllerBase
         }
     }
 
-    [HttpGet("settings/{email}")]
-    public async Task<IActionResult> GetTestSettingsByEmail(string email)
+    [HttpGet("settings/{userId}")]
+    public async Task<IActionResult> GetTestSettingsByUserId(Guid userId, bool bookmarked = false)
     {
         try
         {
-            var settings = await _strategyRepository.GetBacktestsByEmailAsync(email);
+            var settings = await _strategyRepository.GetBacktestsByUserIdAsync(userId, bookmarked);
             return Ok(settings);
         }
         catch (Exception ex)
