@@ -26,7 +26,7 @@ public class CleanUpJob : IJob
 
         _logger.LogInformation("Instance " + key + " CleanUp Job start");
 
-        await _strategyRepository.CleanupBacktests();
+        await _strategyRepository.CleanupStrategiesAsync();
 
         _logger.LogInformation("Instance " + key + " CleanUp Job end");
     }

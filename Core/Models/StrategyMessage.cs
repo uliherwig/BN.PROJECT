@@ -2,8 +2,9 @@
 
 public class StrategyMessage
 {
-    public Guid TestId { get; set; }
-    public MessageType Type { get; set; }
-    public BacktestSettings? TestSettings { get; set; }
+    public Guid StrategyId { get; set; }
+    public StrategyEnum Strategy { get; set; }
+    public MessageTypeEnum MessageType { get; set; }
+    public StrategySettingsModel? Settings { get; set; }
     public List<Quote>? Quotes { get; set; }
 }

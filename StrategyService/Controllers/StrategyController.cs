@@ -1,4 +1,5 @@
-﻿
+﻿using NuGet.Configuration;
+
 namespace BN.PROJECT.StrategyService;
 
 [Route("[controller]")]
@@ -20,7 +21,7 @@ public class StrategyController : ControllerBase
     {
         try
         {
-            var test = await _strategyRepository.GetBacktestByIdAsync(testId);
+            var test = await _strategyRepository.GetStrategyByIdAsync(testId);
             return Ok(test);
         }
         catch (Exception ex)
@@ -35,7 +36,7 @@ public class StrategyController : ControllerBase
     {
         try
         {
-            var strategies = await _strategyRepository.GetBacktestsByUserIdAsync(userId, false);
+            var strategies = await _strategyRepository.GetStrategiesByUserIdAsync(userId, false);
             var result = strategies.Any(s => s.Name == name);
             return Ok(result);
         }
@@ -47,11 +48,11 @@ public class StrategyController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddStrategy([FromBody] BacktestSettings testSettings)
+    public async Task<IActionResult> AddStrategy([FromBody] StrategySettingsModel testSettings)
     {
         try
-        { 
-            await _strategyRepository.AddBacktestAsync(testSettings);
+        {
+            await _strategyRepository.AddStrategyAsync(testSettings);
             return Ok(true);
         }
         catch (Exception ex)
@@ -66,15 +67,15 @@ public class StrategyController : ControllerBase
     {
         try
         {
-            var test = await _strategyRepository.GetBacktestByIdAsync(testId);
+            var test = await _strategyRepository.GetStrategyByIdAsync(testId);
             if (test == null)
             {
                 return NotFound();
             }
 
-            var positions = await _strategyRepository.GetPositionsByTestId(testId);
-            await _strategyRepository.DeleteBacktest(test);
-            await _strategyRepository.DeletePositions(positions);
+            var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(testId);
+            await _strategyRepository.DeleteStrategyAsync(test);
+            await _strategyRepository.DeletePositionsAsync(positions);
             return Ok(true);
         }
         catch (Exception ex)
@@ -84,18 +85,12 @@ public class StrategyController : ControllerBase
         }
     }
 
-    [HttpPut("{testId}")]
-    public async Task<IActionResult> UpdateTestSettings(Guid testId)
+    [HttpPut]
+    public async Task<IActionResult> UpdateStrategy([FromBody] StrategySettingsModel strategy)
     {
         try
         {
-            var test = await _strategyRepository.GetBacktestByIdAsync(testId);
-            if (test == null)
-            {
-                return NotFound();
-            }
-
-            await _strategyRepository.UpdateBacktestAsync(test);
+            var result = await _strategyRepository.UpdateStrategyAsync(strategy);
             return Ok(true);
         }
         catch (Exception ex)
@@ -106,11 +101,11 @@ public class StrategyController : ControllerBase
     }
 
     [HttpGet("settings/{userId}")]
-    public async Task<IActionResult> GetTestSettingsByUserId(Guid userId, bool bookmarked = false)
+    public async Task<IActionResult> GetStrategiesByUserId(Guid userId, bool bookmarked = false)
     {
         try
         {
-            var settings = await _strategyRepository.GetBacktestsByUserIdAsync(userId, bookmarked);
+            var settings = await _strategyRepository.GetStrategiesByUserIdAsync(userId, bookmarked);
             return Ok(settings);
         }
         catch (Exception ex)
@@ -121,48 +116,48 @@ public class StrategyController : ControllerBase
     }
 
     [HttpGet("positions/{testId}")]
-    public async Task<IActionResult> GetTestPositionsByTestId(Guid testId)
+    public async Task<IActionResult> GetTestPositionsByStrategyId(Guid testId)
     {
         try
         {
-            var positions = await _strategyRepository.GetPositionsByTestId(testId);
+            var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(testId);
 
             return Ok(positions.Where(p => p.PriceClose > 0));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error GetTestPositionsByTestId");
+            _logger.LogError(ex, "Error GetTestPositionsByStrategyId");
         }
         return Ok(false);
     }
 
     [HttpGet("results/{testId}")]
-    public async Task<IActionResult> GetTestResultsByTestId(Guid testId)
+    public async Task<IActionResult> GetTestResultsByStrategyId(Guid testId)
     {
         try
         {
-            var testSettings = await _strategyRepository.GetBacktestByIdAsync(testId);
-            var positions = await _strategyRepository.GetPositionsByTestId(testId);
+            var strategySettings = await _strategyRepository.GetStrategyByIdAsync(testId);
+            if (strategySettings == null) return Ok(false);
+            var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(testId);
+
             var testResult = new TestResult
             {
                 Id = testId,
-                Symbol = testSettings.Symbol,
-                StartDate = testSettings.StartDate,
-                EndDate = testSettings.EndDate,
-                TimeFrame = testSettings.BreakoutPeriod,
+                Asset = strategySettings.Asset,
+                StartDate = strategySettings.StartDate,
+                EndDate = strategySettings.EndDate,
                 NumberOfPositions = positions.Count,
-                NumberOfBuyPositions = positions.Count(p => p.Side == Side.Buy),
-                NumberOfSellPositions = positions.Count(p => p.Side == Side.Sell),
+                NumberOfBuyPositions = positions.Count(p => p.Side == SideEnum.Buy),
+                NumberOfSellPositions = positions.Count(p => p.Side == SideEnum.Sell),
                 TotalProfitLoss = positions.Sum(p => p.ProfitLoss),
-                BuyProfitLoss = positions.Where(p => p.Side == Side.Buy).Sum(p => p.ProfitLoss),
-                SellProfitLoss = positions.Where(p => p.Side == Side.Sell).Sum(p => p.ProfitLoss)
-            };
-
+                BuyProfitLoss = positions.Where(p => p.Side == SideEnum.Buy).Sum(p => p.ProfitLoss),
+                SellProfitLoss = positions.Where(p => p.Side == SideEnum.Sell).Sum(p => p.ProfitLoss)
+            };        
             return Ok(testResult);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error GetTestResultsByTestId");
+            _logger.LogError(ex, "Error GetTestResultsByStrategyId");
         }
         return Ok(false);
     }

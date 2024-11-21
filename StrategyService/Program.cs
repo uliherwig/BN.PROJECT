@@ -54,8 +54,6 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
     services.AddScoped<IStrategyRepository, StrategyRepository>();
-    services.AddSingleton<IStrategyService, StrategyService>();
-    services.AddSingleton<IStrategyTestService, StrategyTestService>();
     services.AddSingleton<IStrategyOperations, StrategyOperations>();
 
     services.AddHostedService<MessageConsumerService>();
@@ -67,4 +65,6 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         opt.WaitForJobsToComplete = true;
     });
     services.AddHostedService<BacktestCleanUpService>();
+    services.AddWithAllDerivedTypes<IStrategyService>();
+
 }

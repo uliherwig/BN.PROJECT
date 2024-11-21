@@ -2,7 +2,8 @@
 
 public interface IStrategyService
 {
-    Task StartTest(BacktestSettings testSettings);
-    Task EvaluateQuotes(StrategyMessage message);
+    Task StartTest(StrategyMessage message);
+    Task EvaluateQuote(Guid testId, Quote quote);
     Task StopTest(StrategyMessage message);
+    bool CanHandle(StrategyEnum strategy);
 }

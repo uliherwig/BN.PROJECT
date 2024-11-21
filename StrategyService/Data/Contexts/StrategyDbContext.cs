@@ -2,7 +2,7 @@
 
 public class StrategyDbContext : DbContext
 {
-    public DbSet<BacktestSettings> Strategies { get; set; }
+    public DbSet<StrategySettingsModel> Strategies { get; set; }
     public DbSet<Position> Positions { get; set; }
 
     public StrategyDbContext(DbContextOptions<StrategyDbContext> options)
@@ -12,6 +12,6 @@ public class StrategyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);      
+        base.OnModelCreating(modelBuilder);   
     }
 }

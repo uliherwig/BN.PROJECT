@@ -8,7 +8,7 @@ public class Position
     public Guid TestId { get; set; }
     public required string Symbol { get; set; }
     public int Quantity { get; set; }
-    public Side Side { get; set; }
+    public SideEnum Side { get; set; }
     public decimal PriceOpen { get; set; }
     public decimal PriceClose { get; set; }
     public decimal ProfitLoss { get; set; }

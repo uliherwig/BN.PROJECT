@@ -22,65 +22,6 @@ namespace BN.PROJECT.StrategyService.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("BN.PROJECT.Core.BacktestSettings", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("AllowOvernight")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("Bookmarked")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("BreakoutPeriod")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Broker")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("StopLossPercent")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("StopLossStrategy")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Strategy")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("TakeProfitPercent")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("TestStamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("TrailingStop")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Strategies");
-                });
-
             modelBuilder.Entity("BN.PROJECT.Core.Position", b =>
                 {
                     b.Property<Guid>("Id")
@@ -140,6 +81,63 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Positions");
+                });
+
+            modelBuilder.Entity("BN.PROJECT.Core.StrategySettingsModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AllowOvernight")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Asset")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Bookmarked")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Broker")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("StopLossPercent")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Strategy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StrategyParams")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TakeProfitPercent")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("TestStamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("TrailingStop")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Strategies");
                 });
 #pragma warning restore 612, 618
         }

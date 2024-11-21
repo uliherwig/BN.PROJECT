@@ -16,7 +16,7 @@ public class StrategyServiceClient : IStrategyServiceClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
-    public async Task<string> StartStrategyAsync(BacktestSettings testSettings)
+    public async Task<string> StartStrategyAsync(StrategySettingsModel testSettings)
     {
         try
         {

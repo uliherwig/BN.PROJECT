@@ -20,36 +20,22 @@ public class BacktestController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> RunBacktest([FromBody] BacktestSettings backtestSettings)
+    public async Task<IActionResult> RunBacktest([FromBody] StrategySettingsModel settings)
     {
 
-        backtestSettings.Id = Guid.NewGuid();
-        backtestSettings.StartDate = backtestSettings.StartDate.ToUniversalTime();
-        backtestSettings.EndDate = backtestSettings.EndDate.ToUniversalTime();
-        backtestSettings.TestStamp = DateTime.UtcNow;
-
-        //var  backtestSettings = new BacktestSettings
-        //{
-        //    Symbol = "SPY",
-        //    Name = "Test",
-        //    TakeProfitFactor = 0.01,
-        //    StopLossFactor = 0.01,
-        //    StartDate = new DateTime(2024, 9, 2).ToUniversalTime(),
-        //    EndDate = new DateTime(2024, 9, 7).ToUniversalTime(),
-        //    Strategy = Strategy.Breakout,
-        //    TimeFrame = Core.TimeFrame.Day,
-        //    UserEmail = "johndoe@test.de"
-        //};
+        settings.Id = Guid.NewGuid();
+        settings.StartDate = settings.StartDate.ToUniversalTime();
+        settings.EndDate = settings.EndDate.ToUniversalTime();
+        settings.TestStamp = DateTime.UtcNow;      
 
         try
         {
-            if (backtestSettings == null)
+            if (settings == null)
             {
                 return BadRequest("BacktestSettings cannot be null");
             }
 
-
-            var result = await _strategyServiceClient.StartStrategyAsync(backtestSettings);
+            var result = await _strategyServiceClient.StartStrategyAsync(settings);
             if (Enum.TryParse(result, out ErrorCode errorCode))
             {
                 return BadRequest(errorCode);
@@ -57,7 +43,7 @@ public class BacktestController : ControllerBase
 
             if (result == "true")
             {
-                await _backtestService.RunBacktest(backtestSettings);
+                await _backtestService.RunBacktest(settings);
             }
 
             return Ok(result);

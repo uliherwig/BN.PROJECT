@@ -1,4 +1,6 @@
-﻿namespace BN.PROJECT.StrategyService;
+﻿using System.Diagnostics;
+
+namespace BN.PROJECT.StrategyService;
 public class MessageConsumerService : IHostedService
 {
     private readonly ILogger<MessageConsumerService> _logger;
@@ -12,7 +14,7 @@ public class MessageConsumerService : IHostedService
         _serviceProvider = serviceProvider;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -26,9 +28,9 @@ public class MessageConsumerService : IHostedService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error in QuoteConsumerService");
-            return;
+            _logger.LogError(e, "Error in QuoteConsumerService");           
         }
+        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -39,26 +41,35 @@ public class MessageConsumerService : IHostedService
     private async void ConsumeMessage(string messageJson)
     {
         var message = JsonConvert.DeserializeObject<StrategyMessage>(messageJson);
-        _logger.LogInformation($"Nachricht empfangen: {message}");
+        if (message == null)
+        {
+            return;
+        }
 
         using (var scope = _serviceProvider.CreateScope())
         {
-            var strategyService = scope.ServiceProvider.GetRequiredService<IStrategyTestService>();
+            var services = scope.ServiceProvider.GetServices<IStrategyService>();
 
-            if (message?.Type == MessageType.StartTest)
+            var strategyService = services.Single(s => s.CanHandle(message.Strategy));
+
+            if (message.MessageType == MessageTypeEnum.StartTest)
             {
                 await strategyService.StartTest(message);
             }
 
-            if (message?.Type == MessageType.Quotes)
+            if (message.MessageType == MessageTypeEnum.Quotes && message.Quotes != null)
             {
+                var stopwatch = Stopwatch.StartNew();
+
                 foreach (var quote in message.Quotes)
                 {
-                    await strategyService.EvaluateQuote(message.TestId, quote);
+                    await strategyService.EvaluateQuote(message.StrategyId, quote);
                 }
+                stopwatch.Stop();
+                _logger.LogInformation($"EvaluateQuote done in {stopwatch.Elapsed.TotalMilliseconds} ms");
             }
 
-            if (message?.Type == MessageType.StopTest)
+            if (message.MessageType == MessageTypeEnum.StopTest)
             {
                 await strategyService.StopTest(message);
             }

@@ -5,10 +5,15 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 
 ## to be done
 
-- add unit test project for alpaca service
 - add unit tests for all services
 - implement code coverage tool coverlet
 - implement code coverage report generator 
+
+## Version 2024.11.1
+
+- implement architecture for handling of different strategies
+- refactor models
+- implement template for new strategies
 
 ## Version 2024.10.4
 

@@ -16,7 +16,7 @@ public class BrokerServiceClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
-    public async Task<string> StartStrategyAsync(BacktestSettings testSettings)
+    public async Task<string> StartStrategyAsync(StrategySettingsModel testSettings)
     {
         var json = JsonConvert.SerializeObject(testSettings);
         var content = new StringContent(json, Encoding.UTF8, "application/json");

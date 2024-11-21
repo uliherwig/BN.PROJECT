@@ -1,5 +1,5 @@
 ﻿namespace BN.PROJECT.Core;
-public enum Side
+public enum SideEnum
 {
     Buy,
     Sell

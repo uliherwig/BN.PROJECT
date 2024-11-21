@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.StrategyService;
 
-public class StrategyProcessModel
+public class BreakoutProcessModel
 {
     public DateTime StartDate { get; set; }
     public TimeSpan BreakoutTimeSpan { get; set; }
@@ -17,6 +17,15 @@ public class StrategyProcessModel
     public DateTime PrevLowStamp { get; set; }
     public decimal PrevHigh { get; set; }
     public DateTime PrevHighStamp { get; set; }
+    public string? Asset { get; set; }
+    public TimeSpan TimeFrame { get; set; }
+    public decimal DifferenceHighLow { get; set; }
+    public bool IsIncreasing { get; set; }
+    public bool AllowOvernight { get; set; }
+    public decimal TakeProfitPercent { get; set; }
+    public decimal StopLossPercent { get; set; }
+    public decimal TrailingStop { get; set; }
+    public Guid Id { get; set; }
 
 
 

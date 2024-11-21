@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.Core;
 
-public enum MessageType
+public enum MessageTypeEnum
 {
     StartTest,
     Quotes,

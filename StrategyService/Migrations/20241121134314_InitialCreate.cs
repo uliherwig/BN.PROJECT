@@ -44,20 +44,19 @@ namespace BN.PROJECT.StrategyService.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Strategy = table.Column<int>(type: "integer", nullable: false),
                     Broker = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Symbol = table.Column<string>(type: "text", nullable: false),
+                    Asset = table.Column<string>(type: "text", nullable: false),
                     TakeProfitPercent = table.Column<decimal>(type: "numeric", nullable: false),
                     StopLossPercent = table.Column<decimal>(type: "numeric", nullable: false),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Strategy = table.Column<int>(type: "integer", nullable: false),
-                    BreakoutPeriod = table.Column<int>(type: "integer", nullable: false),
                     TrailingStop = table.Column<decimal>(type: "numeric", nullable: false),
                     AllowOvernight = table.Column<bool>(type: "boolean", nullable: false),
                     Bookmarked = table.Column<bool>(type: "boolean", nullable: false),
-                    StopLossStrategy = table.Column<int>(type: "integer", nullable: false),
-                    TestStamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    TestStamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    StrategyParams = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

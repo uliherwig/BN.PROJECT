@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.Core;
 
-public enum StopLossStrategy
+public enum StopLossTypeEnum
 {
     Breakout,
     CustomLimit

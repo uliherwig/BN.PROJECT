@@ -1,5 +1,5 @@
 ﻿namespace BN.PROJECT.Core;
-public enum BreakoutPeriod
+public enum BreakoutPeriodEnum
 {
     Minute,
     TenMinutes,

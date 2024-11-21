@@ -6,7 +6,7 @@ public static class PositionExtensions
         Guid testId,
         string symbol,
         int quantity,
-        Side side,
+        SideEnum side,
         decimal priceOpen,
         decimal stopLoss,
         decimal takeProfit,
@@ -33,7 +33,7 @@ public static class PositionExtensions
       Guid testId,
       string symbol,
       int quantity,
-      Side side,
+      SideEnum side,
       decimal priceOpen,
       decimal stopLoss,
       decimal takeProfit,
@@ -78,6 +78,6 @@ public static class PositionExtensions
         position.PriceClose = priceClose;
         position.StampClosed = stampClose.ToUniversalTime();
         position.CloseSignal = closeSignal;
-        position.ProfitLoss = (priceClose - position.PriceOpen) * position.Quantity * (position.Side == Side.Buy ? 1 : -1);
+        position.ProfitLoss = (priceClose - position.PriceOpen) * position.Quantity * (position.Side == SideEnum.Buy ? 1 : -1);
     }
 }

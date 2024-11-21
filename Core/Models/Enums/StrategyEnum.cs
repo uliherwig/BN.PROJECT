@@ -1,5 +1,5 @@
 ﻿namespace BN.PROJECT.Core;
-public enum Strategy
+public enum StrategyEnum
 {
     None,
     Breakout,
@@ -7,6 +7,7 @@ public enum Strategy
     Momentum,
     Reversal,
     TrendFollowing,
+    SimpleMovingAverage,
     //ValueInvesting,
     //GrowthInvesting,
     //DividendInvesting,

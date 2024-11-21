@@ -15,24 +15,24 @@ public class StrategyOperations : IStrategyOperations
         return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day).Add(startOfTimeSpan);
     }
 
-    public TimeSpan GetTimeSpanByBreakoutPeriod(BreakoutPeriod breakoutPeriod)
+    public TimeSpan GetTimeSpanByBreakoutPeriod(BreakoutPeriodEnum breakoutPeriod)
     {
         return breakoutPeriod switch
         {
-            BreakoutPeriod.Day => TimeSpan.FromDays(1),
-            BreakoutPeriod.Hour => TimeSpan.FromHours(1),
-            BreakoutPeriod.Minute => TimeSpan.FromMinutes(1),
-            BreakoutPeriod.TenMinutes => TimeSpan.FromMinutes(10),
+            BreakoutPeriodEnum.Day => TimeSpan.FromDays(1),
+            BreakoutPeriodEnum.Hour => TimeSpan.FromHours(1),
+            BreakoutPeriodEnum.Minute => TimeSpan.FromMinutes(1),
+            BreakoutPeriodEnum.TenMinutes => TimeSpan.FromMinutes(10),
             _ => TimeSpan.FromDays(1)
         };
     }
 
-    public Position OpenPosition(BacktestSettings settings, StrategyProcessModel tpm, Quote quote, Side positionType)
+    public Position OpenPosition(BreakoutProcessModel tpm, Quote quote, SideEnum positionType)
     {
-        var stopLoss = positionType == Side.Buy ? tpm.PrevLow : tpm.PrevHigh;
-        var takeProfit = positionType == Side.Buy ? quote.AskPrice + (quote.AskPrice * settings.TakeProfitPercent / 100) : quote.BidPrice - (quote.BidPrice * settings.TakeProfitPercent / 100);
-        var position = PositionExtensions.CreatePosition(settings.Id,
-                             settings.Symbol,
+        var stopLoss = positionType == SideEnum.Buy ? tpm.PrevLow : tpm.PrevHigh;
+        var takeProfit = positionType == SideEnum.Buy ? quote.AskPrice + (quote.AskPrice * tpm.TakeProfitPercent / 100) : quote.BidPrice - (quote.BidPrice * tpm.TakeProfitPercent / 100);
+        var position = PositionExtensions.CreatePosition(tpm.Id,
+                             tpm.Asset,
                              1,
                              positionType,
                              quote.AskPrice,
@@ -44,6 +44,11 @@ public class StrategyOperations : IStrategyOperations
                              tpm.PrevLowStamp,
                              tpm.PrevHighStamp);
         return position;
+    }
+
+    public BreakoutModel GetBreakoutModel(StrategySettingsModel settings)
+    {
+        return JsonConvert.DeserializeObject<BreakoutModel>(settings.StrategyParams);
     }
 
 }

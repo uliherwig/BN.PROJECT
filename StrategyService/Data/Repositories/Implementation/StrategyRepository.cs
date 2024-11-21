@@ -2,7 +2,6 @@
 
 public class StrategyRepository : IStrategyRepository
 {
-
     private readonly StrategyDbContext _context;
     private readonly ILogger<StrategyRepository> _logger;
 
@@ -12,40 +11,42 @@ public class StrategyRepository : IStrategyRepository
         _logger = logger;
     }
 
-    public async Task<List<BacktestSettings>> GetBacktestsByUserIdAsync(Guid userId, bool bookmarked) =>
+    public async Task<List<StrategySettingsModel>> GetStrategiesByUserIdAsync(Guid userId, bool bookmarked) =>
         bookmarked ? await _context.Strategies.Where(s => s.UserId == userId && s.Bookmarked).OrderByDescending(s => s.TestStamp).ToListAsync()
         : await _context.Strategies.Where(s => s.UserId == userId).OrderByDescending(s => s.TestStamp).ToListAsync();
 
-    public async Task<BacktestSettings?> GetBacktestByIdAsync(Guid testId) =>
+    public async Task<StrategySettingsModel?> GetStrategyByIdAsync(Guid testId) =>
         await _context.Strategies.Where(s => s.Id == testId).FirstOrDefaultAsync();
 
-
-    public async Task AddBacktestAsync(BacktestSettings backtestSettings)
+    public async Task AddStrategyAsync(StrategySettingsModel strategySettings)
     {
         try
         {
-            await _context.Strategies.AddAsync(backtestSettings);
+            await _context.Strategies.AddAsync(strategySettings);
             await _context.SaveChangesAsync();
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error adding backtestsettings");
-        }
-    }
-    public async Task UpdateBacktestAsync(BacktestSettings backtestSettings)
-    {
-        try
-        {
-            _context.Strategies.Update(backtestSettings);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error adding backtestsettings");
+            _logger.LogError(e, "Error adding strategy settings");
         }
     }
 
-    public async Task<List<Position>> GetPositionsByTestId(Guid testId) => await _context.Positions.Where(p => p.TestId == testId).ToListAsync();
+    public async Task<int> UpdateStrategyAsync(StrategySettingsModel strategySettings)
+    {
+        try
+        {
+            _context.Strategies.Update(strategySettings);
+            return await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error updating strategy settings");
+        }
+        return 0;
+    }
+
+    public async Task<List<Position>> GetPositionsByStrategyIdAsync(Guid testId) =>
+        await _context.Positions.Where(p => p.TestId == testId).ToListAsync();
 
     public async Task AddPositionAsync(Position position)
     {
@@ -56,9 +57,10 @@ public class StrategyRepository : IStrategyRepository
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error adding backtest positions");
+            _logger.LogError(e, "Error adding strategy positions");
         }
     }
+
     public async Task UpdatePositionAsync(Position position)
     {
         try
@@ -68,9 +70,10 @@ public class StrategyRepository : IStrategyRepository
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error updating backtest positions");
+            _logger.LogError(e, "Error updating strategy positions");
         }
     }
+
     public async Task AddPositionsAsync(List<Position> positions)
     {
         try
@@ -80,37 +83,36 @@ public class StrategyRepository : IStrategyRepository
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error adding backtest positions");
+            _logger.LogError(e, "Error adding strategy positions");
         }
     }
 
-    public async Task DeleteBacktest(BacktestSettings backtestSettings)
+    public async Task DeleteStrategyAsync(StrategySettingsModel strategySettings)
     {
-        _context.Strategies.Remove(backtestSettings);
+        _context.Strategies.Remove(strategySettings);
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeletePositions(List<Position> positions)
+    public async Task DeletePositionsAsync(List<Position> positions)
     {
         _context.Positions.RemoveRange(positions);
         await _context.SaveChangesAsync();
     }
 
-    public async Task CleanupBacktests()
+    public async Task CleanupStrategiesAsync()
     {
         try
         {
             var threshold = DateTime.UtcNow.AddDays(-30);
-            var tests = await _context.Strategies.Where(t => t.TestStamp < threshold && t.Bookmarked == false).ToListAsync();
-            var positions = await _context.Positions.Where(p => tests.Select(t => t.Id).Contains(p.TestId)).ToListAsync();
-            _context.Strategies.RemoveRange(tests);
+            var strategies = await _context.Strategies.Where(t => t.TestStamp < threshold && t.Bookmarked == false).ToListAsync();
+            var positions = await _context.Positions.Where(p => strategies.Select(t => t.Id).Contains(p.TestId)).ToListAsync();
+            _context.Strategies.RemoveRange(strategies);
             _context.Positions.RemoveRange(positions);
             await _context.SaveChangesAsync();
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error cleaning up backtests");
+            _logger.LogError(e, "Error cleaning up strategies");
         }
-
     }
 }
