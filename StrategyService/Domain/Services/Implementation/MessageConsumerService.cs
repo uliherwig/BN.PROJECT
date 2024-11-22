@@ -66,7 +66,7 @@ public class MessageConsumerService : IHostedService
                     await strategyService.EvaluateQuote(message.StrategyId, quote);
                 }
                 stopwatch.Stop();
-                _logger.LogInformation($"EvaluateQuote done in {stopwatch.Elapsed.TotalMilliseconds} ms");
+                _logger.LogInformation($"EvaluateQuote done in {stopwatch.Elapsed.TotalMilliseconds} ms. Number of quotes = {message.Quotes.Count}");
             }
 
             if (message.MessageType == MessageTypeEnum.StopTest)
