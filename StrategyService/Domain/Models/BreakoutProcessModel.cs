@@ -17,7 +17,8 @@ public class BreakoutProcessModel
     public DateTime PrevLowStamp { get; set; }
     public decimal PrevHigh { get; set; }
     public DateTime PrevHighStamp { get; set; }
-    public string? Asset { get; set; }
+    public required string Asset { get; set; }
+    public int Quantity { get; set; }
     public TimeSpan TimeFrame { get; set; }
     public decimal DifferenceHighLow { get; set; }
     public bool IsIncreasing { get; set; }
@@ -25,7 +26,7 @@ public class BreakoutProcessModel
     public decimal TakeProfitPercent { get; set; }
     public decimal StopLossPercent { get; set; }
     public decimal TrailingStop { get; set; }
-    public Guid Id { get; set; }
+    public Guid StrategyId { get; set; }
 
 
 

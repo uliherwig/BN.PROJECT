@@ -9,6 +9,10 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 - implement code coverage tool coverlet
 - implement code coverage report generator 
 
+## Version 2024.11.2
+
+- sma strategy implementation
+
 ## Version 2024.11.1
 
 - implement architecture for handling of different strategies

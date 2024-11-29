@@ -27,28 +27,8 @@ public class StrategyOperations : IStrategyOperations
         };
     }
 
-    public Position OpenPosition(BreakoutProcessModel tpm, Quote quote, SideEnum positionType)
-    {
-        var stopLoss = positionType == SideEnum.Buy ? tpm.PrevLow : tpm.PrevHigh;
-        var takeProfit = positionType == SideEnum.Buy ? quote.AskPrice + (quote.AskPrice * tpm.TakeProfitPercent / 100) : quote.BidPrice - (quote.BidPrice * tpm.TakeProfitPercent / 100);
-        var position = PositionExtensions.CreatePosition(tpm.Id,
-                             tpm.Asset,
-                             1,
-                             positionType,
-                             quote.AskPrice,
-                             stopLoss,
-                             takeProfit,
-                             quote.TimestampUtc,
-                             tpm.PrevLow,
-                             tpm.PrevHigh,
-                             tpm.PrevLowStamp,
-                             tpm.PrevHighStamp);
-        return position;
-    }
-
     public BreakoutModel GetBreakoutModel(StrategySettingsModel settings)
     {
         return JsonConvert.DeserializeObject<BreakoutModel>(settings.StrategyParams);
     }
-
 }

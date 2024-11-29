@@ -1,37 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-    <RootNamespace>BN.PROJECT.AlpacaServiceTests</RootNamespace>
-  </PropertyGroup>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+		<RootNamespace>BN.PROJECT.AlpacaServiceTests</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Quartz" Version="3.12.0" />
-    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.12.0" />
-    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.12.0" />
-    <PackageReference Include="xunit" Version="2.5.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="coverlet.collector" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+		<PackageReference Include="Moq" Version="4.20.72" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Quartz" Version="3.12.0" />
+		<PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.12.0" />
+		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.12.0" />
+		<PackageReference Include="xunit" Version="2.5.3" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
+	<ItemGroup>
+		<Using Include="Xunit" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Adapter\" />
-    <Folder Include="Controllers\" />
-    <Folder Include="Data\" />
-    <Folder Include="Domain\" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\AlpacaService\AlpacaService.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Adapter\" />
+		<Folder Include="Controllers\" />
+		<Folder Include="Data\" />
+		<Folder Include="Domain\" />
+	</ItemGroup>
 
 </Project>

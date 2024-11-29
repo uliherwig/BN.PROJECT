@@ -3,66 +3,39 @@
 public static class PositionExtensions
 {
     public static Position CreatePosition(
-        Guid testId,
+        Guid strategyId,
         string symbol,
         int quantity,
         SideEnum side,
         decimal priceOpen,
         decimal stopLoss,
         decimal takeProfit,
-        DateTime stampOpen)
+        DateTime stampOpen,
+        StrategyEnum strategyType,
+        string StrategyParameter)
     {
         var position = new Position
         {
             Id = Guid.NewGuid(),
-            TestId = testId,
+            StrategyId = strategyId,
             Symbol = symbol,
             Quantity = quantity,
             Side = side,
             PriceOpen = priceOpen,
+            PriceClose = 0,
+            ProfitLoss = 0,
+            StampClosed = DateTime.MinValue,
             TakeProfit = takeProfit,
             StopLoss = stopLoss,
             StampOpened = stampOpen.ToUniversalTime(),
             CloseSignal = "",
+            StrategyType = strategyType,
+            StrategyParams = StrategyParameter
+
         };
 
         return position;
-    }
-
-    public static Position CreatePosition(
-      Guid testId,
-      string symbol,
-      int quantity,
-      SideEnum side,
-      decimal priceOpen,
-      decimal stopLoss,
-      decimal takeProfit,
-      DateTime stampOpen,
-      decimal prevLow,
-      decimal prevHigh,
-      DateTime prevLowStamp,
-      DateTime prevHighStamp)
-    {
-        var position = new Position
-        {
-            Id = Guid.NewGuid(),
-            TestId = testId,
-            Symbol = symbol,
-            Quantity = quantity,
-            Side = side,
-            PriceOpen = priceOpen,
-            TakeProfit = takeProfit,
-            StopLoss = stopLoss,
-            StampOpened = stampOpen.ToUniversalTime(),
-            CloseSignal = "",
-            PrevHigh = prevHigh,
-            PrevLow = prevLow,
-            PrevHighStamp = prevHighStamp.ToUniversalTime(),
-            PrevLowStamp = prevLowStamp.ToUniversalTime()
-        };
-
-        return position;
-    }
+    }   
 
     public static bool UpdateTakeProfitAndStopLoss(this Position position, decimal newTakeProfit, decimal newStopLoss)
     {

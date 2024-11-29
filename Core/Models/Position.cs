@@ -5,7 +5,7 @@ public class Position
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; } = Guid.NewGuid();
-    public Guid TestId { get; set; }
+    public Guid StrategyId { get; set; }
     public required string Symbol { get; set; }
     public int Quantity { get; set; }
     public SideEnum Side { get; set; }
@@ -16,9 +16,8 @@ public class Position
     public decimal StopLoss { get; set; }
     public DateTime StampOpened { get; set; }
     public DateTime StampClosed { get; set; }
-    public string CloseSignal { get; set; } = "";
-    public decimal PrevLow { get; set; }
-    public DateTime PrevLowStamp { get; set; }
-    public decimal PrevHigh { get; set; }
-    public DateTime PrevHighStamp { get; set; }
+    public string CloseSignal { get; set; } = string.Empty;
+    public StrategyEnum StrategyType { get; set; }
+    public string StrategyParams { get; set; } = string.Empty;
+   
 }

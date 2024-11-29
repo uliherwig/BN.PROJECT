@@ -25,7 +25,7 @@ public class BacktestService : IBacktestService
         var message = new StrategyMessage
         {
             StrategyId = testSettings.Id,
-            Strategy = testSettings.Strategy,
+            Strategy = testSettings.StrategyType,
             MessageType = MessageTypeEnum.StartTest,
             Settings = testSettings
         };

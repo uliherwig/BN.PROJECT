@@ -46,7 +46,7 @@ public class StrategyRepository : IStrategyRepository
     }
 
     public async Task<List<Position>> GetPositionsByStrategyIdAsync(Guid testId) =>
-        await _context.Positions.Where(p => p.TestId == testId).ToListAsync();
+        await _context.Positions.Where(p => p.StrategyId == testId).ToListAsync();
 
     public async Task AddPositionAsync(Position position)
     {
@@ -105,7 +105,7 @@ public class StrategyRepository : IStrategyRepository
         {
             var threshold = DateTime.UtcNow.AddDays(-30);
             var strategies = await _context.Strategies.Where(t => t.TestStamp < threshold && t.Bookmarked == false).ToListAsync();
-            var positions = await _context.Positions.Where(p => strategies.Select(t => t.Id).Contains(p.TestId)).ToListAsync();
+            var positions = await _context.Positions.Where(p => strategies.Select(t => t.Id).Contains(p.StrategyId)).ToListAsync();
             _context.Strategies.RemoveRange(strategies);
             _context.Positions.RemoveRange(positions);
             await _context.SaveChangesAsync();

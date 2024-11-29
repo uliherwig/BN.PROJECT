@@ -16,7 +16,7 @@ namespace BN.PROJECT.StrategyService.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TestId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StrategyId = table.Column<Guid>(type: "uuid", nullable: false),
                     Symbol = table.Column<string>(type: "text", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     Side = table.Column<int>(type: "integer", nullable: false),
@@ -28,10 +28,8 @@ namespace BN.PROJECT.StrategyService.Migrations
                     StampOpened = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     StampClosed = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CloseSignal = table.Column<string>(type: "text", nullable: false),
-                    PrevLow = table.Column<decimal>(type: "numeric", nullable: false),
-                    PrevLowStamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PrevHigh = table.Column<decimal>(type: "numeric", nullable: false),
-                    PrevHighStamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    StrategyType = table.Column<int>(type: "integer", nullable: false),
+                    StrategyParams = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,10 +42,11 @@ namespace BN.PROJECT.StrategyService.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Strategy = table.Column<int>(type: "integer", nullable: false),
+                    StrategyType = table.Column<int>(type: "integer", nullable: false),
                     Broker = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Asset = table.Column<string>(type: "text", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
                     TakeProfitPercent = table.Column<decimal>(type: "numeric", nullable: false),
                     StopLossPercent = table.Column<decimal>(type: "numeric", nullable: false),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

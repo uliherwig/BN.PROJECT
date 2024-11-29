@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.StrategyService.Migrations
 {
     [DbContext(typeof(StrategyDbContext))]
-    [Migration("20241121134314_InitialCreate")]
+    [Migration("20241126093934_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,18 +34,6 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<string>("CloseSignal")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<decimal>("PrevHigh")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("PrevHighStamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("PrevLow")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("PrevLowStamp")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("PriceClose")
                         .HasColumnType("numeric");
@@ -71,15 +59,22 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<decimal>("StopLoss")
                         .HasColumnType("numeric");
 
+                    b.Property<Guid>("StrategyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("StrategyParams")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("StrategyType")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Symbol")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<decimal>("TakeProfit")
                         .HasColumnType("numeric");
-
-                    b.Property<Guid>("TestId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -113,18 +108,21 @@ namespace BN.PROJECT.StrategyService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("StopLossPercent")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("Strategy")
-                        .HasColumnType("integer");
-
                     b.Property<string>("StrategyParams")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("StrategyType")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("TakeProfitPercent")
                         .HasColumnType("numeric");

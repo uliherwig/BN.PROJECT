@@ -1,5 +1,4 @@
-﻿using BN.PROJECT.Core;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace BN.PROJECT.StrategyService;
 
@@ -11,7 +10,6 @@ public class BreakoutStrategy : IStrategyService
 
     private readonly ConcurrentDictionary<Guid, List<Position>> _positions = new();
     private readonly ConcurrentDictionary<Guid, BreakoutProcessModel> _strategyProcesses = new();
-    //private readonly ConcurrentDictionary<Guid, StrategySettingsModel> _testSettings = new();
 
     public BreakoutStrategy(
         ILogger<BreakoutStrategy> logger,
@@ -23,17 +21,13 @@ public class BreakoutStrategy : IStrategyService
         _strategyOperations = strategyOperations;
     }
 
-    public async Task StartTest(StrategyMessage message)
+    public Task StartTest(StrategyMessage message)
     {
-        if (message == null)
+        if (message == null || message.Settings == null)
         {
-            return;
+            return Task.CompletedTask;
         }
         var strategySettings = message.Settings;
-        if (strategySettings == null)
-        {
-            return;
-        }
         var breakOutSettings = _strategyOperations.GetBreakoutModel(strategySettings);
 
         var tpm = new BreakoutProcessModel
@@ -51,14 +45,15 @@ public class BreakoutStrategy : IStrategyService
             MarketCloseTime = new TimeSpan(19, 55, 0), // todo replace with method to get market close time get it from asset
             AllowOvernight = strategySettings.AllowOvernight,
             Asset = strategySettings.Asset,
-            Id = message.StrategyId,
+            Quantity = strategySettings.Quantity,
+            StrategyId = message.StrategyId,
             TakeProfitPercent = strategySettings.TakeProfitPercent,
             StopLossPercent = strategySettings.StopLossPercent,
             TrailingStop = strategySettings.TrailingStop,
         };
         _ = _strategyProcesses.TryAdd(message.StrategyId, tpm);
-        _ = _positions.TryAdd(message.StrategyId, []);
-        return;
+        _ = _positions.TryAdd(message.StrategyId, new List<Position>());
+        return Task.CompletedTask;
     }
 
 
@@ -87,6 +82,8 @@ public class BreakoutStrategy : IStrategyService
             tpm.PrevTimeFrameStart = tpm.TimeFrameStart;
             tpm.CurrentHigh = quote.AskPrice;
             tpm.CurrentLow = quote.BidPrice;
+            tpm.CurrentHighStamp = quote.TimestampUtc;
+            tpm.CurrentLowStamp = quote.TimestampUtc;
         }
         tpm.TimeFrameStart = _strategyOperations.GetStartOfTimeSpan(quoteStamp, tpm.BreakoutTimeSpan);
 
@@ -101,6 +98,7 @@ public class BreakoutStrategy : IStrategyService
                 tpm.PrevHighStamp = tpm.CurrentHighStamp;
                 tpm.PrevLow = tpm.CurrentLow;
                 tpm.PrevLowStamp = tpm.CurrentLowStamp;
+                _logger.LogInformation($"#Breakout Limits {tpm.PrevLowStamp:MM.dd HH:mm} {tpm.PrevHighStamp:MM.dd HH:mm}  Low: {tpm.PrevLow}  High: {tpm.PrevHigh}");
             }
 
             tpm.TakeProfitPlus = (tpm.PrevHigh - tpm.PrevLow) / 2;
@@ -131,46 +129,73 @@ public class BreakoutStrategy : IStrategyService
         }
 
 
-        // check if we need to close position at EoD 
-        if (tpm.AllowOvernight == false && quoteStamp.TimeOfDay > tpm.MarketCloseTime)
-        {
-            var position = _positions[testId].FirstOrDefault(p => p.PriceClose == 0);
-            if (position != null)
-            {
-                var closePrice = position.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
-                position.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close");
-            }
-            return Task.CompletedTask;
-        }
+
 
 
         var openPosition = _positions[testId].Where(p => p.PriceClose == 0).FirstOrDefault();
         if (openPosition == null)
         {
+            var breakoutParams = JsonConvert.SerializeObject(new
+            {
+                PrevLow = tpm.PrevLow,
+                PrevHigh = tpm.PrevHigh,
+                PrevLowStamp = tpm.PrevLowStamp,
+                PrevHighStamp = tpm.PrevHighStamp
+            });
 
             // check breakout high
-            if (quote.AskPrice > tpm.PrevHigh)
+            if (quote.AskPrice > tpm.PrevHigh && quote.AskPrice - tpm.PrevHigh < 1)
             {
-                var position = _strategyOperations.OpenPosition( tpm, quote, SideEnum.Buy);
+                var position = PositionExtensions.CreatePosition(
+                                     tpm.StrategyId,
+                                     tpm.Asset,
+                                     tpm.Quantity,
+                                     SideEnum.Buy,
+                                     quote.AskPrice,
+                                     tpm.PrevLow,
+                                     quote.BidPrice + (quote.BidPrice * tpm.TakeProfitPercent / 100),
+                                     quote.TimestampUtc,
+                                     StrategyEnum.Breakout,
+                                     breakoutParams);
+
+
                 _positions[testId].Add(position);
             }
 
             // check breakout low
-            if (quote.BidPrice < tpm.PrevLow)
+            if (quote.BidPrice < tpm.PrevLow && tpm.PrevLow - quote.BidPrice < 1)
             {
-                var position = _strategyOperations.OpenPosition( tpm, quote, SideEnum.Sell);
+                var position = PositionExtensions.CreatePosition(
+                                   tpm.StrategyId,
+                                   tpm.Asset,
+                                   tpm.Quantity,
+                                   SideEnum.Sell,
+                                   quote.AskPrice,
+                                   tpm.PrevHigh,
+                                   quote.BidPrice - (quote.BidPrice * tpm.TakeProfitPercent / 100),
+                                   quote.TimestampUtc,
+                                   StrategyEnum.Breakout,
+                                   breakoutParams);
+
                 _positions[testId].Add(position);
             }
         }
         else
         {
+            // check if we need to close position at EoD 
+            if (tpm.AllowOvernight == false && quoteStamp.TimeOfDay > tpm.MarketCloseTime)
+            {
+                var closePrice = openPosition.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
+                openPosition.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close");
+                return Task.CompletedTask;
+            }
             if (openPosition.Side == SideEnum.Buy)
             {
-                if (quote.AskPrice > openPosition.TakeProfit)
+                if (quote.BidPrice > openPosition.TakeProfit)
                 {
                     if (tpm.TrailingStop > 0m)
                     {
-                        var tp = quote.AskPrice + (quote.AskPrice * tpm.TakeProfitPercent / 100);
+                        var tp = quote.BidPrice + (quote.BidPrice * tpm.TakeProfitPercent / 100);
                         var sl = quote.BidPrice - (quote.BidPrice * tpm.TrailingStop / 100);
                         openPosition.UpdateTakeProfitAndStopLoss(tp, sl);
                     }
@@ -188,11 +213,11 @@ public class BreakoutStrategy : IStrategyService
 
             if (openPosition.Side == SideEnum.Sell)
             {
-                if (quote.BidPrice < openPosition.TakeProfit)
+                if (quote.AskPrice < openPosition.TakeProfit)
                 {
                     if (tpm.TrailingStop > 0m)
                     {
-                        var tp = quote.BidPrice - (quote.BidPrice * tpm.TakeProfitPercent / 100);
+                        var tp = quote.AskPrice - (quote.AskPrice * tpm.TakeProfitPercent / 100);
                         var sl = quote.AskPrice + (quote.AskPrice * tpm.TrailingStop / 100);
                         openPosition.UpdateTakeProfitAndStopLoss(tp, sl);
                     }
