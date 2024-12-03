@@ -1,0 +1,65 @@
+name: Build and Deploy Identity Service
+
+on:
+  push:
+    paths:
+      - 'identityservice/**' # Trigger only when files in the Identity service directory are modified
+      - '.github/workflows/identity.yml' # Trigger when this workflow file changes
+  pull_request:
+    paths:
+      - 'services/identity/**'
+
+jobs:
+  build-and-test:
+    name: Build and Test Identity Service
+    runs-on: self-hosted
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up .NET environment
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0' # Use the appropriate version of .NET
+
+      # Step 3: Restore dependencies
+      - name: Restore Dependencies
+        run: |
+          cd services/identity
+          dotnet restore
+
+      # Step 4: Build the service
+      - name: Build Identity Service
+        run: |
+          cd services/identity
+          dotnet build --no-restore --configuration Release
+
+      # Step 5: Run tests
+      - name: Test Identity Service
+        run: |
+          cd services/identity
+          dotnet test --no-build --configuration Release
+
+  dockerize:
+    name: Build Docker Image
+    runs-on: self-hosted
+    needs: build-and-test # Runs only after build-and-test job succeeds
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Build Docker image
+      - name: Build Docker Image
+        run: |
+          docker build -t myregistry/identity-service:latest services/identity
+
+      # Step 3: Push Docker image to registry (optional)
+      - name: Push Docker Image
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker push myregistry/identity-service:latest
