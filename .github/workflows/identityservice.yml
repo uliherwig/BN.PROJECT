@@ -7,7 +7,7 @@ on:
       - '.github/workflows/identity.yml' # Trigger when this workflow file changes
   pull_request:
     paths:
-      - 'services/identity/**'
+      - 'identityservice/**'
 
 jobs:
   build-and-test:
@@ -28,19 +28,19 @@ jobs:
       # Step 3: Restore dependencies
       - name: Restore Dependencies
         run: |
-          cd services/identity
+          cd identityservice
           dotnet restore
 
       # Step 4: Build the service
       - name: Build Identity Service
         run: |
-          cd services/identity
+          cd identityservice
           dotnet build --no-restore --configuration Release
 
       # Step 5: Run tests
       - name: Test Identity Service
         run: |
-          cd services/identity
+          cd identityservice
           dotnet test --no-build --configuration Release
 
   dockerize:
@@ -56,7 +56,7 @@ jobs:
       # Step 2: Build Docker image
       - name: Build Docker Image
         run: |
-          docker build -t myregistry/identity-service:latest services/identity
+          docker build -t myregistry/identity-service:latest identityservice
 
       # Step 3: Push Docker image to registry (optional)
       - name: Push Docker Image
