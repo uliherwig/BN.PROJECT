@@ -1,0 +1,31 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'identityservice/**' # Trigger only when Identity Service files are updated
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted # Use your self-hosted runner
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        run: |
+          echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Step 3: Build the Docker image
+      - name: Build Docker Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/identity-service:latest identityservice
+
+      # Step 4: Push the Docker image to GitHub Container Registry
+      - name: Push Docker Image
+        run: |
+          docker push ghcr.io/${{ github.repository }}/identity-service:latest
