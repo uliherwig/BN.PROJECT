@@ -2,13 +2,13 @@
 
 public class AlpacaDbContext : DbContext
 {
-    public DbSet<AlpacaAsset> Assets { get; set; }
-    public DbSet<AlpacaOrder> Orders { get; set; }
-    public DbSet<AlpacaBar> Bars { get; set; }
-    public DbSet<AlpacaPosition> Positions { get; set; }
-    public DbSet<AlpacaQuote> Quotes { get; set; }
-    public DbSet<UserSettings> UserSettings { get; set; }
-
+    public virtual DbSet<AlpacaAsset> Assets { get; set; }
+    public virtual DbSet<AlpacaOrder> Orders { get; set; }
+    public virtual DbSet<AlpacaBar> Bars { get; set; }
+    public virtual DbSet<AlpacaPosition> Positions { get; set; }
+    public virtual DbSet<AlpacaQuote> Quotes { get; set; }
+    public virtual DbSet<UserSettings> UserSettings { get; set; }
+    public AlpacaDbContext() { }
     public AlpacaDbContext(DbContextOptions<AlpacaDbContext> options)
         : base(options)
     {

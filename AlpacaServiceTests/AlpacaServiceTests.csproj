@@ -35,7 +35,6 @@
 	<ItemGroup>
 		<Folder Include="Adapter\" />
 		<Folder Include="Controllers\" />
-		<Folder Include="Data\" />
 		<Folder Include="Domain\" />
 	</ItemGroup>
 
