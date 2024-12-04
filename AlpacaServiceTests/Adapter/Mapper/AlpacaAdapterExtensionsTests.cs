@@ -3,6 +3,8 @@ using BN.PROJECT.AlpacaService;
 using Moq;
 using Xunit;
 
+namespace BN.PROJECT.AlpacaService.Tests;
+
 public class AlpacaAdapterExtensionsTests
 {
     [Fact]
