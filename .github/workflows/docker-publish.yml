@@ -1,9 +1,16 @@
 name: CI/CD Pipeline
 
 on:
+  workflow_dispatch:
+      inputs:
+        service:
+          description: 'The service to build and deploy'
+          required: true
+          default: 'identity'
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
