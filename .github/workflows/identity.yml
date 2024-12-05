@@ -26,7 +26,7 @@ jobs:
           echo "Path = "
           echo $(pwd)
           ls
-          cd IdentityService
+          cd identityservice
           ls
 
       # Step 2: Log in to GitHub Container Registry
@@ -40,7 +40,7 @@ jobs:
         run: |
           echo $(pwd) 
           cd IdentityService
-          docker build -t identityservice:latest identityservice
+          docker build -t /identityservice:latest identityservice
 
       # Step 4: Push the Docker image to GitHub Container Registry
       - name: Push Docker Image
