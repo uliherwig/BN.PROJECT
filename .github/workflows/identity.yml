@@ -40,6 +40,7 @@ jobs:
         run: |
           echo $(pwd) 
           cd IdentityService
+          ls
           docker build -t identityservice .
 
       # Step 4: Push the Docker image to GitHub Container Registry
