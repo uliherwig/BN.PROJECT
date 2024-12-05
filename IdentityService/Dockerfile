@@ -5,17 +5,21 @@ EXPOSE 5044
 EXPOSE 7076
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-COPY . /src
 WORKDIR /src
-COPY ["IdentityService.csproj", "/"]
-RUN dotnet restore "/IdentityService.csproj"
+
+# Kopieren Sie die Projektdateien und Wiederherstellen der Abhängigkeiten
+COPY ["IdentityService/IdentityService.csproj", "IdentityService/"]
+COPY ["Core/CORE.csproj", "Core/"]
+RUN dotnet restore "IdentityService/IdentityService.csproj"
+
+# Kopieren Sie den Rest des Codes und bauen Sie das Projekt
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/IdentityService"
 RUN dotnet build "IdentityService.csproj" -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "IdentityService.csproj" -c Release -o /app/publish
-	
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
@@ -24,3 +28,4 @@ COPY --from=publish /app/publish .
 ENV ASPNETCORE_URLS=http://+:5044
 
 ENTRYPOINT ["dotnet", "IdentityService.dll"]
+
