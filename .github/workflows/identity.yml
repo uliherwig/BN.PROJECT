@@ -33,7 +33,7 @@ jobs:
       # Step 3: Build the Docker image
       - name: Build Docker Image
         run: |
-          docker build -t ghcr.io/uliherwig/BN.PROJECT/tree/main/IdentityService:latest identityservice
+          docker build -t ghcr.io/uliherwig/bn.project/tree/main/IdentityService:latest identityservice
 
       # Step 4: Push the Docker image to GitHub Container Registry
       - name: Push Docker Image
