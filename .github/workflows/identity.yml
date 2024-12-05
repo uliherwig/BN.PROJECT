@@ -26,7 +26,7 @@ jobs:
           echo "Path = "
           echo $(pwd)
           ls
-          cd identityservice
+          cd IdentityService
           ls
 
       # Step 2: Log in to GitHub Container Registry
