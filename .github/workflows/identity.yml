@@ -25,6 +25,7 @@ jobs:
         run: |
           echo "Path = "
           echo $(pwd)
+          ls
 
       # Step 2: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
