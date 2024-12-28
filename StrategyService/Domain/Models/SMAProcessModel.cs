@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.StrategyService;
 
-public class SMAProcessModel
+public class SmaProcessModel
 {
     public Guid StrategyId { get; set; }
     public DateTime StartDate { get; set; }
@@ -14,9 +14,10 @@ public class SMAProcessModel
     public decimal TrailingStop { get; set; }
     public int ShortPeriod { get; set; }
     public int LongPeriod { get; set; }
+    public StopLossTypeEnum StopLossType { get; set; }
+    public decimal IntersectionThreshold { get; set; }
     public List<Quote> LastQuotes { get; set; } = [];
-
-
+    public List<SmaTick> LastSmas { get; set; } = [];
 
 
 }

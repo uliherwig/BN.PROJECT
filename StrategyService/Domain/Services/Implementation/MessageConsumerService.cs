@@ -28,7 +28,7 @@ public class MessageConsumerService : IHostedService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error in QuoteConsumerService");           
+            _logger.LogError(e, "Error in MessageConsumerService");
         }
         return Task.CompletedTask;
     }
@@ -38,7 +38,7 @@ public class MessageConsumerService : IHostedService
         return Task.CompletedTask;
     }
 
-    private async void ConsumeMessage(string messageJson)
+    public async void ConsumeMessage(string messageJson)
     {
         var message = JsonConvert.DeserializeObject<StrategyMessage>(messageJson);
         if (message == null)

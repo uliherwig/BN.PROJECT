@@ -2,6 +2,8 @@
 
 public enum StopLossTypeEnum
 {
+    None,
     Breakout,
-    CustomLimit
+    SMANextCrossing,
+
 }

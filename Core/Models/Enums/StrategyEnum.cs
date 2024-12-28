@@ -7,7 +7,7 @@ public enum StrategyEnum
     Momentum,
     Reversal,
     TrendFollowing,
-    SimpleMovingAverage,
+    SMA,
     //ValueInvesting,
     //GrowthInvesting,
     //DividendInvesting,

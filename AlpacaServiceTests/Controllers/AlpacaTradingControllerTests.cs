@@ -1,30 +1,40 @@
-﻿using BN.PROJECT.AlpacaService;
+﻿using Alpaca.Markets;
+using BN.PROJECT.AlpacaService;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
+using NuGet.Protocol;
+using System.Dynamic;
 
 namespace BN.PROJECT.AlpacaServiceTests
 {
     public class AlpacaTradingControllerTests
     {
-        private readonly Mock<IAlpacaRepository> _mockRepo;
+        private readonly IAlpacaRepository _alpacaRepository;
         private readonly Mock<IAlpacaTradingService> _mockTradingService;
         private readonly AlpacaTradingController _alpacaTradingController;
 
         public AlpacaTradingControllerTests()
         {
-            _mockRepo = new Mock<IAlpacaRepository>();
-
-            _mockRepo.Setup(repo => repo.GetAssets()).ReturnsAsync(new List<AlpacaAsset>
-            {
-                new AlpacaAsset { Symbol = "A", Name="A", AssetId = Guid.NewGuid() },
-                new AlpacaAsset { Symbol = "B", Name="B", AssetId = Guid.NewGuid() },
-                new AlpacaAsset { Symbol = "C", Name="C", AssetId = Guid.NewGuid() },
-                new AlpacaAsset { Symbol = "D", Name="D", AssetId = Guid.NewGuid()  }
-            });
+            var dbContext = DatabaseGenerator.CreateContext();
+            DatabaseGenerator.SeedDataBase();
+            _alpacaRepository = new AlpacaRepository(dbContext);       
             _mockTradingService = new Mock<IAlpacaTradingService>();
+            var accountId = new  Guid("1F621067-A2B3-4197-8112-473DACBEAE25");
 
-            _alpacaTradingController = new AlpacaTradingController(_mockTradingService.Object, _mockRepo.Object);
+            var account = new
+            {
+                AccountId = accountId,
+                Status = AccountStatus.Active,
+                Currency = "USD",
+                Cash = 1000
+            };
+            var a = JsonConvert.DeserializeObject<IAccount>(account.ToJson());
+
+            _mockTradingService.Setup<Task<IAccount>>(x => x.GetAccountAsync(It.IsAny<UserSettings>()))
+                .ReturnsAsync(a);
+
+            _alpacaTradingController = new AlpacaTradingController(_mockTradingService.Object, _alpacaRepository);
 
         }
 
@@ -36,6 +46,20 @@ namespace BN.PROJECT.AlpacaServiceTests
             Assert.NotNull(badResult);
         }
 
+        [Fact]
+        public async Task GetAccount_ShouldReturnBadRequestUserSettingsNotFound()
+        {
+            var result = await _alpacaTradingController.GetAccount("456");
+            var notFoundObject = result as NotFoundObjectResult;
+            Assert.NotNull(notFoundObject);
+        }
+        [Fact]
+        public async Task GetAccount_ShouldReturnBadRequestAlpacaAccountNotFound()
+        {
+            var result = await _alpacaTradingController.GetAccount("123");
+            var notFoundObject = result as NotFoundObjectResult;
+            Assert.NotNull(notFoundObject);
+        }
 
         [Fact]
         public async Task GetAllAssetsAsync()

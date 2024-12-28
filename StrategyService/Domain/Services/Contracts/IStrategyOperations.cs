@@ -4,5 +4,5 @@ public interface IStrategyOperations
 {
     DateTime GetStartOfTimeSpan(DateTime dateTime, TimeSpan timeSpan);
     TimeSpan GetTimeSpanByBreakoutPeriod(BreakoutPeriodEnum tradeInterval);
-    BreakoutModel GetBreakoutModel(StrategySettingsModel settings);
+    void UpdateOrCloseOpenPosition(ref Position openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent);
 }

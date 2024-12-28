@@ -48,6 +48,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddControllers();
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
+
     services.AddKeyCloakAuthentication(configuration);
     services.AddMessageBus(configuration);
 
@@ -56,7 +57,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IStrategyRepository, StrategyRepository>();
     services.AddSingleton<IStrategyOperations, StrategyOperations>();
 
-    services.AddHostedService<MessageConsumerService>();
+    services.AddHostedService<MessageConsumerService >();
 
     // Quartz-Services
     services.AddQuartz();

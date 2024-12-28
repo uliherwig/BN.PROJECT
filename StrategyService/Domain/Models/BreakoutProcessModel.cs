@@ -27,6 +27,7 @@ public class BreakoutProcessModel
     public decimal StopLossPercent { get; set; }
     public decimal TrailingStop { get; set; }
     public Guid StrategyId { get; set; }
+    public StopLossTypeEnum StopLossType { get; set; }
 
 
 
