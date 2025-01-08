@@ -13,6 +13,7 @@
 	<ItemGroup>
 		<PackageReference Include="coverlet.collector" Version="6.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
@@ -34,11 +35,4 @@
 	<ItemGroup>
 		<ProjectReference Include="..\AlpacaService\AlpacaService.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Adapter\" />
-		<Folder Include="Domain\" />
-		<Folder Include="Mocks\" />
-	</ItemGroup>
-
 </Project>

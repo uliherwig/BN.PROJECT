@@ -1,6 +1,3 @@
-using Confluent.Kafka;
-using System.Configuration;
-
 namespace BN.PROJECT.AlpacaService;
 
 [ApiController]
@@ -20,7 +17,7 @@ public class AlpacaTradingController : ControllerBase
     [HttpGet("account/{userId}")]
     public async Task<IActionResult> GetAccount(string userId)
     {
-        if(string.IsNullOrEmpty(userId))
+        if (string.IsNullOrEmpty(userId))
         {
             return BadRequest(new { Message = "UserId cannot be null" });
         }

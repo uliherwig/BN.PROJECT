@@ -1,5 +1,5 @@
-
 namespace BN.PROJECT.Core;
+
 public class KeycloakAuthorizeAttribute : AuthorizeAttribute, IAuthorizationFilter
 {
     private readonly string[] _roles;
@@ -8,6 +8,7 @@ public class KeycloakAuthorizeAttribute : AuthorizeAttribute, IAuthorizationFilt
     {
         _roles = roles;
     }
+
     public async void OnAuthorization(AuthorizationFilterContext context)
     {
         var httpClientFactory = context.HttpContext.RequestServices.GetService<IHttpClientFactory>();

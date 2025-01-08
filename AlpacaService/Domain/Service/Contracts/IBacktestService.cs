@@ -1,7 +1,6 @@
-﻿
-namespace BN.PROJECT.AlpacaService;
+﻿namespace BN.PROJECT.AlpacaService;
 
 public interface IBacktestService
 {
-    Task<string> RunBacktest(StrategySettingsModel testSettings);
+    Task RunBacktest(StrategySettingsModel testSettings);
 }

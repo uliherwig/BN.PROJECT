@@ -5,5 +5,4 @@ public enum StopLossTypeEnum
     None,
     Breakout,
     SMANextCrossing,
-
 }

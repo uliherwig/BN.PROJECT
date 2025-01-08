@@ -1,4 +1,5 @@
 ﻿namespace BN.PROJECT.Core;
+
 public enum StrategyEnum
 {
     None,
@@ -33,5 +34,3 @@ public enum StrategyEnum
     //HierarchicalClustering,
     //DBSCAN,
 }
-
-

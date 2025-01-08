@@ -1,4 +1,5 @@
 namespace BN.PROJECT.Core;
+
 public static class AuthenticationExtension
 {
     public static IServiceCollection AddKeyCloakAuthentication(this IServiceCollection services, IConfiguration configuration)

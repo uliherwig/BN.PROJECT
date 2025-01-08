@@ -1,8 +1,4 @@
 ﻿using BN.PROJECT.Core;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 
 namespace BN.PROJECT.StrategyService.Tests
@@ -33,7 +29,6 @@ namespace BN.PROJECT.StrategyService.Tests
 
                 // Get the base directory of the application
                 string baseDirectory = Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).FullName).FullName).FullName;
-
 
                 // Combine the base directory with the relative path to the JSON file
                 string filePath = Path.Combine(baseDirectory, "TestData/SPY-2024-11-27.json");

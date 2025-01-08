@@ -3,6 +3,7 @@
 public class StrategyOperations : IStrategyOperations
 {
     private readonly ILogger<StrategyOperations> _logger;
+
     public StrategyOperations(ILogger<StrategyOperations> logger)
     {
         _logger = logger;
@@ -26,7 +27,8 @@ public class StrategyOperations : IStrategyOperations
             _ => TimeSpan.FromDays(1)
         };
     }
-    public void UpdateOrCloseOpenPosition(ref Position openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent )
+
+    public void UpdateOrCloseOpenPosition(ref Position openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent)
     {
         if (openPosition.Side == SideEnum.Buy)
         {

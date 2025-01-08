@@ -40,17 +40,11 @@ public class AlpacaDataController : ControllerBase
         return Ok(bar);
     }
 
-    [HttpGet("trades/{symbol}")]
-    public async Task<IActionResult> GetTradesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
-    {
-        var trades = await _alpacaDataService.GetTradesBySymbol(symbol, startDate, endDate);
-        return Ok(trades);
-    }
-
-    [HttpPost("save-historicalBars/{symbol}")]
-    public async Task<IActionResult> PostHistoricalBarsBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
-    {
-        var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate, BarTimeFrame.Minute);
-        return Ok(bars);
-    }
+    // TODO check if this is needed
+    //[HttpGet("trades/{symbol}")]
+    //public async Task<IActionResult> GetTradesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    //{
+    //    var trades = await _alpacaDataService.GetTradesBySymbol(symbol, startDate, endDate);
+    //    return Ok(trades);
+    //}
 }

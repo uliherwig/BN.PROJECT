@@ -31,5 +31,6 @@ public interface IAlpacaRepository
     Task<UserSettings?> GetUserSettingsAsync(string userId);
 
     Task UpdateUserSettingsAsync(UserSettings userSettings);
+
     Task DeleteUserSettingsAsync(UserSettings userSettings);
 }

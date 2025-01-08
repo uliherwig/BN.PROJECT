@@ -1,11 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BN.PROJECT.Core;
+﻿namespace BN.PROJECT.Core;
 
 public class TestLogger<T> : ILogger<T>
 {

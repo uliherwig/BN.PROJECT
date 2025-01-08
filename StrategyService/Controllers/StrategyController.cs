@@ -1,6 +1,4 @@
-﻿using NuGet.Configuration;
-
-namespace BN.PROJECT.StrategyService;
+﻿namespace BN.PROJECT.StrategyService;
 
 [Route("[controller]")]
 [ApiController]

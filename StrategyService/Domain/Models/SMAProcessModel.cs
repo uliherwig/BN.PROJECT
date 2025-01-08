@@ -5,7 +5,7 @@ public class SmaProcessModel
     public Guid StrategyId { get; set; }
     public DateTime StartDate { get; set; }
     public TimeSpan MarketCloseTime { get; set; }
-    public required string Asset { get; set; }
+    public string Asset { get; set; }
     public int Quantity { get; set; }
     public bool IsIncreasing { get; set; }
     public bool AllowOvernight { get; set; }
@@ -18,6 +18,4 @@ public class SmaProcessModel
     public decimal IntersectionThreshold { get; set; }
     public List<Quote> LastQuotes { get; set; } = [];
     public List<SmaTick> LastSmas { get; set; } = [];
-
-
 }

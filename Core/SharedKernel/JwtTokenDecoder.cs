@@ -20,5 +20,3 @@ public class JwtTokenDecoder
         return claims;
     }
 }
-
-

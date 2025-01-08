@@ -1,5 +1,4 @@
-﻿using NuGet.Configuration;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace BN.PROJECT.StrategyService;
 
@@ -58,7 +57,6 @@ public class BreakoutStrategy : IStrategyService
         return Task.CompletedTask;
     }
 
-
     public Task EvaluateQuote(Guid strategyId, Quote quote)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -73,12 +71,10 @@ public class BreakoutStrategy : IStrategyService
             return Task.CompletedTask;
         }
 
-
         var tpm = _strategyProcesses[strategyId];
         var quoteStamp = quote.TimestampUtc;
         if (tpm.StartDate == DateTime.MinValue)
         {
-
             tpm.StartDate = quoteStamp;
             tpm.TimeFrameStart = _strategyOperations.GetStartOfTimeSpan(quoteStamp, tpm.BreakoutTimeSpan);
             tpm.PrevTimeFrameStart = tpm.TimeFrameStart;
@@ -130,10 +126,6 @@ public class BreakoutStrategy : IStrategyService
             return Task.CompletedTask;
         }
 
-
-
-
-
         var openPosition = _positions[strategyId].Where(p => p.PriceClose == 0).FirstOrDefault();
         if (openPosition == null)
         {
@@ -161,7 +153,6 @@ public class BreakoutStrategy : IStrategyService
                                      StrategyEnum.Breakout,
                                      breakoutParams);
 
-
                 _positions[strategyId].Add(position);
             }
 
@@ -186,7 +177,7 @@ public class BreakoutStrategy : IStrategyService
         }
         else
         {
-            // check if we need to close position at EoD 
+            // check if we need to close position at EoD
             if (tpm.AllowOvernight == false && quoteStamp.TimeOfDay > tpm.MarketCloseTime)
             {
                 var closePrice = openPosition.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
@@ -216,7 +207,6 @@ public class BreakoutStrategy : IStrategyService
         var buys = pos.Where(p => p.Side == SideEnum.Buy).ToList();
         var sells = pos.Where(p => p.Side == SideEnum.Sell).ToList();
 
-
         _logger.LogInformation($"#BT OVERNIGHT POSITIONS: {overNight.Count}  Profit: {overNight.Sum(p => p.ProfitLoss)}");
         _logger.LogInformation($"#BT PROFIT POSITIONS: {profits.Count}  Profit: {profits.Sum(p => p.ProfitLoss)}");
         _logger.LogInformation($"#BT LOSS POSITIONS: {losses.Count}  Loss: {losses.Sum(p => p.ProfitLoss)}");
@@ -235,8 +225,8 @@ public class BreakoutStrategy : IStrategyService
         _strategyProcesses.TryRemove(strategyId, out _);
         _positions.TryRemove(strategyId, out _);
         _logger.LogInformation($"#BT {strategyId} Test stopped");
-
     }
+
     public List<Position>? GetPositions(Guid strategyId)
     {
         var positions = _positions.ContainsKey(strategyId) ? _positions[strategyId] : null;

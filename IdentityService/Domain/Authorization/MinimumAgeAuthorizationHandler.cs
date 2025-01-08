@@ -1,5 +1,4 @@
-﻿
-namespace BN.PROJECT.IdentityService
+﻿namespace BN.PROJECT.IdentityService
 {
     // This class contains logic for determining whether MinimumAgeRequirements in authorization
     // policies are satisfied or not
@@ -15,7 +14,7 @@ namespace BN.PROJECT.IdentityService
         // Check whether a given MinimumAgeRequirement is satisfied or not for a particular context
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MinimumAgeRequirement requirement)
         {
-            // Log as a warning so that it's very clear in sample output which authorization policies 
+            // Log as a warning so that it's very clear in sample output which authorization policies
             // (and requirements/handlers) are in use
             _logger.LogWarning("Evaluating authorization requirement for age >= {age}", requirement.Age);
 

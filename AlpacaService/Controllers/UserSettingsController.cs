@@ -6,6 +6,7 @@ public class UserSettingsController : ControllerBase
 {
     private readonly IAlpacaRepository _alpacaRepository;
     private readonly ILogger<UserSettingsController> _logger;
+
     public UserSettingsController(IAlpacaRepository alpacaRepository, ILogger<UserSettingsController> logger)
     {
         _alpacaRepository = alpacaRepository;
@@ -30,7 +31,6 @@ public class UserSettingsController : ControllerBase
             _logger.LogError(ex, "Error adding user settings");
         }
         return Ok(false);
-
     }
 
     [HttpGet("{userId}")]
@@ -43,7 +43,6 @@ public class UserSettingsController : ControllerBase
         }
 
         return Ok(userSettings);
-
     }
 
     [HttpPut]

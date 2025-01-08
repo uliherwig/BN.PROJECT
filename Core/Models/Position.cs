@@ -5,8 +5,9 @@ public class Position
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; } = Guid.NewGuid();
+
     public Guid StrategyId { get; set; }
-    public required string Symbol { get; set; }
+    public string Symbol { get; set; }
     public int Quantity { get; set; }
     public SideEnum Side { get; set; }
     public decimal PriceOpen { get; set; }
@@ -19,5 +20,4 @@ public class Position
     public string CloseSignal { get; set; } = string.Empty;
     public StrategyEnum StrategyType { get; set; }
     public string StrategyParams { get; set; } = string.Empty;
-   
 }

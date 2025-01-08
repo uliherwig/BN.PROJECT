@@ -1,10 +1,4 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BN.PROJECT.Core;
 
@@ -19,7 +13,6 @@ public class TestWebHostBuilder : IWebHostBuilder
     public TestWebHostBuilder()
     {
         _webHostBuilder = new WebHostBuilder();
-
     }
 
     public IWebHost Build()

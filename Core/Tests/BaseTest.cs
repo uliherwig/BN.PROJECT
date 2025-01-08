@@ -1,6 +1,5 @@
 ﻿// <copyright company="BSH Hausgeräte GmbH"></copyright>
 
-using System.IO;
 using Newtonsoft.Json;
 
 namespace BN.PROJECT.Core;
@@ -44,6 +43,4 @@ public class BaseTest
     }
 
     protected T ReadTestData<T>(params string[] relativePath) => JsonConvert.DeserializeObject<T>(ReadTestData(relativePath));
-
-
 }

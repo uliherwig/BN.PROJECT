@@ -1,8 +1,8 @@
 namespace BN.PROJECT.IdentityService;
 
-public class JwtTokenDecoder
+public class JwtTokenDecoder : IJwtTokenDecoder
 {
-    public static IDictionary<string, string> DecodeJwtToken(string token)
+    public IDictionary<string, string> DecodeJwtToken(string token)
     {
         var handler = new JwtSecurityTokenHandler();
         var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
@@ -20,5 +20,3 @@ public class JwtTokenDecoder
         return claims;
     }
 }
-
-

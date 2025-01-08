@@ -1,7 +1,5 @@
 using Alpaca.Markets;
-using BN.PROJECT.AlpacaService;
 using Moq;
-using Xunit;
 
 namespace BN.PROJECT.AlpacaService.Tests;
 
@@ -9,8 +7,7 @@ public class AlpacaAdapterExtensionsTests
 {
     [Fact]
     public void ToAlpacaBar_ShouldMapPropertiesCorrectly()
-    {    
-
+    {
         // Arrange
         var mockBar = new Mock<IBar>();
         mockBar.SetupGet(b => b.Close).Returns(100);

@@ -29,7 +29,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -57,7 +56,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IStrategyRepository, StrategyRepository>();
     services.AddSingleton<IStrategyOperations, StrategyOperations>();
 
-    services.AddHostedService<MessageConsumerService >();
+    services.AddHostedService<MessageConsumerService>();
 
     // Quartz-Services
     services.AddQuartz();
@@ -67,5 +66,4 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     });
     services.AddHostedService<BacktestCleanUpService>();
     services.AddWithAllDerivedTypes<IStrategyService>();
-
 }

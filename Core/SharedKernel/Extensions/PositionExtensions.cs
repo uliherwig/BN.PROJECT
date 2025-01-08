@@ -31,15 +31,13 @@ public static class PositionExtensions
             CloseSignal = "",
             StrategyType = strategyType,
             StrategyParams = StrategyParameter
-
         };
 
         return position;
-    }   
+    }
 
     public static bool UpdateTakeProfitAndStopLoss(this Position position, decimal newTakeProfit, decimal newStopLoss)
     {
-
         position.TakeProfit = newTakeProfit;
         position.StopLoss = newStopLoss;
         position.CloseSignal = "Update ";

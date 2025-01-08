@@ -1,6 +1,5 @@
 namespace BN.PROJECT.AlpacaService;
 
-
 [PersistJobDataAfterExecution]
 [DisallowConcurrentExecution]
 public class AlpacaHistoryJob : IJob
@@ -44,6 +43,7 @@ public class AlpacaHistoryJob : IJob
 
         _logger.LogInformation("Instance " + key + " History Job end");
     }
+
     private async Task UpdateAssets(List<string> assetsSelection)
     {
         var assets = await _alpacaTradingService.GetAssetsAsync();
@@ -51,7 +51,7 @@ public class AlpacaHistoryJob : IJob
         var alpacaAssets = new List<AlpacaAsset>();
         foreach (var symbol in assetsSelection)
         {
-            if(assetsDb.Any(a => a.Symbol == symbol))
+            if (assetsDb.Any(a => a.Symbol == symbol))
             {
                 _logger.LogInformation("UpdateAssets Asset already exists: " + symbol);
                 continue;
@@ -81,7 +81,7 @@ public class AlpacaHistoryJob : IJob
 
             var latestBarFromDb = await _alpacaRepository.GetLatestBar(symbol);
             var latestBarFromAlpaca = await _alpacaDataService.GetLatestBarBySymbol(symbol);
-            if(latestBarFromDb == null)
+            if (latestBarFromDb == null)
             {
                 _logger.LogInformation("UpdateHistoricalBars Asset: " + symbol + " no latestBar ");
             }

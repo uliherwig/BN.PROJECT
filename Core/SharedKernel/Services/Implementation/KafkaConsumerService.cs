@@ -8,6 +8,7 @@ public class KafkaConsumerService : IKafkaConsumerService
     private string _groupId = "BN.PROJECT";
     private CancellationTokenSource _cancellationTokenSource;
     private Task _consumingTask;
+
     public event Action<string> MessageReceived;
 
     public KafkaConsumerService(ILogger<KafkaConsumerService> logger)
@@ -22,7 +23,6 @@ public class KafkaConsumerService : IKafkaConsumerService
             _cancellationTokenSource = new CancellationTokenSource();
             _topic = topic;
             _consumingTask = Task.Run(() => Consume(_cancellationTokenSource.Token));
-
         }
     }
 
@@ -81,8 +81,6 @@ public class KafkaConsumerService : IKafkaConsumerService
         using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrapServers }).Build())
         {
             await adminClient.DeleteTopicsAsync(new List<string> { topic }, null);
-
         }
     }
-
 }

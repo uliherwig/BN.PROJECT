@@ -99,11 +99,10 @@ public class AlpacaRepository : IAlpacaRepository
         _context.UserSettings.Update(userSettings);
         await _context.SaveChangesAsync();
     }
+
     public async Task DeleteUserSettingsAsync(UserSettings userSettings)
     {
         _context.UserSettings.Remove(userSettings);
         await _context.SaveChangesAsync();
     }
-
-
 }

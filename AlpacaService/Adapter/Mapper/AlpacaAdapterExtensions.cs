@@ -106,6 +106,5 @@
                 Tape = quote.Tape
             };
         }
-
     }
 }

@@ -5,21 +5,19 @@ namespace BN.PROJECT.AlpacaService;
 public class BacktestService : IBacktestService
 {
     private readonly IAlpacaRepository _alpacaRepository;
-    private readonly IStrategyServiceClient _strategyServiceClient;
     private readonly IKafkaProducerHostedService _kafkaProducer;
     private readonly ILogger<BacktestService> _logger;
 
     public BacktestService(IAlpacaRepository alpacaRepository,
         ILogger<BacktestService> logger,
-        IKafkaProducerHostedService kafkaProducer,
-        IStrategyServiceClient strategyServiceClient)
+        IKafkaProducerHostedService kafkaProducer)
     {
         _alpacaRepository = alpacaRepository;
         _logger = logger;
         _kafkaProducer = kafkaProducer;
-        _strategyServiceClient = strategyServiceClient;
     }
-    public async Task<string> RunBacktest(StrategySettingsModel testSettings)
+
+    public async Task RunBacktest(StrategySettingsModel testSettings)
     {
         var stopwatch = Stopwatch.StartNew();
         var message = new StrategyMessage
@@ -36,7 +34,7 @@ public class BacktestService : IBacktestService
         var startDate = testSettings.StartDate.ToUniversalTime();
         var endDate = testSettings.EndDate.ToUniversalTime();
 
-        // send quotes per day 
+        // send quotes per day
         TimeSpan timeFrame = TimeSpan.FromDays(1);
 
         var stamp = startDate.ToUniversalTime();
@@ -69,8 +67,6 @@ public class BacktestService : IBacktestService
             await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
             _logger.LogInformation($"RunBacktest {stamp.ToLocalTime()} current time {stopwatch.ElapsedMilliseconds} ms");
             stamp = stamp.Add(timeFrame).ToUniversalTime();
-
-
         };
 
         message.MessageType = MessageTypeEnum.StopTest;
@@ -81,7 +77,5 @@ public class BacktestService : IBacktestService
 
         stopwatch.Stop();
         _logger.LogInformation($"RunBacktest {testSettings.Id} completed in {stopwatch.ElapsedMilliseconds} ms");
-        return "OK";
     }
-
 }

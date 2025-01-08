@@ -1,4 +1,5 @@
 namespace BN.PROJECT.StrategyService;
+
 public class BrokerServiceClient
 {
     private readonly HttpClient _httpClient;
@@ -16,6 +17,7 @@ public class BrokerServiceClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
+
     public async Task<string> StartStrategyAsync(StrategySettingsModel testSettings)
     {
         var json = JsonConvert.SerializeObject(testSettings);

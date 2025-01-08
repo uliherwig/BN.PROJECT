@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 
 namespace BN.PROJECT.StrategyService;
+
 public class MessageConsumerService : IHostedService
 {
     private readonly ILogger<MessageConsumerService> _logger;
@@ -76,5 +77,3 @@ public class MessageConsumerService : IHostedService
         }
     }
 }
-
-

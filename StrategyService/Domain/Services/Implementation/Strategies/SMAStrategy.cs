@@ -49,7 +49,6 @@ public class SmaStrategy : IStrategyService
             StopLossType = smaSettings.StopLossType,
             IntersectionThreshold = smaSettings.IntersectionThreshold,
             MarketCloseTime = new TimeSpan(19, 55, 0),
-
         };
 
         _ = _strategyProcesses.TryAdd(message.StrategyId, tpm);
@@ -58,7 +57,6 @@ public class SmaStrategy : IStrategyService
 
         return Task.CompletedTask;
     }
-
 
     public Task EvaluateQuote(Guid strategyId, Quote quote)
     {
@@ -119,7 +117,6 @@ public class SmaStrategy : IStrategyService
 
         tpm.LastSmas.Add(currentSmaTick);
 
-
         var openPosition = _positions[strategyId].Where(p => p.PriceClose == 0).FirstOrDefault();
         if (openPosition == null)
         {
@@ -167,7 +164,7 @@ public class SmaStrategy : IStrategyService
         }
         else
         {
-            // check if we need to close position at EoD 
+            // check if we need to close position at EoD
             if (tpm.AllowOvernight == false && quoteStamp.TimeOfDay > tpm.MarketCloseTime)
             {
                 var closePrice = openPosition.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
@@ -189,13 +186,13 @@ public class SmaStrategy : IStrategyService
 
     public async Task StopTest(StrategyMessage message)
     {
-        if(message == null || !_strategyProcesses.ContainsKey(message.StrategyId))
+        if (message == null || !_strategyProcesses.ContainsKey(message.StrategyId))
         {
             return;
         }
         try
         {
-            _logger.LogInformation("Backtest stopped");        
+            _logger.LogInformation("Backtest stopped");
 
             var pos = _positions[message.StrategyId].ToList();
             var overNight = pos.Where(p => p.StampOpened.Day != p.StampClosed.Day).ToList();
@@ -224,8 +221,6 @@ public class SmaStrategy : IStrategyService
             foreach (var tick in ticks)
             {
                 csvBuilder.AppendLine($"{tick.TimestampUtc.ToShortTimeString()};{tick.AskPrice.ToString("F3")};{tick.BidPrice.ToString("F3")};{tick.ShortSma.ToString("F3")};{tick.LongSma.ToString("F3")};{(tick.ShortSma - tick.LongSma).ToString("F3")}");
-
-
             }
 
             var test = csvBuilder.ToString();
@@ -249,5 +244,4 @@ public class SmaStrategy : IStrategyService
 
     public bool CanHandle(StrategyEnum strategy) =>
          strategy == StrategyEnum.SMA;
-
 }

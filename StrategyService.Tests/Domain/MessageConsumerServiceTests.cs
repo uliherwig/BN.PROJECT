@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using BN.PROJECT.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
-using BN.PROJECT.Core;
 using NuGet.Protocol;
-
 
 namespace BN.PROJECT.StrategyService.Tests
 {
@@ -33,7 +27,6 @@ namespace BN.PROJECT.StrategyService.Tests
             _serviceScopeMock.Setup(x => x.ServiceProvider).Returns(_serviceProviderMock.Object);
             _serviceProviderMock.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(_serviceScopeFactoryMock.Object);
             _serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(_serviceScopeMock.Object);
-
 
             _messageConsumerService = new MessageConsumerService(_testLogger, _serviceProviderMock.Object);
         }
@@ -89,7 +82,6 @@ namespace BN.PROJECT.StrategyService.Tests
             strategyServiceMock.Verify(x => x.StartTest(It.Is<StrategyMessage>(m => m.Strategy == message.Strategy && m.MessageType == message.MessageType)), Times.Once);
         }
 
-
         [Fact]
         public async Task StopAsync_ShouldReturnCompletedTask()
         {
@@ -100,7 +92,4 @@ namespace BN.PROJECT.StrategyService.Tests
             Assert.Equal(Task.CompletedTask, result);
         }
     }
-
-
-
 }

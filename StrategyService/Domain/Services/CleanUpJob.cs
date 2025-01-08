@@ -1,6 +1,5 @@
 namespace BN.PROJECT.StrategyService;
 
-
 [PersistJobDataAfterExecution]
 [DisallowConcurrentExecution]
 public class CleanUpJob : IJob
@@ -8,7 +7,6 @@ public class CleanUpJob : IJob
     private readonly ILogger<CleanUpJob> _logger;
     private readonly IConfiguration _configuration;
     private readonly IStrategyRepository _strategyRepository;
-
 
     public CleanUpJob(
         ILogger<CleanUpJob> logger,
@@ -30,5 +28,4 @@ public class CleanUpJob : IJob
 
         _logger.LogInformation("Instance " + key + " CleanUp Job end");
     }
-
 }

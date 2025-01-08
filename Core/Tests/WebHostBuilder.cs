@@ -1,8 +1,6 @@
 // <copyright company="BSH Hausgeräte GmbH"></copyright>
 
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BSH.MES.Testing.Common;
 
@@ -17,7 +15,6 @@ public class TestWebHostBuilder : IWebHostBuilder
     public TestWebHostBuilder()
     {
         _webHostBuilder = new WebHostBuilder();
-
     }
 
     public bool ExecuteInit { get; set; }
@@ -29,9 +26,7 @@ public class TestWebHostBuilder : IWebHostBuilder
             return WebHost;
         }
 
-
         WebHost = _webHostBuilder.Build();
-
 
         return WebHost;
     }

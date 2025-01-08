@@ -1,8 +1,7 @@
-﻿
-namespace BN.PROJECT.IdentityService;
+﻿namespace BN.PROJECT.IdentityService;
+
 public class IdentityRepository : IIdentityRepository
 {
-
     private readonly IdentityDbContext _context;
     private readonly ILogger<IdentityRepository> _logger;
 
@@ -51,7 +50,6 @@ public class IdentityRepository : IIdentityRepository
             _context.Roles.Remove(role);
             await _context.SaveChangesAsync();
         }
-
     }
 
     public async Task DeleteSessionAsync(Guid sessionId)

@@ -6,6 +6,4 @@ public class SmaModel
     public int LongPeriod { get; set; } = 30;
     public StopLossTypeEnum StopLossType { get; set; }
     public decimal IntersectionThreshold { get; set; }
-
-
 }

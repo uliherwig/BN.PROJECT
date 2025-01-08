@@ -1,4 +1,5 @@
 namespace BN.PROJECT.AlpacaService;
+
 public class StrategyServiceClient : IStrategyServiceClient
 {
     private readonly HttpClient _httpClient;
@@ -16,6 +17,7 @@ public class StrategyServiceClient : IStrategyServiceClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
+
     public async Task<string> StartStrategyAsync(StrategySettingsModel testSettings)
     {
         try
@@ -23,15 +25,13 @@ public class StrategyServiceClient : IStrategyServiceClient
             var json = JsonConvert.SerializeObject(testSettings);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync($"/strategy", content);
-        
+
             var result = await response.Content.ReadAsStringAsync();
             return result;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
             return e.Message;
         }
-
     }
 }

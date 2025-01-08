@@ -8,16 +8,19 @@ public class AccountController : ControllerBase
     private readonly ILogger<AccountController> _logger;
     private readonly IIdentityRepository _identityRepository;
     private readonly IKeycloakServiceClient _keycloakServiceClient;
+    private readonly IJwtTokenDecoder _jwtTokenDecoder;
 
     public AccountController(
         IConfiguration configuration, ILogger<AccountController> logger,
         IIdentityRepository identityRepository,
-        IKeycloakServiceClient keycloakServiceClient)
+        IKeycloakServiceClient keycloakServiceClient,
+        IJwtTokenDecoder jwtTokenDecoder)
     {
         _configuration = configuration;
         _logger = logger;
         _identityRepository = identityRepository;
         _keycloakServiceClient = keycloakServiceClient;
+        _jwtTokenDecoder = jwtTokenDecoder;
     }
 
     [HttpPost("sign-in")]
@@ -51,7 +54,7 @@ public class AccountController : ControllerBase
         var response = await _keycloakServiceClient.SignOut(signOutRequest);
         if ((bool)response.Success)
         {
-            var claims = JwtTokenDecoder.DecodeJwtToken(signOutRequest.RefreshToken);
+            var claims = _jwtTokenDecoder.DecodeJwtToken(signOutRequest.RefreshToken);
             var userId = new Guid(claims["sub"]);
             var session = await _identityRepository.GetSessionByUserIdAsync(userId);
             if (session != null)
@@ -64,15 +67,13 @@ public class AccountController : ControllerBase
         return Ok(response);
     }
 
-
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
-
         var response = await _keycloakServiceClient.RefreshToken(refreshTokenRequest);
         if (!string.IsNullOrEmpty(response.RefreshToken))
         {
-            var claims = JwtTokenDecoder.DecodeJwtToken(response.RefreshToken);
+            var claims = _jwtTokenDecoder.DecodeJwtToken(response.RefreshToken);
             var userId = new Guid(claims["sub"]);
             var session = await _identityRepository.GetSessionByUserIdAsync(userId);
             if (session != null)
@@ -111,7 +112,6 @@ public class AccountController : ControllerBase
             return Ok(response);
         }
         return BadRequest();
-
     }
 
     [KeycloakAuthorize("admin")]

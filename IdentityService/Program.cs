@@ -17,7 +17,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
@@ -89,6 +88,4 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     //services.AddSingleton<IAuthorizationHandler, MinimumAgeAuthorizationHandler>();
 
     services.AddScoped<IIdentityRepository, IdentityRepository>();
-
-
 }
