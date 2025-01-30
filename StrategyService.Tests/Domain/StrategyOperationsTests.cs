@@ -1,9 +1,6 @@
-using System;
 using BN.PROJECT.Core;
-using BN.PROJECT.StrategyService;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 
 namespace BN.PROJECT.StrategyService.Tests;
 

@@ -4,7 +4,7 @@ public interface IStrategyService
 {
     Task StartTest(StrategyMessage message);
 
-    Task EvaluateQuote(Guid strategyId, Quote quote);
+    Task EvaluateQuote(Guid strategyId, Guid userId, Quote quote);
 
     Task StopTest(StrategyMessage message);
 

@@ -54,14 +54,18 @@ public class KafkaConsumerService : IKafkaConsumerService
                 {
                     var consumeResult = consumer.Consume(cancellationToken);
                     MessageReceived?.Invoke(consumeResult.Message.Value);
-
-                    // _logger.LogInformation($"Nachricht empfangen: {consumeResult.Message.Value}");
                 }
+            }
+            catch (ConsumeException ex)
+            {
+                _logger.LogError($"Consume error: {ex.Error.Reason}");
+                consumer.Close();
             }
             catch (OperationCanceledException)
             {
                 consumer.Close();
             }
+
         }
     }
 

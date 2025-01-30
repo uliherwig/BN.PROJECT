@@ -8,15 +8,7 @@
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<RootNamespace>BN.PROJECT.AlpacaService</RootNamespace>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <Compile Remove="Domain\Models\**" />
-	  <Content Remove="Domain\Models\**" />
-	  <EmbeddedResource Remove="Domain\Models\**" />
-	  <None Remove="Domain\Models\**" />
-	</ItemGroup>
-
-	<ItemGroup>
+		<ItemGroup>
 		<PackageReference Include="Alpaca.Markets" Version="7.0.6" />
 		<PackageReference Include="Alpaca.Markets.Extensions" Version="7.0.0" />
 		<PackageReference Include="IdentityModel" Version="7.0.0" />

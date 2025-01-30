@@ -4,33 +4,36 @@ ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+ConfigureMiddleware(app);
 
-app.UseHttpsRedirection();
+ConfigureEndpoints(app);
 
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<IdentityDbContext>();
-    context.Database.Migrate();
-}
+MigrateDatabase(app);
 
 app.Run();
 
+static void ConfigureMiddleware(WebApplication app)
+{
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
+static void ConfigureEndpoints(WebApplication app)
+{
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+}
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     var connectionString = configuration.GetConnectionString("IdentityDbConnection");
@@ -77,15 +80,20 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
             }
         });
     });
-    //services.AddHostedService<KeycloakConfigStartUp>();
 
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
     services.AddHttpClient<IKeycloakServiceClient, KeycloakServiceClient>();
     services.AddHostedService<SeedDatabaseService>();
-    //services.AddSingleton<IConfiguration>(configuration);
-    //services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
-    //services.AddSingleton<IAuthorizationHandler, MinimumAgeAuthorizationHandler>();
 
     services.AddScoped<IIdentityRepository, IdentityRepository>();
+}
+static void MigrateDatabase(WebApplication app)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<IdentityDbContext>();
+        context.Database.Migrate();
+    }
 }

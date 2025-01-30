@@ -2,6 +2,7 @@
 
 public class SmaProcessModel
 {
+    public bool IsBacktest { get; set; }
     public Guid StrategyId { get; set; }
     public DateTime StartDate { get; set; }
     public TimeSpan MarketCloseTime { get; set; }

@@ -4,23 +4,17 @@
 [ApiController]
 public class AccountController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<AccountController> _logger;
+    // GlobalExceptionMiddleware for logging exceptions
+
     private readonly IIdentityRepository _identityRepository;
     private readonly IKeycloakServiceClient _keycloakServiceClient;
-    private readonly IJwtTokenDecoder _jwtTokenDecoder;
 
     public AccountController(
-        IConfiguration configuration, ILogger<AccountController> logger,
         IIdentityRepository identityRepository,
-        IKeycloakServiceClient keycloakServiceClient,
-        IJwtTokenDecoder jwtTokenDecoder)
+        IKeycloakServiceClient keycloakServiceClient)
     {
-        _configuration = configuration;
-        _logger = logger;
         _identityRepository = identityRepository;
         _keycloakServiceClient = keycloakServiceClient;
-        _jwtTokenDecoder = jwtTokenDecoder;
     }
 
     [HttpPost("sign-in")]
@@ -52,9 +46,9 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Logout([FromBody] SignOutRequest signOutRequest)
     {
         var response = await _keycloakServiceClient.SignOut(signOutRequest);
-        if ((bool)response.Success)
+        if (response != null && response.Success == true)
         {
-            var claims = _jwtTokenDecoder.DecodeJwtToken(signOutRequest.RefreshToken);
+            var claims = JwtTokenDecoder.DecodeJwtToken(signOutRequest.RefreshToken);
             var userId = new Guid(claims["sub"]);
             var session = await _identityRepository.GetSessionByUserIdAsync(userId);
             if (session != null)
@@ -73,7 +67,7 @@ public class AccountController : ControllerBase
         var response = await _keycloakServiceClient.RefreshToken(refreshTokenRequest);
         if (!string.IsNullOrEmpty(response.RefreshToken))
         {
-            var claims = _jwtTokenDecoder.DecodeJwtToken(response.RefreshToken);
+            var claims = JwtTokenDecoder.DecodeJwtToken(response.RefreshToken);
             var userId = new Guid(claims["sub"]);
             var session = await _identityRepository.GetSessionByUserIdAsync(userId);
             if (session != null)
@@ -91,23 +85,20 @@ public class AccountController : ControllerBase
     {
         var response = await _keycloakServiceClient.SignUp(signUpRequest);
 
-        if (response != null)
+        if (response != null && response.Success == true)
         {
-            if (response.Success == true)
+            var user = new User
             {
-                var user = new User
-                {
-                    UserId = new Guid(response.UserId),
-                    Username = signUpRequest.Username,
-                    Email = signUpRequest.Email,
-                    FirstName = signUpRequest.FirstName,
-                    LastName = signUpRequest.LastName,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    IsEmailVerified = false
-                };
-                await _identityRepository.AddUserAsync(user);
-            }
+                UserId = new Guid(response.UserId),
+                Username = signUpRequest.Username,
+                Email = signUpRequest.Email,
+                FirstName = signUpRequest.FirstName,
+                LastName = signUpRequest.LastName,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsEmailVerified = false
+            };
+            await _identityRepository.AddUserAsync(user);
 
             return Ok(response);
         }

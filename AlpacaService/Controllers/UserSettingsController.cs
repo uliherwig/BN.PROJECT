@@ -16,21 +16,13 @@ public class UserSettingsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddUserSettingsAsync([FromBody] UserSettings userSettings)
     {
-        try
+        if (userSettings == null)
         {
-            if (userSettings == null)
-            {
-                return BadRequest("UserSettings cannot be null");
-            }
+            return BadRequest("UserSettings cannot be null");
+        }
 
-            await _alpacaRepository.AddUserSettingsAsync(userSettings);
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error adding user settings");
-        }
-        return Ok(false);
+        await _alpacaRepository.AddUserSettingsAsync(userSettings);
+        return Ok(true);
     }
 
     [HttpGet("{userId}")]
@@ -48,21 +40,13 @@ public class UserSettingsController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateUserSettingsAsync([FromBody] UserSettings userSettings)
     {
-        try
+        if (userSettings == null)
         {
-            if (userSettings == null)
-            {
-                return BadRequest("UserSettings cannot be null");
-            }
+            return BadRequest("UserSettings cannot be null");
+        }
 
-            await _alpacaRepository.UpdateUserSettingsAsync(userSettings);
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating user settings");
-        }
-        return Ok(false);
+        await _alpacaRepository.UpdateUserSettingsAsync(userSettings);
+        return Ok(true);
     }
 
     [HttpDelete]

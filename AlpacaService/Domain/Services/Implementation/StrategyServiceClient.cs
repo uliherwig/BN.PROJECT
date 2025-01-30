@@ -11,11 +11,14 @@ public class StrategyServiceClient : IStrategyServiceClient
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
-    public async Task<string> GetStrategyAsync()
+    public async Task<StrategySettingsModel?> GetStrategyAsync(string strategyId)
     {
-        var response = await _httpClient.GetAsync($"/strategy");
+        var response = await _httpClient.GetAsync($"/strategy/{strategyId}");
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStringAsync();
+        var result = await response.Content.ReadAsStringAsync();
+
+        var settings = JsonConvert.DeserializeObject<StrategySettingsModel>(result);
+        return settings;
     }
 
     public async Task<string> StartStrategyAsync(StrategySettingsModel testSettings)

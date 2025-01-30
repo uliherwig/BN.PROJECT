@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.Core;
 
-public class KafkaProducerService : IKafkaProducerHostedService
+public class KafkaProducerService : IKafkaProducerService
 {
     private readonly ILogger<KafkaProducerService> _logger;
     private IProducer<Null, string> _producer;

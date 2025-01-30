@@ -2,12 +2,10 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2025.01.2
 
-## to be done
-
-- add unit tests for all services
-- implement code coverage tool coverlet
-- implement code coverage report generator 
+- maintenance page
+- alpaca execution 
 
 ## Version 2025.01.1
 
@@ -15,12 +13,11 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 
 ## Version 2024.12.1
 
-- SMA Strategy Refactoring
-- Strategy Integration Tests
+- SMA strategy refactoring
 
 ## Version 2024.11.2
 
-- sma strategy implementation
+- SMA strategy implementation
 
 ## Version 2024.11.1
 

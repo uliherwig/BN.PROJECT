@@ -1,10 +1,15 @@
-﻿namespace BN.PROJECT.StrategyService;
+﻿using AutoMapper.Execution;
+using NuGet.Protocol;
+
+namespace BN.PROJECT.StrategyService;
 
 public class SmaStrategy : IStrategyService
 {
     private readonly ILogger<SmaStrategy> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IStrategyOperations _strategyOperations;
+    private readonly IKafkaProducerService _kafkaProducer;
+
 
     public readonly ConcurrentDictionary<Guid, List<Position>> _positions = new();
     private readonly ConcurrentDictionary<Guid, SmaProcessModel> _strategyProcesses = new();
@@ -13,11 +18,13 @@ public class SmaStrategy : IStrategyService
     public SmaStrategy(
         ILogger<SmaStrategy> logger,
         IServiceProvider serviceProvider,
-        IStrategyOperations strategyOperations)
+        IStrategyOperations strategyOperations,
+        IKafkaProducerService kafkaProducer)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
         _strategyOperations = strategyOperations;
+        _kafkaProducer = kafkaProducer;
     }
 
     public Task StartTest(StrategyMessage message)
@@ -35,6 +42,7 @@ public class SmaStrategy : IStrategyService
 
         var tpm = new SmaProcessModel
         {
+            IsBacktest = message.IsBacktest,
             StrategyId = message.StrategyId,
             StartDate = DateTime.MinValue,
             Asset = strategySettings.Asset,
@@ -58,7 +66,7 @@ public class SmaStrategy : IStrategyService
         return Task.CompletedTask;
     }
 
-    public Task EvaluateQuote(Guid strategyId, Quote quote)
+    public Task EvaluateQuote(Guid strategyId, Guid userId, Quote quote)
     {
         if (!_strategyProcesses.ContainsKey(strategyId) || (quote == null || quote.AskPrice == 0 || quote.BidPrice == 0))
         {
@@ -143,6 +151,12 @@ public class SmaStrategy : IStrategyService
                               StrategyEnum.SMA,
                               smaParams);
                 _positions[strategyId].Add(position);
+
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, position).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
             }
 
             // check breakout low
@@ -160,6 +174,11 @@ public class SmaStrategy : IStrategyService
                              StrategyEnum.SMA,
                              smaParams);
                 _positions[strategyId].Add(position);
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, position).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
             }
         }
         else
@@ -169,12 +188,22 @@ public class SmaStrategy : IStrategyService
             {
                 var closePrice = openPosition.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
                 openPosition.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close");
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, openPosition).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
                 return Task.CompletedTask;
             }
 
             if (tpm.StopLossType == StopLossTypeEnum.None)
             {
                 _strategyOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, tpm.TrailingStop, tpm.TakeProfitPercent);
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, openPosition).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
             }
             if (tpm.StopLossType == StopLossTypeEnum.SMANextCrossing && closeTrigger)
             {

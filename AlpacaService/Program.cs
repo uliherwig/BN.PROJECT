@@ -1,50 +1,28 @@
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Services.AddQuartz(q =>
-//{
-//    q.UseMicrosoftDependencyInjectionJobFactory();
-//});
-//builder.Services.AddQuartzHostedService(opt =>
-//{
-//    opt.WaitForJobsToComplete = true;
-//});
+ConfigureLogging(builder.Host);
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .WriteTo.Console()
-    .WriteTo.Seq("http://localhost:9017")
-    .CreateLogger();
-builder.Host.UseSerilog(Log.Logger);
 ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+ConfigureMiddleware(app);
 
-app.UseHttpsRedirection();
-app.UseRouting();
-app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-app.UseAuthentication();
-app.UseAuthorization();
+ConfigureEndpoints(app);
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<AlpacaDbContext>();
-    context.Database.Migrate();
-}
+MigrateDatabase(app);
 
 app.Run();
 
+static void ConfigureLogging(IHostBuilder hostBuilder)
+{
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Information()
+        .WriteTo.Console()
+        .WriteTo.Seq("http://localhost:9017")
+        .CreateLogger();
+    hostBuilder.UseSerilog(Log.Logger);
+}
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     var connectionString = configuration.GetConnectionString("AlpacaDbConnection");
@@ -92,21 +70,56 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
 
+    services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
+
+    services.AddScoped<IAlpacaClient, AlpacaClient>();
     services.AddScoped<IAlpacaRepository, AlpacaRepository>();
     services.AddScoped<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
-    services.AddScoped<BacktestService>();
+    services.AddScoped<IStrategyTestService, StrategyTestService>();
+
+    services.AddHostedService<MessageConsumerService>();
 
     // Quartz-Services
     services.AddQuartz();
     services.AddQuartzHostedService(opt =>
     {
         opt.WaitForJobsToComplete = true;
-    });
-
-    services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
+    }); 
 
     // Register QuartzHostedService
     services.AddHostedService<AlpacaHistoryService>();
     services.AddControllers();
+}
+static void ConfigureMiddleware(WebApplication app)
+{
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseRouting();
+    app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
+static void ConfigureEndpoints(WebApplication app)
+{
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+}
+static void MigrateDatabase(WebApplication app)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<AlpacaDbContext>();
+        context.Database.Migrate();
+    }
 }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using NuGet.Protocol;
+using System.Diagnostics;
 
 namespace BN.PROJECT.StrategyService;
 
@@ -7,6 +8,7 @@ public class BreakoutStrategy : IStrategyService
     private readonly ILogger<BreakoutStrategy> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IStrategyOperations _strategyOperations;
+    private readonly IKafkaProducerService _kafkaProducer;
 
     private readonly ConcurrentDictionary<Guid, List<Position>> _positions = new();
     private readonly ConcurrentDictionary<Guid, BreakoutProcessModel> _strategyProcesses = new();
@@ -14,11 +16,13 @@ public class BreakoutStrategy : IStrategyService
     public BreakoutStrategy(
         ILogger<BreakoutStrategy> logger,
         IServiceProvider serviceProvider,
-        IStrategyOperations strategyOperations)
+        IStrategyOperations strategyOperations,
+        IKafkaProducerService kafkaProducer)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
         _strategyOperations = strategyOperations;
+        _kafkaProducer = kafkaProducer;
     }
 
     public Task StartTest(StrategyMessage message)
@@ -32,6 +36,7 @@ public class BreakoutStrategy : IStrategyService
 
         var tpm = new BreakoutProcessModel
         {
+            IsBacktest = message.IsBacktest,
             StartDate = DateTime.MinValue,
             BreakoutTimeSpan = _strategyOperations.GetTimeSpanByBreakoutPeriod(breakOutSettings.BreakoutPeriod),
             CurrentHigh = 10000.0m,
@@ -53,11 +58,11 @@ public class BreakoutStrategy : IStrategyService
             StopLossType = breakOutSettings.StopLossType,
         };
         _ = _strategyProcesses.TryAdd(message.StrategyId, tpm);
-        _ = _positions.TryAdd(message.StrategyId, new List<Position>());
+        _ = _positions.TryAdd(message.StrategyId, []);
         return Task.CompletedTask;
     }
 
-    public Task EvaluateQuote(Guid strategyId, Quote quote)
+    public Task EvaluateQuote(Guid strategyId, Guid userId, Quote quote)
     {
         var stopwatch = Stopwatch.StartNew();
 
@@ -154,6 +159,11 @@ public class BreakoutStrategy : IStrategyService
                                      breakoutParams);
 
                 _positions[strategyId].Add(position);
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, position).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
             }
 
             // check breakout low
@@ -173,6 +183,11 @@ public class BreakoutStrategy : IStrategyService
                                    breakoutParams);
 
                 _positions[strategyId].Add(position);
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, position).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
             }
         }
         else
@@ -181,11 +196,21 @@ public class BreakoutStrategy : IStrategyService
             if (tpm.AllowOvernight == false && quoteStamp.TimeOfDay > tpm.MarketCloseTime)
             {
                 var closePrice = openPosition.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, openPosition).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
                 openPosition.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close");
             }
             else
             {
                 _strategyOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, tpm.TrailingStop, tpm.TakeProfitPercent);
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, openPosition).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
             }
         }
         stopwatch.Stop();
@@ -195,33 +220,23 @@ public class BreakoutStrategy : IStrategyService
 
     public async Task StopTest(StrategyMessage message)
     {
+
         _logger.LogInformation("Backtest stopped");
         var strategyId = message.StrategyId;
 
-        var pos = _positions[strategyId].ToList();
-
-        var overNight = pos.Where(p => p.StampOpened.Day != p.StampClosed.Day).ToList();
-        var profits = pos.Where(p => p.ProfitLoss > 0).ToList();
-        var losses = pos.Where(p => p.ProfitLoss < 0).ToList();
-
-        var buys = pos.Where(p => p.Side == SideEnum.Buy).ToList();
-        var sells = pos.Where(p => p.Side == SideEnum.Sell).ToList();
-
-        _logger.LogInformation($"#BT OVERNIGHT POSITIONS: {overNight.Count}  Profit: {overNight.Sum(p => p.ProfitLoss)}");
-        _logger.LogInformation($"#BT PROFIT POSITIONS: {profits.Count}  Profit: {profits.Sum(p => p.ProfitLoss)}");
-        _logger.LogInformation($"#BT LOSS POSITIONS: {losses.Count}  Loss: {losses.Sum(p => p.ProfitLoss)}");
-
-        _logger.LogInformation($"#BT BUY POSITIONS: {profits.Count}  Profit: {profits.Sum(p => p.ProfitLoss)}");
-        _logger.LogInformation($"#BT SELL POSITIONS: {losses.Count}  Profit: {losses.Sum(p => p.ProfitLoss)}");
-
-        var profit = pos.Sum(p => p.ProfitLoss);
-        _logger.LogInformation($"#BT POSITIONS: {pos.Count}  Profit: {profit}");
-        using (var scope = _serviceProvider.CreateScope())
+        if (_strategyProcesses.ContainsKey(strategyId) == false)
         {
-            var strategyRepository = scope.ServiceProvider.GetRequiredService<IStrategyRepository>();
-            await strategyRepository.AddPositionsAsync(pos);
+            return;
         }
-
+        if (_strategyProcesses[strategyId].IsBacktest)
+        {
+            var pos = _positions[strategyId].ToList();
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var strategyRepository = scope.ServiceProvider.GetRequiredService<IStrategyRepository>();
+                await strategyRepository.AddPositionsAsync(pos);
+            }
+        }
         _strategyProcesses.TryRemove(strategyId, out _);
         _positions.TryRemove(strategyId, out _);
         _logger.LogInformation($"#BT {strategyId} Test stopped");

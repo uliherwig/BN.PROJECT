@@ -71,7 +71,12 @@ namespace BN.PROJECT.AlpacaService.Tests
         public async Task GetOrderByIdAsync_ShouldReturnOrder()
         {
             // Arrange
-            var userId = "testUser";
+            var userSettings = new UserSettings
+            {
+                UserId = "testUser",
+                AlpacaKey = "123",
+                AlpacaSecret = "456"
+            };
             var orderId = "testOrder";
             var mockOrder = new Mock<IOrder>();
 
@@ -79,7 +84,7 @@ namespace BN.PROJECT.AlpacaService.Tests
                 .ReturnsAsync(mockOrder.Object);
 
             // Act
-            var result = await _alpacaTradingService.GetOrderByIdAsync(userId, orderId);
+            var result = await _alpacaTradingService.GetOrderByIdAsync(userSettings, orderId);
 
             // Assert
             Assert.NotNull(result);
@@ -91,14 +96,19 @@ namespace BN.PROJECT.AlpacaService.Tests
         public async Task CancelOrderByIdAsync_ShouldReturnTrue()
         {
             // Arrange
-            var userId = "testUser";
+            var userSettings = new UserSettings
+            {
+                UserId = "testUser",
+                AlpacaKey = "123",
+                AlpacaSecret = "456"
+            };
             var orderId = Guid.NewGuid();
 
             _mockAlpacaTradingClient.Setup(client => client.CancelOrderAsync(orderId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             // Act
-            var result = await _alpacaTradingService.CancelOrderByIdAsync(userId, orderId);
+            var result = await _alpacaTradingService.CancelOrderByIdAsync(userSettings, orderId);
 
             // Assert
             Assert.True(result);

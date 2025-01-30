@@ -1,6 +1,4 @@
-﻿using System;
-using BN.PROJECT.IdentityService;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace BN.PROJECT.IdentityService.Tests
 {

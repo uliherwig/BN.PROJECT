@@ -28,8 +28,8 @@ namespace BN.PROJECT.AlpacaService.Tests
         public async Task GetAccount_ShouldReturnBadRequestUserSettingsNotFound()
         {
             var result = await _alpacaTradingController.GetAccount("456");
-            var notFoundObject = result as NotFoundObjectResult;
-            Assert.NotNull(notFoundObject);
+            var badResult = result as BadRequestObjectResult;
+            Assert.NotNull(badResult);
         }
 
         //[Fact]

@@ -33,4 +33,12 @@ public interface IAlpacaRepository
     Task UpdateUserSettingsAsync(UserSettings userSettings);
 
     Task DeleteUserSettingsAsync(UserSettings userSettings);
+
+    Task AddAlpacaExecutionAsync(AlpacaExecutionModel execution);
+
+    Task UpdateAlpacaExecutionAsync(AlpacaExecutionModel execution);
+    
+    Task<AlpacaExecutionModel> GetAlpacaExecutionAsync(Guid id);
+
+    Task<AlpacaExecutionModel?> GetActiveAlpacaExecutionAsync(Guid userId);
 }

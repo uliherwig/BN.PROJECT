@@ -4,12 +4,14 @@ using Moq;
 
 namespace BN.PROJECT.AlpacaService.Tests
 {
-    public class BacktestServiceTests
+    public class StrategyTestServiceTests
     {
         private readonly Mock<IAlpacaRepository> _mockAlpacaRepository;
-        private readonly Mock<IKafkaProducerHostedService> _mockKafkaProducer;
-        private readonly Mock<ILogger<BacktestService>> _mockLogger;
-        private readonly BacktestService _backtestService;
+        private readonly Mock<IAlpacaTradingService> _mockAlpacaTradingService;
+        private readonly Mock<IKafkaProducerService> _mockKafkaProducer;
+        private readonly Mock<IStrategyServiceClient> _mockStrategyServiceClient;
+        private readonly Mock<ILogger<StrategyTestService>> _mockLogger;
+        private readonly StrategyTestService _backtestService;
 
         private readonly StrategySettingsModel _settings = new()
         {
@@ -23,16 +25,22 @@ namespace BN.PROJECT.AlpacaService.Tests
             UserId = Guid.NewGuid(),
         };
 
-        public BacktestServiceTests()
+        public StrategyTestServiceTests()
         {
             _mockAlpacaRepository = new Mock<IAlpacaRepository>();
-            _mockKafkaProducer = new Mock<IKafkaProducerHostedService>();
+            _mockAlpacaTradingService = new Mock<IAlpacaTradingService>();
+            _mockKafkaProducer = new Mock<IKafkaProducerService>();
+            _mockStrategyServiceClient = new Mock<IStrategyServiceClient>();
 
             _mockKafkaProducer.Setup(producer => producer.SendMessageAsync("strategy", It.IsAny<string>(), It.IsAny<CancellationToken>()))
                               .Returns(Task.CompletedTask);
 
-            _mockLogger = new Mock<ILogger<BacktestService>>();
-            _backtestService = new BacktestService(_mockAlpacaRepository.Object, _mockLogger.Object, _mockKafkaProducer.Object);
+            _mockLogger = new Mock<ILogger<StrategyTestService>>();
+            _backtestService = new StrategyTestService(_mockAlpacaRepository.Object, 
+                _mockLogger.Object, 
+                _mockKafkaProducer.Object,
+                _mockStrategyServiceClient.Object,
+                _mockAlpacaTradingService.Object);
         }
 
         [Fact]

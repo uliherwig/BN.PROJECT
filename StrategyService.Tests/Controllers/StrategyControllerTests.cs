@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BN.PROJECT.Core;
-using BN.PROJECT.StrategyService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 
 namespace BN.PROJECT.StrategyService.Tests;
 
@@ -30,6 +24,7 @@ public class StrategyControllerTests
         // Arrange
         var strategyId = Guid.NewGuid();
         var strategy = new StrategySettingsModel { Id = strategyId };
+
         _mockStrategyRepository.Setup(repo => repo.GetStrategyByIdAsync(strategyId))
             .ReturnsAsync(strategy);
 

@@ -19,6 +19,9 @@ public class StrategyTests
     private readonly TestLogger<SmaStrategy> _testLoggerSma;
     private readonly TestLogger<BreakoutStrategy> _testLoggerBreakout;
     private readonly IStrategyOperations _strategyOperations;
+    private readonly Mock<IKafkaProducerService> _mockKafkaProducer;
+
+
 
     public StrategyTests()
     {
@@ -37,8 +40,12 @@ public class StrategyTests
         _serviceProviderMock.Setup(x => x.GetService(typeof(IStrategyRepository))).Returns(_strategyRepositoryServiceMock.Object);
         _strategyRepositoryServiceMock.Setup(x => x.AddPositionsAsync(It.IsAny<List<Position>>())).Returns(Task.CompletedTask);
 
-        _smaStrategy = new SmaStrategy(_testLoggerSma, _serviceProviderMock.Object, _strategyOperations);
-        _breakoutStrategy = new BreakoutStrategy(_testLoggerBreakout, _serviceProviderMock.Object, _strategyOperations);
+        _mockKafkaProducer = new Mock<IKafkaProducerService>();
+        _mockKafkaProducer.Setup(producer => producer.SendMessageAsync("order", It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                           .Returns(Task.CompletedTask);
+
+        _smaStrategy = new SmaStrategy(_testLoggerSma, _serviceProviderMock.Object, _strategyOperations, _mockKafkaProducer.Object);
+        _breakoutStrategy = new BreakoutStrategy(_testLoggerBreakout, _serviceProviderMock.Object, _strategyOperations, _mockKafkaProducer.Object);
     }
 
     [Fact]
@@ -74,12 +81,13 @@ public class StrategyTests
             TestStamp = DateTime.UtcNow,
             StrategyParams = smaParams
         };
-        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings });
 
         // Act
+        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings });
+
         foreach (var quote in testData)
         {
-            await _smaStrategy.EvaluateQuote(strategySettings.Id, quote);
+            await _smaStrategy.EvaluateQuote(strategySettings.Id, strategySettings.UserId, quote);
         }
 
         // Assert
@@ -122,12 +130,13 @@ public class StrategyTests
             TestStamp = DateTime.UtcNow,
             StrategyParams = smaParams
         };
-        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings });
 
         // Act
+        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings });
+
         foreach (var quote in testData)
         {
-            await _smaStrategy.EvaluateQuote(strategySettings.Id, quote);
+            await _smaStrategy.EvaluateQuote(strategySettings.Id, strategySettings.UserId, quote);
         }
 
         // Assert
@@ -168,12 +177,13 @@ public class StrategyTests
             TestStamp = DateTime.UtcNow,
             StrategyParams = testparams
         };
-        await _breakoutStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.Breakout, Settings = strategySettings });
 
         // Act
+        await _breakoutStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.Breakout, Settings = strategySettings });
+
         foreach (var quote in testData)
         {
-            await _breakoutStrategy.EvaluateQuote(strategySettings.Id, quote);
+            await _breakoutStrategy.EvaluateQuote(strategySettings.Id, strategySettings.UserId, quote);
         }
 
         // Assert
@@ -182,7 +192,83 @@ public class StrategyTests
         Assert.Equal(3, result.Count);
         Assert.Equal(1, result.Count(x => x.PriceClose == 0.0m));
     }
+    [Fact]
+    public async Task RunTest_2_Tests_Parallel_ShouldReturnTwoPositions()
+    {
+        // Arrange
+        var testData = TestData.GetTestData();
 
+        var smaParams1 = JsonConvert.SerializeObject(new
+        {
+            ShortPeriod = 20,
+            LongPeriod = 30,
+            CloseType = StopLossTypeEnum.None,
+            IntersectionThreshold = 0.02m
+        });
+
+        var strategySettings1 = new StrategySettingsModel
+        {
+            UserId = Guid.NewGuid(),
+            StrategyType = StrategyEnum.SMA,
+            Broker = "Alpaca",
+            Name = "ExampleStrategy1",
+            Asset = "SPY",
+            Quantity = 1,
+            TakeProfitPercent = 0.2m,
+            StopLossPercent = 0.2m,
+            StartDate = DateTime.Parse("2024-11-27T14:30:00.000Z").ToUniversalTime(),
+            EndDate = DateTime.Parse("2024-11-27T21:08:00.000Z").ToUniversalTime(),
+            TrailingStop = 0.0m,
+            AllowOvernight = true,
+            Bookmarked = false,
+            TestStamp = DateTime.UtcNow,
+            StrategyParams = smaParams1
+        };
+
+        var smaParams2 = JsonConvert.SerializeObject(new
+        {
+            ShortPeriod = 20,
+            LongPeriod = 30,
+            CloseType = StopLossTypeEnum.None,
+            IntersectionThreshold = 0.02m
+        });
+
+        var strategySettings2 = new StrategySettingsModel
+        {
+            UserId = Guid.NewGuid(),
+            StrategyType = StrategyEnum.SMA,
+            Broker = "Alpaca",
+            Name = "ExampleStrategy2",
+            Asset = "SPY",
+            Quantity = 1,
+            TakeProfitPercent = 0.2m,
+            StopLossPercent = 0.2m,
+            StartDate = DateTime.Parse("2024-11-27T14:30:00.000Z").ToUniversalTime(),
+            EndDate = DateTime.Parse("2024-11-27T21:08:00.000Z").ToUniversalTime(),
+            TrailingStop = 0.0m,
+            AllowOvernight = true,
+            Bookmarked = false,
+            TestStamp = DateTime.UtcNow,
+            StrategyParams = smaParams2
+        };
+
+        // Act
+        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings1.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings1 });
+        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings2.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings2 });
+
+        foreach (var quote in testData)
+        {
+            await _smaStrategy.EvaluateQuote(strategySettings1.Id, strategySettings1.UserId, quote);
+            await _smaStrategy.EvaluateQuote(strategySettings2.Id, strategySettings2.UserId, quote);
+        }
+
+        // Assert
+        var result1 = _smaStrategy.GetPositions(strategySettings1.Id);
+        var result2 = _smaStrategy.GetPositions(strategySettings2.Id);
+
+        Assert.Equal(2, result1.Count);
+        Assert.Equal(2, result2.Count);
+    }
     public async Task Demo()
     {
         var testInjection = TestInjection.Use(builder =>

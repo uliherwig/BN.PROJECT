@@ -74,4 +74,15 @@ public class StrategyOperations : IStrategyOperations
             }
         }
     }
+
+    OrderMessage IStrategyOperations.CreateOrderMessage(Guid strategyId, Guid userId, Position position)
+    {
+        return new OrderMessage
+        {
+            MessageType = MessageTypeEnum.Order,
+            StrategyId = strategyId,
+            UserId = userId,
+            Position = position
+        };
+    }
 }

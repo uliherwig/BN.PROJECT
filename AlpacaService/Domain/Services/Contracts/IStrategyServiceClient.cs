@@ -2,7 +2,7 @@ namespace BN.PROJECT.AlpacaService;
 
 public interface IStrategyServiceClient
 {
-    Task<string> GetStrategyAsync();
+    Task<StrategySettingsModel?> GetStrategyAsync(string strategyId);
 
     Task<string> StartStrategyAsync(StrategySettingsModel testSettings);
 }

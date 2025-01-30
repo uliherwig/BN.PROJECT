@@ -2,6 +2,7 @@
 
 public class BreakoutProcessModel
 {
+    public bool IsBacktest { get; set; }
     public DateTime StartDate { get; set; }
     public TimeSpan BreakoutTimeSpan { get; set; }
     public long LastTimeFrameVolume { get; set; }

@@ -105,4 +105,28 @@ public class AlpacaRepository : IAlpacaRepository
         _context.UserSettings.Remove(userSettings);
         await _context.SaveChangesAsync();
     }
+
+    public async Task AddAlpacaExecutionAsync(AlpacaExecutionModel execution)
+    {
+        await _context.Executions.AddAsync(execution);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAlpacaExecutionAsync(AlpacaExecutionModel execution)
+    {
+        _context.Executions.Update(execution);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<AlpacaExecutionModel?> GetAlpacaExecutionAsync(Guid id)
+    {
+        var execution = await _context.Executions.FindAsync(id);
+        return execution;
+    }
+
+    public async Task<AlpacaExecutionModel?> GetActiveAlpacaExecutionAsync(Guid userId)
+    {
+        var execution = await _context.Executions.FirstOrDefaultAsync(e => e.UserId == userId && e.EndDate == DateTime.MinValue);
+        return execution;
+    }
 }

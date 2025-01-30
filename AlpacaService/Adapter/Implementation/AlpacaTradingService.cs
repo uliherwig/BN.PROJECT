@@ -1,3 +1,5 @@
+
+
 namespace BN.PROJECT.AlpacaService
 {
     public class AlpacaTradingService : IAlpacaTradingService
@@ -39,7 +41,7 @@ namespace BN.PROJECT.AlpacaService
             return await tradingClient.GetAssetAsync(symbol);
         }
 
-        public async Task<List<AlpacaOrder>> GetAllOrdersAsync(string userId, OrderStatusFilter orderStatusFilter)
+        public async Task<List<AlpacaOrder>> GetAllOrdersAsync(UserSettings userSettings, OrderStatusFilter orderStatusFilter)
         {
             var tradingClient = _alpacaClient.GetCommonTradingClient();
             var req = new ListOrdersRequest
@@ -51,48 +53,50 @@ namespace BN.PROJECT.AlpacaService
             return orders.Select(order => order.ToAlpacaOrder()).ToList();
         }
 
-        public async Task<AlpacaOrder> GetOrderByIdAsync(string userId, string orderId)
+        public async Task<AlpacaOrder> GetOrderByIdAsync(UserSettings userSettings, string orderId)
         {
             var tradingClient = _alpacaClient.GetCommonTradingClient();
             var order = await tradingClient.GetOrderAsync(orderId);
             return order.ToAlpacaOrder();
         }
 
-        public async Task<bool> CancelOrderByIdAsync(string userId, Guid orderId)
+        public async Task<bool> CancelOrderByIdAsync(UserSettings userSettings, Guid orderId)
         {
             var tradingClient = _alpacaClient.GetCommonTradingClient();
             return await tradingClient.CancelOrderAsync(orderId);
         }
 
-        public async Task<AlpacaOrder> CreateOrderAsync(string userId, string symbol, OrderQuantity qty, OrderSide side, OrderType orderType, TimeInForce timeInForce)
+        public async Task<AlpacaOrder> CreateOrderAsync(UserSettings userSettings, string symbol, OrderQuantity qty, OrderSide side, OrderType orderType, TimeInForce timeInForce)
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var req = new NewOrderRequest(symbol, qty, side, orderType, timeInForce);
-            var order = await tradingClient.PostOrderAsync(req);
-            var alpacaOrder = order.ToAlpacaOrder();
-            return alpacaOrder;
+            var tradingClient = _alpacaClient.GetPrivateTradingClient(userSettings);
+            //var req = new NewOrderRequest(symbol, qty, side, orderType, timeInForce);
+            //var order = await tradingClient.PostOrderAsync(req);
+            //var alpacaOrder = order.ToAlpacaOrder();
+            //return alpacaOrder;
+
+            return new AlpacaOrder();
         }
 
-        public async Task<List<AlpacaPosition>> GetAllOpenPositions(string userId)
+        public async Task<List<AlpacaPosition>> GetAllOpenPositions(UserSettings userSettings)
         {
             var tradingClient = _alpacaClient.GetCommonTradingClient();
             var positions = await tradingClient.ListPositionsAsync();
             return positions.Select(p => p.ToAlpacaPosition()).ToList();
         }
 
-        public async Task<AlpacaPosition> GetPositionsBySymbol(string userId, string symbol)
+        public async Task<AlpacaPosition> GetPositionsBySymbol(UserSettings userSettings, string symbol)
         {
             var tradingClient = _alpacaClient.GetCommonTradingClient();
             var pos = await tradingClient.GetPositionAsync(symbol);
             return pos.ToAlpacaPosition();
         }
 
-        public async Task<AlpacaOrder> ClosePositionOrder(string userId, string symbol)
+        public async Task<AlpacaOrder> ClosePositionOrder(UserSettings userSettings, string symbol)
         {
             var tradingClient = _alpacaClient.GetCommonTradingClient();
             var deletePositionRequest = new DeletePositionRequest(symbol);
             var order = await tradingClient.DeletePositionAsync(deletePositionRequest);
             return order.ToAlpacaOrder();
-        }
+        }    
     }
 }

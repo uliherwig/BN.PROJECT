@@ -64,7 +64,7 @@ public class MessageConsumerService : IHostedService
 
                 foreach (var quote in message.Quotes)
                 {
-                    await strategyService.EvaluateQuote(message.StrategyId, quote);
+                    await strategyService.EvaluateQuote(message.StrategyId,message.UserId, quote);
                 }
                 stopwatch.Stop();
                 _logger.LogInformation($"EvaluateQuote done in {stopwatch.Elapsed.TotalMilliseconds} ms. Number of quotes = {message.Quotes.Count}");

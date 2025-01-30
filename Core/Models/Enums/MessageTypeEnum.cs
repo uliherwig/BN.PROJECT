@@ -5,5 +5,6 @@ public enum MessageTypeEnum
     StartTest,
     Quotes,
     StopTest,
-    Success
+    Success,
+    Order
 }

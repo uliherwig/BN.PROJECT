@@ -17,23 +17,30 @@ public class AlpacaTradingController : ControllerBase
     [HttpGet("account/{userId}")]
     public async Task<IActionResult> GetAccount(string userId)
     {
+        var result = new BrokerAccount();
         if (string.IsNullOrEmpty(userId))
         {
-            return BadRequest(new { Message = "UserId cannot be null" });
+            return BadRequest("UserId cannot be null or empty");
         }
         var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
         if (userSettings == null)
         {
-            return NotFound(new { Message = "NoCredentials" });
+            result.AccountStatus = AccountStatusEnum.NoCredentials;
         }
-
-        var account = await _alpacaTradingService.GetAccountAsync(userSettings);
-        if (account == null)
+        else
         {
-            return NotFound(new { Message = "WrongCredentials" });
+            var account = await _alpacaTradingService.GetAccountAsync(userSettings);
+            if (account != null)
+            {
+                result = account.ToBrokerAccount(AccountStatusEnum.AccountLoaded, new Guid(userId));
+            }
+            else
+            {
+                result.AccountStatus = AccountStatusEnum.WrongCredentials;
+                result.UserId = new Guid(userId);
+            }
         }
-
-        return Ok(account);
+        return Ok(result);
     }
 
     [HttpGet("assets")]
@@ -50,58 +57,81 @@ public class AlpacaTradingController : ControllerBase
         return Ok(asset);
     }
 
-    [HttpPost("market-order")]
-    public async Task<IActionResult> CreateMarketOrder(string userId, string symbol, int quantity, bool isBuy)
-    {
-        OrderQuantity qty = quantity;
-        OrderSide side = isBuy ? OrderSide.Buy : OrderSide.Sell;
-        var order = await _alpacaTradingService.CreateOrderAsync(userId, symbol, qty, side, OrderType.Market, TimeInForce.Day);
-        if (order != null)
-        {
-            await _alpacaRepository.AddOrderAsync(order);
-        }
-        return Ok(order);
-    }
-
     [HttpGet("orders")]
     public async Task<IActionResult> GetAllOrders(string userId, OrderStatusFilter orderStatusFilter)
     {
-        var orders = await _alpacaTradingService.GetAllOrdersAsync(userId, orderStatusFilter);
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        if (userSettings == null)
+        {
+            return NotFound("User settings not found");
+        }
+
+        var orders = await _alpacaTradingService.GetAllOrdersAsync(userSettings, orderStatusFilter);
         return Ok(orders);
     }
 
     [HttpGet("order/{orderId}")]
     public async Task<IActionResult> GetOrderById(string userId, string orderId)
     {
-        var order = await _alpacaTradingService.GetOrderByIdAsync(userId, orderId);
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        if (userSettings == null)
+        {
+            return NotFound("User settings not found");
+        }
+
+        var order = await _alpacaTradingService.GetOrderByIdAsync(userSettings, orderId);
         return Ok(order);
     }
 
     [HttpDelete("order/{orderId}")]
     public async Task<IActionResult> CancelOrderById(string userId, Guid orderId)
     {
-        var result = await _alpacaTradingService.CancelOrderByIdAsync(userId, orderId);
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        if (userSettings == null)
+        {
+            return NotFound("User settings not found");
+        }
+
+        var result = await _alpacaTradingService.CancelOrderByIdAsync(userSettings, orderId);
         return Ok(result);
     }
 
     [HttpGet("positions")]
     public async Task<IActionResult> GetPositions(string userId)
     {
-        var positions = await _alpacaTradingService.GetAllOpenPositions(userId);
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        if (userSettings == null)
+        {
+            return NotFound("User settings not found");
+        }
+
+        var positions = await _alpacaTradingService.GetAllOpenPositions(userSettings);
         return Ok(positions);
     }
 
     [HttpGet("position/{symbol}")]
     public async Task<IActionResult> GetPositionsBySymbol(string userId, string symbol)
     {
-        var position = await _alpacaTradingService.GetPositionsBySymbol(userId, symbol);
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        if (userSettings == null)
+        {
+            return NotFound("User settings not found");
+        }
+
+        var position = await _alpacaTradingService.GetPositionsBySymbol(userSettings, symbol);
         return Ok(position);
     }
 
     [HttpDelete("position/{symbol}")]
     public async Task<IActionResult> ClosePosition(string userId, string symbol)
     {
-        var result = await _alpacaTradingService.ClosePositionOrder(userId, symbol);
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        if (userSettings == null)
+        {
+            return NotFound("User settings not found");
+        }
+
+        var result = await _alpacaTradingService.ClosePositionOrder(userSettings, symbol);
         return Ok(result);
     }
 }

@@ -19,6 +19,7 @@ public class AlpacaDataController : ControllerBase
         return Ok(bars);
     }
 
+    //[KeycloakAuthorize("admin")]
     [HttpGet("latest-bar/{symbol}")]
     public async Task<IActionResult> GetLatestBarBySymbol(string symbol)
     {

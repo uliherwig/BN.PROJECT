@@ -5,7 +5,6 @@ public class KeycloakServiceClient : IKeycloakServiceClient
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
     private readonly ILogger<KeycloakServiceClient> _logger;
-    private readonly IJwtTokenDecoder _jwtTokenDecoder;
 
     private readonly string _authority;
     private readonly string _realm;
@@ -15,8 +14,7 @@ public class KeycloakServiceClient : IKeycloakServiceClient
     public KeycloakServiceClient(
         HttpClient httpClient,
         IConfiguration configuration,
-        ILogger<KeycloakServiceClient> logger,
-        IJwtTokenDecoder jwtTokenDecoder)
+        ILogger<KeycloakServiceClient> logger)
     {
         _configuration = configuration;
         _logger = logger;
@@ -36,7 +34,6 @@ public class KeycloakServiceClient : IKeycloakServiceClient
         _logger.LogInformation($"ClientId: {_clientId}");
         _logger.LogInformation($"ClientSecret: {_clientSecret}");
         _logger.LogInformation($"Host: {_configuration["Keycloak:Host"]}");
-        _jwtTokenDecoder = jwtTokenDecoder;
     }
 
     public async Task<SignInResponse> SignIn(SignInRequest signInRequest)
@@ -71,7 +68,7 @@ public class KeycloakServiceClient : IKeycloakServiceClient
         {
             var responseContent = await response.Content.ReadAsStringAsync();
             var tokenResponse = JsonConvert.DeserializeObject<JwtToken>(responseContent);
-            var claims = _jwtTokenDecoder.DecodeJwtToken(tokenResponse.AccessToken);
+            var claims = JwtTokenDecoder.DecodeJwtToken(tokenResponse.AccessToken);
 
             tokenResponse.Name = claims["preferred_username"];
             return new SignInResponse

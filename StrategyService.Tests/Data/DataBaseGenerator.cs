@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BN.PROJECT.Core;
-using NuGet.Configuration;
-using Microsoft.CodeAnalysis.Elfie.Model;
-using Microsoft.AspNetCore.SignalR;
 
 
 namespace BN.PROJECT.StrategyService.Tests;

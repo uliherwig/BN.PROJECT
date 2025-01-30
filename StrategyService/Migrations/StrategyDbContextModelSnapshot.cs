@@ -32,6 +32,9 @@ namespace BN.PROJECT.StrategyService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("ExecutionId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("PriceClose")
                         .HasColumnType("numeric");
 
