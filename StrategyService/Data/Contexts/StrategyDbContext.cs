@@ -3,7 +3,7 @@
 public class StrategyDbContext : DbContext
 {
     public DbSet<StrategySettingsModel> Strategies { get; set; }
-    public DbSet<Position> Positions { get; set; }
+    public DbSet<PositionModel> Positions { get; set; }
 
     public StrategyDbContext(DbContextOptions<StrategyDbContext> options)
         : base(options)

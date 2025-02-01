@@ -11,7 +11,7 @@ public class SmaStrategy : IStrategyService
     private readonly IKafkaProducerService _kafkaProducer;
 
 
-    public readonly ConcurrentDictionary<Guid, List<Position>> _positions = new();
+    public readonly ConcurrentDictionary<Guid, List<PositionModel>> _positions = new();
     private readonly ConcurrentDictionary<Guid, SmaProcessModel> _strategyProcesses = new();
     private readonly ConcurrentDictionary<Guid, List<SmaTick>> _ticks = new();
 
@@ -99,7 +99,7 @@ public class SmaStrategy : IStrategyService
 
         var lastIncrease = tpm.IsIncreasing;
 
-        var trigger = SideEnum.None;
+        var trigger = SideEnum.Buy;
         var closeTrigger = false;
         tpm.IsIncreasing = shortSma > longSma;
 
@@ -265,7 +265,7 @@ public class SmaStrategy : IStrategyService
         }
     }
 
-    public List<Position>? GetPositions(Guid strategyId)
+    public List<PositionModel>? GetPositions(Guid strategyId)
     {
         var positions = _positions.ContainsKey(strategyId) ? _positions[strategyId] : null;
         return positions;

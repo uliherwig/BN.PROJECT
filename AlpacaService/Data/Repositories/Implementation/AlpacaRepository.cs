@@ -124,7 +124,14 @@ public class AlpacaRepository : IAlpacaRepository
         return execution;
     }
 
-    public async Task<AlpacaExecutionModel?> GetActiveAlpacaExecutionAsync(Guid userId)
+    public async Task<List<AlpacaExecutionModel>?> GetActiveAlpacaExecutionsAsync()
+    {
+        return await _context.Executions
+               .Where(e => e.EndDate == DateTime.MinValue)
+               .ToListAsync();
+    }
+
+    public async Task<AlpacaExecutionModel?> GetActiveAlpacaExecutionByUserIdAsync(Guid userId)
     {
         var execution = await _context.Executions.FirstOrDefaultAsync(e => e.UserId == userId && e.EndDate == DateTime.MinValue);
         return execution;

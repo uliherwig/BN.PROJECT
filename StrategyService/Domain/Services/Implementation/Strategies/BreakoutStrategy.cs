@@ -10,7 +10,7 @@ public class BreakoutStrategy : IStrategyService
     private readonly IStrategyOperations _strategyOperations;
     private readonly IKafkaProducerService _kafkaProducer;
 
-    private readonly ConcurrentDictionary<Guid, List<Position>> _positions = new();
+    private readonly ConcurrentDictionary<Guid, List<PositionModel>> _positions = new();
     private readonly ConcurrentDictionary<Guid, BreakoutProcessModel> _strategyProcesses = new();
 
     public BreakoutStrategy(
@@ -242,7 +242,7 @@ public class BreakoutStrategy : IStrategyService
         _logger.LogInformation($"#BT {strategyId} Test stopped");
     }
 
-    public List<Position>? GetPositions(Guid strategyId)
+    public List<PositionModel>? GetPositions(Guid strategyId)
     {
         var positions = _positions.ContainsKey(strategyId) ? _positions[strategyId] : null;
         return positions;

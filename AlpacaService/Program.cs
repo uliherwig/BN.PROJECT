@@ -78,16 +78,17 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
     services.AddScoped<IStrategyTestService, StrategyTestService>();
 
-    services.AddHostedService<MessageConsumerService>();
+    services.AddHostedService<MessageConsumerService>(); 
 
     // Quartz-Services
     services.AddQuartz();
     services.AddQuartzHostedService(opt =>
     {
         opt.WaitForJobsToComplete = true;
-    }); 
+    });
 
     // Register QuartzHostedService
+    services.AddHostedService<SendQuoteTaskService>();
     services.AddHostedService<AlpacaHistoryService>();
     services.AddControllers();
 }

@@ -60,7 +60,7 @@ public static class DataBaseGenerator
         context.Strategies.Add(strategy2);
         context.SaveChanges();
 
-        var position1 = new Position
+        var position1 = new PositionModel
         {
             Id = TestGuid,
             StrategyId = TestGuid,
@@ -77,7 +77,7 @@ public static class DataBaseGenerator
             CloseSignal = "",
 
         };
-        var position2 = new Position
+        var position2 = new PositionModel
         {
             Id = Guid.NewGuid(),
             StrategyId = Guid.NewGuid(),

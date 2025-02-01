@@ -45,7 +45,7 @@ public class StrategyOperationsTests
     public void UpdateOrCloseOpenPosition_ShouldUpdateTakeProfitAndStopLossForBuy()
     {
         // Arrange
-        var openPosition = new Position { Side = SideEnum.Buy, TakeProfit = 100, StopLoss = 90 };
+        var openPosition = new PositionModel { Side = SideEnum.Buy, TakeProfit = 100, StopLoss = 90 };
         var quote = new Quote { BidPrice = 110, AskPrice = 105, TimestampUtc = DateTime.UtcNow };
         decimal trailingStop = 5;
         decimal takeProfitPercent = 10;

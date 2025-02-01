@@ -6,7 +6,7 @@ public interface IStrategyOperations
 
     TimeSpan GetTimeSpanByBreakoutPeriod(BreakoutPeriodEnum tradeInterval);
 
-    void UpdateOrCloseOpenPosition(ref Position openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent);
+    void UpdateOrCloseOpenPosition(ref PositionModel openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent);
 
-    OrderMessage CreateOrderMessage(Guid strategyId, Guid userId, Position position);
+    OrderMessage CreateOrderMessage(Guid strategyId, Guid userId, PositionModel position);
 }

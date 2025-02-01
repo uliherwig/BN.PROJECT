@@ -77,7 +77,7 @@ public class StrategyControllerTests
         // Arrange
         var strategyId = Guid.NewGuid();
         var strategy = new StrategySettingsModel { Id = strategyId };
-        var positions = new List<Position>();
+        var positions = new List<PositionModel>();
         _mockStrategyRepository.Setup(repo => repo.GetStrategyByIdAsync(strategyId))
             .ReturnsAsync(strategy);
         _mockStrategyRepository.Setup(repo => repo.GetPositionsByStrategyIdAsync(strategyId))
@@ -150,9 +150,9 @@ public class StrategyControllerTests
     {
         // Arrange
         var strategyId = Guid.NewGuid();
-        var positions = new List<Position>
+        var positions = new List<PositionModel>
         {
-            new Position { PriceClose = 100 }
+            new PositionModel { PriceClose = 100 }
         };
         _mockStrategyRepository.Setup(repo => repo.GetPositionsByStrategyIdAsync(strategyId))
             .ReturnsAsync(positions);
@@ -177,9 +177,9 @@ public class StrategyControllerTests
             StartDate = DateTime.UtcNow,
             EndDate = DateTime.UtcNow
         };
-        var positions = new List<Position>
+        var positions = new List<PositionModel>
         {
-            new Position { PriceClose = 100, Side = SideEnum.Buy, ProfitLoss = 10 }
+            new PositionModel { PriceClose = 100, Side = SideEnum.Buy, ProfitLoss = 10 }
         };
         _mockStrategyRepository.Setup(repo => repo.GetStrategyByIdAsync(strategyId))
             .ReturnsAsync(strategy);

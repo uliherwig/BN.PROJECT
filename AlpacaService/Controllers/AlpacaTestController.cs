@@ -37,7 +37,7 @@ public class AlpacaTestController : ControllerBase
     [HttpGet("get-execution/{userId}")]
     public async Task<IActionResult> GetActiveExecutionByUserId(string userId)
     {
-        var exec = await _alpacaRepository.GetActiveAlpacaExecutionAsync(Guid.Parse(userId));
+        var exec = await _alpacaRepository.GetActiveAlpacaExecutionByUserIdAsync(Guid.Parse(userId));
         if (exec == null)
         {
             exec = new AlpacaExecutionModel();
@@ -76,29 +76,29 @@ public class AlpacaTestController : ControllerBase
     [HttpPost("start-execution/{userId}/{strategyId}")]
     public async Task<IActionResult> StartAlpacaExecution(Guid userId, Guid strategyId)
     {
+        var strategy = await _strategyServiceClient.GetStrategyAsync(strategyId.ToString());
+        if(strategy == null)
+        {
+            return BadRequest("Strategy not found");
+        }
+        if(strategy.UserId != userId)
+        {
+            return BadRequest("User is not the owner of the strategy");
+        }
         var alpacaExecution = new AlpacaExecutionModel
         {
             Id = Guid.NewGuid(),
-            UserId = userId,
-            StrategyId = strategyId,
+            UserId = strategy.UserId,
+            StrategyId = strategy.Id,
+            Assets = strategy.Asset,
+            StrategyType = strategy.StrategyType,
             StartDate = DateTime.UtcNow,
             EndDate = DateTime.MinValue
         };
 
         await _alpacaRepository.AddAlpacaExecutionAsync(alpacaExecution);
 
-        await _strategyTestService.RunExecution(userId, strategyId);
-
-        //var result = await _strategyServiceClient.StartStrategyAsync(settings);
-        //if (Enum.TryParse(result, out ErrorCode errorCode))
-        //{
-        //    return BadRequest(errorCode);
-        //}
-
-        //if (result == "true")
-        //{
-        //
-        //}
+        await _strategyTestService.StartExecution(strategy.UserId, strategyId);   
 
         return Ok(alpacaExecution);
     }
@@ -106,7 +106,7 @@ public class AlpacaTestController : ControllerBase
     [HttpDelete("stop-execution/{userId}")]
     public async Task<IActionResult> StopAlpacaExecution(Guid userId)
     {
-        var execution = await _alpacaRepository.GetActiveAlpacaExecutionAsync(userId);
+        var execution = await _alpacaRepository.GetActiveAlpacaExecutionByUserIdAsync(userId);
         if (execution == null)
         {
             return BadRequest("No active execution found");

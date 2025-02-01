@@ -97,6 +97,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     {
         opt.WaitForJobsToComplete = true;
     });
+
     services.AddHostedService<BacktestCleanUpService>();
 
     services.AddWithAllDerivedTypes<IStrategyService>();  // adds all classes that implement IStrategyService as Singleton

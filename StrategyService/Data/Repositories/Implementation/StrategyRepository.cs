@@ -45,10 +45,10 @@ public class StrategyRepository : IStrategyRepository
         return 0;
     }
 
-    public async Task<List<Position>> GetPositionsByStrategyIdAsync(Guid testId) =>
+    public async Task<List<PositionModel>> GetPositionsByStrategyIdAsync(Guid testId) =>
         await _context.Positions.Where(p => p.StrategyId == testId).ToListAsync();
 
-    public async Task AddPositionAsync(Position position)
+    public async Task AddPositionAsync(PositionModel position)
     {
         try
         {
@@ -61,7 +61,7 @@ public class StrategyRepository : IStrategyRepository
         }
     }
 
-    public async Task UpdatePositionAsync(Position position)
+    public async Task UpdatePositionAsync(PositionModel position)
     {
         try
         {
@@ -74,7 +74,7 @@ public class StrategyRepository : IStrategyRepository
         }
     }
 
-    public async Task AddPositionsAsync(List<Position> positions)
+    public async Task AddPositionsAsync(List<PositionModel> positions)
     {
         try
         {
@@ -93,7 +93,7 @@ public class StrategyRepository : IStrategyRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeletePositionsAsync(List<Position> positions)
+    public async Task DeletePositionsAsync(List<PositionModel> positions)
     {
         _context.Positions.RemoveRange(positions);
         await _context.SaveChangesAsync();

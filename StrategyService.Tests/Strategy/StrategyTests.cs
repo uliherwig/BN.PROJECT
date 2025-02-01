@@ -38,7 +38,7 @@ public class StrategyTests
         _serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(_serviceScopeMock.Object);
 
         _serviceProviderMock.Setup(x => x.GetService(typeof(IStrategyRepository))).Returns(_strategyRepositoryServiceMock.Object);
-        _strategyRepositoryServiceMock.Setup(x => x.AddPositionsAsync(It.IsAny<List<Position>>())).Returns(Task.CompletedTask);
+        _strategyRepositoryServiceMock.Setup(x => x.AddPositionsAsync(It.IsAny<List<PositionModel>>())).Returns(Task.CompletedTask);
 
         _mockKafkaProducer = new Mock<IKafkaProducerService>();
         _mockKafkaProducer.Setup(producer => producer.SendMessageAsync("order", It.IsAny<string>(), It.IsAny<CancellationToken>()))

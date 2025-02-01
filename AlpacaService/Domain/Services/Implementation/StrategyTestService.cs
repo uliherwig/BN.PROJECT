@@ -85,7 +85,8 @@ public class StrategyTestService : IStrategyTestService
         stopwatch.Stop();
         _logger.LogInformation($"RunBacktest {testSettings.Id} completed in {stopwatch.ElapsedMilliseconds} ms");
     }
-    public async Task RunExecution(Guid userId, Guid strategyId)
+
+    public async Task StartExecution(Guid userId, Guid strategyId)
     {
         var testSettings = await _strategyServiceClient.GetStrategyAsync(strategyId.ToString());
         if (testSettings == null)
@@ -105,76 +106,45 @@ public class StrategyTestService : IStrategyTestService
 
         await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
 
-        var symbol = testSettings.Asset;
-        var startDate = testSettings.StartDate.ToUniversalTime();
-        var endDate = testSettings.EndDate.ToUniversalTime();
+   
+ 
 
-        // send quotes per day
-        TimeSpan timeFrame = TimeSpan.FromDays(1);
+        //// send quotes per day
+        //TimeSpan timeFrame = TimeSpan.FromDays(1);
 
-        var stamp = startDate.ToUniversalTime();
+        //var stamp = startDate.ToUniversalTime();
 
-        while (stamp < endDate)
-        {
-            var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
-            var bars = await _alpacaRepository.GetHistoricalBars(symbol, stamp, stampEnd);
-            if (bars.Count == 0)
-            {
-                stamp = stamp.Add(timeFrame).ToUniversalTime();
-                continue;
-            }
-            var quotesDay = new List<Quote>();
-            foreach (var bar in bars)
-            {
-                var q = new Quote
-                {
-                    Symbol = symbol,
-                    AskPrice = bar.C + 0.1m,
-                    BidPrice = bar.C - 0.1m,
-                    TimestampUtc = bar.T.ToUniversalTime()
-                };
-                quotesDay.Add(q);
-            }
-            message.MessageType = MessageTypeEnum.Quotes;
-            message.Settings = null;
-            message.Quotes = quotesDay;
+        //while (stamp < endDate)
+        //{
+        //    var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
+        //    var bars = await _alpacaRepository.GetHistoricalBars(symbol, stamp, stampEnd);
+        //    if (bars.Count == 0)
+        //    {
+        //        stamp = stamp.Add(timeFrame).ToUniversalTime();
+        //        continue;
+        //    }
+        //    var quotesDay = new List<Quote>();
+        //    foreach (var bar in bars)
+        //    {
+        //        var q = new Quote
+        //        {
+        //            Symbol = symbol,
+        //            AskPrice = bar.C + 0.1m,
+        //            BidPrice = bar.C - 0.1m,
+        //            TimestampUtc = bar.T.ToUniversalTime()
+        //        };
+        //        quotesDay.Add(q);
+        //    }
+        //    message.MessageType = MessageTypeEnum.Quotes;
+        //    message.Settings = null;
+        //    message.Quotes = quotesDay;
 
-            await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-            stamp = stamp.Add(timeFrame).ToUniversalTime();
-        };
+        //    await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
+        //    stamp = stamp.Add(timeFrame).ToUniversalTime();
+        //};
 
-        message.MessageType = MessageTypeEnum.StopTest;
-        message.Settings = null;
-        message.Quotes = null;
-
-        await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-
+   
     }
-
-
-    public async Task CreateAlpacaOrder(OrderMessage orderMessage)
-    {
-        _logger.LogInformation($"Run Alpaca Execution");
-
-
-        var userId = orderMessage.UserId;
-        var symbol = orderMessage.Position.Symbol;
-        var qty = orderMessage.Position.Quantity;
-        var side = orderMessage.Position.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell;
-        var orderType = OrderType.Market;
-        var timeInForce = TimeInForce.Day;
-
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId.ToString());
-        if (userSettings == null)
-        {
-            _logger.LogError("User settings not found for userId: {userId}");
-            return;
-        }
-
-        await _alpacaTradingService.CreateOrderAsync(userSettings, symbol, qty, side, orderType, timeInForce);
-
-    }
-
     public async Task StopExecution(Guid userId, Guid strategyId)
     {
         var message = new StrategyMessage
@@ -183,8 +153,30 @@ public class StrategyTestService : IStrategyTestService
             IsBacktest = false,
             UserId = userId,
             StrategyId = strategyId
-
         };
         await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
     }
+
+    public async Task CreateAlpacaOrder(OrderMessage orderMessage)
+    {
+        _logger.LogInformation($"Run Alpaca Execution");
+
+        var userId = orderMessage.UserId;
+        var symbol = orderMessage.Position.Symbol;
+        var qty = (int)orderMessage.Position.Quantity;
+        var side = orderMessage.Position.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell;
+        var orderType = OrderType.Market;
+        var timeInForce = TimeInForce.Day;
+
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId.ToString());
+        if (userSettings == null)
+        {
+            _logger.LogError($"User settings not found for userId: {userId}");
+            return;
+        }
+
+        await _alpacaTradingService.CreateOrderAsync(userSettings, symbol, qty, side, orderType, timeInForce);
+    }
+
+    
 }

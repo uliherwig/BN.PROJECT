@@ -104,7 +104,7 @@
                 AssetLastPrice = position.AssetLastPrice,
                 AssetChangePercent = position.AssetChangePercent
             };
-        }
+        }     
 
         public static AlpacaQuote ToAlpacaQuote(this IQuote quote)
         {

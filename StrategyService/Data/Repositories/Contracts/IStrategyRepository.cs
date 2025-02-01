@@ -12,15 +12,15 @@ public interface IStrategyRepository
 
     Task<int> UpdateStrategyAsync(StrategySettingsModel strategySettings);
 
-    Task<List<Position>> GetPositionsByStrategyIdAsync(Guid testId);
+    Task<List<PositionModel>> GetPositionsByStrategyIdAsync(Guid testId);
 
-    Task AddPositionAsync(Position position);
+    Task AddPositionAsync(PositionModel position);
 
-    Task AddPositionsAsync(List<Position> positions);
+    Task AddPositionsAsync(List<PositionModel> positions);
 
-    Task UpdatePositionAsync(Position position);
+    Task UpdatePositionAsync(PositionModel position);
 
-    Task DeletePositionsAsync(List<Position> positions);
+    Task DeletePositionsAsync(List<PositionModel> positions);
 
     Task CleanupStrategiesAsync();
 }

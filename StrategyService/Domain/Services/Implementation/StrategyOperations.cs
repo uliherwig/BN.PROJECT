@@ -28,7 +28,7 @@ public class StrategyOperations : IStrategyOperations
         };
     }
 
-    public void UpdateOrCloseOpenPosition(ref Position openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent)
+    public void UpdateOrCloseOpenPosition(ref PositionModel openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent)
     {
         if (openPosition.Side == SideEnum.Buy)
         {
@@ -75,7 +75,7 @@ public class StrategyOperations : IStrategyOperations
         }
     }
 
-    OrderMessage IStrategyOperations.CreateOrderMessage(Guid strategyId, Guid userId, Position position)
+    OrderMessage IStrategyOperations.CreateOrderMessage(Guid strategyId, Guid userId, PositionModel position)
     {
         return new OrderMessage
         {

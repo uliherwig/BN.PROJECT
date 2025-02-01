@@ -105,7 +105,7 @@ public class StrategyRepositoryTests
     {
         // Arrange
         var repository = new StrategyRepository(_dbContext, _mockLogger.Object);
-        var position = new Position
+        var position = new PositionModel
         {
             Id = Guid.NewGuid(),
             StrategyId = Guid.NewGuid(),

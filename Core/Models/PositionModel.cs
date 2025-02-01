@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.Core;
 
-public class Position
+public class PositionModel
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -9,7 +9,7 @@ public class Position
     public StrategyEnum StrategyType { get; set; }
     public Guid ExecutionId { get; set; } = Guid.Empty;
     public string Symbol { get; set; }
-    public int Quantity { get; set; }
+    public decimal Quantity { get; set; }
     public SideEnum Side { get; set; }
     public decimal PriceOpen { get; set; }
     public decimal PriceClose { get; set; }

@@ -106,6 +106,12 @@ public class AlpacaTradingController : ControllerBase
         }
 
         var positions = await _alpacaTradingService.GetAllOpenPositions(userSettings);
+        foreach (var position in positions)
+        {
+            position.Symbol = position.Symbol.ToUpper();
+        }
+
+
         return Ok(positions);
     }
 
