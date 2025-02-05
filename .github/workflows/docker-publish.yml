@@ -2,11 +2,11 @@ name: CI/CD Pipeline
 
 on:
   workflow_dispatch:
-    inputs:
-      service:
-        description: 'The service to build and deploy'
-        required: true
-        default: 'identity'
+      inputs:
+        service:
+          description: 'The service to build and deploy'
+          required: true
+          default: 'identity'
   push:
     branches: [ "main" ]
   pull_request:
@@ -33,11 +33,18 @@ jobs:
       id: vars
       run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
-    - name: Build and push Docker image
+    - name: Build and push IdentityService image
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: ${{ github.event.inputs.service }}/Dockerfile
+        file: IdentityService/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.inputs.service }}:latest,${{ secrets.DOCKER_USERNAME }}/${{ github.event.inputs.service }}:${{ steps.vars.outputs.sha_short }}
+        tags: ${{ secrets.DOCKER_USERNAME }}/identityservice:latest
 
+    - name: Build and push AlpacaService image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: AlpacaService/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/alpacaServiceservice:latest
