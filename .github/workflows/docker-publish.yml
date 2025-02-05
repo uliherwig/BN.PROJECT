@@ -31,7 +31,8 @@ jobs:
 
     - name: Get short SHA
       id: vars
-      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      # run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
     - name: Build and push IdentityService image
       uses: docker/build-push-action@v2
@@ -47,4 +48,12 @@ jobs:
         context: .
         file: AlpacaService/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/alpacaserviceservice:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/alpacaservice:latest
+
+    - name: Build and push StrategyService image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: StrategyService/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/strategyservice:latest
