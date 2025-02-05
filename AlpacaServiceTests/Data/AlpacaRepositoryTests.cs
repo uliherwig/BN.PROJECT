@@ -136,7 +136,7 @@
         {
             // Arrange
             var repository = new AlpacaRepository(_dbContext);
-            var userSettings = new UserSettings { UserId = "123", AlpacaKey = "123", AlpacaSecret = "123" };
+            var userSettings = new UserSettingsModel { UserId = "123", AlpacaKey = "123", AlpacaSecret = "123" };
 
             // Act
             await repository.AddUserSettingsAsync(userSettings);
@@ -151,7 +151,7 @@
         {
             // Arrange
             var repository = new AlpacaRepository(_dbContext);
-            var userSettings = new UserSettings { UserId = "123", AlpacaKey = "123", AlpacaSecret = "123" };
+            var userSettings = new UserSettingsModel { UserId = "123", AlpacaKey = "123", AlpacaSecret = "123" };
             _dbContext.UserSettings.Add(userSettings);
             _dbContext.SaveChanges();
 
@@ -169,7 +169,7 @@
         {
             // Arrange
             var repository = new AlpacaRepository(_dbContext);
-            var userSettings = new UserSettings { UserId = "123", AlpacaKey = "123", AlpacaSecret = "123" };
+            var userSettings = new UserSettingsModel { UserId = "123", AlpacaKey = "123", AlpacaSecret = "123" };
             _dbContext.UserSettings.Add(userSettings);
             _dbContext.SaveChanges();
 
@@ -187,7 +187,7 @@
         {
             // Arrange
             var repository = new AlpacaRepository(_dbContext);
-            var userSettings = new UserSettings { UserId = "123", AlpacaKey = "123", AlpacaSecret = "123" };
+            var userSettings = new UserSettingsModel { UserId = "123", AlpacaKey = "123", AlpacaSecret = "123" };
             _dbContext.UserSettings.Add(userSettings);
             _dbContext.SaveChanges();
 

@@ -83,24 +83,24 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task AddUserSettingsAsync(UserSettings userSettings)
+    public async Task AddUserSettingsAsync(UserSettingsModel userSettings)
     {
         await _context.UserSettings.AddAsync(userSettings);
         await _context.SaveChangesAsync();
     }
 
-    public async Task<UserSettings?> GetUserSettingsAsync(string userId)
+    public async Task<UserSettingsModel?> GetUserSettingsAsync(string userId)
     {
         return await _context.UserSettings.FirstOrDefaultAsync(u => u.UserId == userId);
     }
 
-    public async Task UpdateUserSettingsAsync(UserSettings userSettings)
+    public async Task UpdateUserSettingsAsync(UserSettingsModel userSettings)
     {
         _context.UserSettings.Update(userSettings);
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteUserSettingsAsync(UserSettings userSettings)
+    public async Task DeleteUserSettingsAsync(UserSettingsModel userSettings)
     {
         _context.UserSettings.Remove(userSettings);
         await _context.SaveChangesAsync();

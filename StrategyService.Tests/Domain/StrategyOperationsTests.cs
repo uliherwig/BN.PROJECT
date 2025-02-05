@@ -57,6 +57,4 @@ public class StrategyOperationsTests
         Assert.Equal(121, openPosition.TakeProfit);
         Assert.Equal(104.5m, openPosition.StopLoss);
     }
-
-    // Weitere Tests für andere Szenarien und Methoden
 }

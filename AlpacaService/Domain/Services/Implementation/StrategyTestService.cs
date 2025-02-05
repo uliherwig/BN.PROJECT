@@ -165,6 +165,11 @@ public class StrategyTestService : IStrategyTestService
         var symbol = orderMessage.Position.Symbol;
         var qty = (int)orderMessage.Position.Quantity;
         var side = orderMessage.Position.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell;
+        if (orderMessage.Position.PriceClose > 0 )
+        {
+          side =  orderMessage.Position.Side == SideEnum.Sell ? OrderSide.Buy : OrderSide.Sell;
+        }
+    
         var orderType = OrderType.Market;
         var timeInForce = TimeInForce.Day;
 
@@ -176,6 +181,7 @@ public class StrategyTestService : IStrategyTestService
         }
 
         await _alpacaTradingService.CreateOrderAsync(userSettings, symbol, qty, side, orderType, timeInForce);
+
     }
 
     

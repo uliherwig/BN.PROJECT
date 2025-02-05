@@ -14,7 +14,7 @@ public class UserSettingsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddUserSettingsAsync([FromBody] UserSettings userSettings)
+    public async Task<IActionResult> AddUserSettingsAsync([FromBody] UserSettingsModel userSettings)
     {
         if (userSettings == null)
         {
@@ -38,7 +38,7 @@ public class UserSettingsController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateUserSettingsAsync([FromBody] UserSettings userSettings)
+    public async Task<IActionResult> UpdateUserSettingsAsync([FromBody] UserSettingsModel userSettings)
     {
         if (userSettings == null)
         {
@@ -50,7 +50,7 @@ public class UserSettingsController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteUserSettingsAsync([FromBody] UserSettings userSettings)
+    public async Task<IActionResult> DeleteUserSettingsAsync([FromBody] UserSettingsModel userSettings)
     {
         if (userSettings == null)
         {

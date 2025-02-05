@@ -208,6 +208,8 @@ public class SmaStrategy : IStrategyService
             if (tpm.StopLossType == StopLossTypeEnum.SMANextCrossing && closeTrigger)
             {
                 openPosition.ClosePosition(quote.TimestampUtc, quote.BidPrice, "MA");
+                var message = _strategyOperations.CreateOrderMessage(strategyId, userId, openPosition).ToJson();
+                _kafkaProducer.SendMessageAsync("order", message);
             }
         }
         return Task.CompletedTask;

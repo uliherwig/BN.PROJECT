@@ -10,7 +10,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         private readonly Mock<IAlpacaRepository> _mockAlpacaRepository;
         private readonly Mock<ILogger<UserSettingsController>> _mockLogger;
         private readonly UserSettingsController _controller;
-        private readonly UserSettings _userSettings = new UserSettings { UserId = "testUser", AlpacaKey = "123", AlpacaSecret = "456" };
+        private readonly UserSettingsModel _userSettings = new UserSettingsModel { UserId = "testUser", AlpacaKey = "123", AlpacaSecret = "456" };
 
         public UserSettingsControllerTests()
         {
@@ -52,7 +52,7 @@ namespace BN.PROJECT.AlpacaService.Tests
             var userId = "testUser";
 
             _mockAlpacaRepository.Setup(repo => repo.GetUserSettingsAsync(userId))
-                .ReturnsAsync((UserSettings)null);
+                .ReturnsAsync((UserSettingsModel)null);
 
             // Act
             var result = await _controller.GetUserSettingsAsync(userId);

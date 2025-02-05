@@ -1,4 +1,5 @@
-﻿using NuGet.Protocol;
+﻿using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using NuGet.Protocol;
 using System.Diagnostics;
 
 namespace BN.PROJECT.StrategyService;
@@ -202,6 +203,7 @@ public class BreakoutStrategy : IStrategyService
                     _kafkaProducer.SendMessageAsync("order", message);
                 }
                 openPosition.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close");
+           
             }
             else
             {

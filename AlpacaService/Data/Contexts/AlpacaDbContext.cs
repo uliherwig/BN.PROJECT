@@ -7,7 +7,7 @@ public class AlpacaDbContext : DbContext
     public virtual DbSet<AlpacaBar> Bars { get; set; }
     public virtual DbSet<AlpacaPosition> Positions { get; set; }
     public virtual DbSet<AlpacaQuote> Quotes { get; set; }
-    public virtual DbSet<UserSettings> UserSettings { get; set; }
+    public virtual DbSet<UserSettingsModel> UserSettings { get; set; }
     public virtual DbSet<AlpacaExecutionModel> Executions { get; set; }
 
     public AlpacaDbContext()

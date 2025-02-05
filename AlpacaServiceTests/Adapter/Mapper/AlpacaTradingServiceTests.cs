@@ -18,7 +18,7 @@ namespace BN.PROJECT.AlpacaService.Tests
             _mockAlpacaTradingClient = new Mock<IAlpacaTradingClient>();
 
             // Setup the mock to return the mocked IAlpacaTradingClient
-            _mockAlpacaClient.Setup(client => client.GetPrivateTradingClient(It.IsAny<UserSettings>()))
+            _mockAlpacaClient.Setup(client => client.GetPrivateTradingClient(It.IsAny<UserSettingsModel>()))
                 .Returns(_mockAlpacaTradingClient.Object);
 
             _mockAlpacaClient.Setup(client => client.GetCommonTradingClient())
@@ -32,7 +32,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         public async Task GetAccountAsync_ShouldReturnAccount()
         {
             // Arrange
-            var userSettings = new UserSettings { UserId = "testUser", AlpacaKey = "key", AlpacaSecret = "secret" };
+            var userSettings = new UserSettingsModel { UserId = "testUser", AlpacaKey = "key", AlpacaSecret = "secret" };
             var mockAccount = new Mock<IAccount>();
 
             _mockAlpacaTradingClient.Setup(client => client.GetAccountAsync(It.IsAny<CancellationToken>()))
@@ -71,7 +71,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         public async Task GetOrderByIdAsync_ShouldReturnOrder()
         {
             // Arrange
-            var userSettings = new UserSettings
+            var userSettings = new UserSettingsModel
             {
                 UserId = "testUser",
                 AlpacaKey = "123",
@@ -96,7 +96,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         public async Task CancelOrderByIdAsync_ShouldReturnTrue()
         {
             // Arrange
-            var userSettings = new UserSettings
+            var userSettings = new UserSettingsModel
             {
                 UserId = "testUser",
                 AlpacaKey = "123",

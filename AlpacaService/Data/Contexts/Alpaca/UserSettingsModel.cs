@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.AlpacaService;
 
-public class UserSettings
+public class UserSettingsModel
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]

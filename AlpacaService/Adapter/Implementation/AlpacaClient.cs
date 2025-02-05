@@ -23,7 +23,7 @@ public class AlpacaClient : IAlpacaClient
         return Alpaca.Markets.Environments.Paper.GetAlpacaTradingClient(new SecretKey(alpacaId, alpacaSecret));
     }
 
-    public IAlpacaTradingClient? GetPrivateTradingClient(UserSettings userSettings)
+    public IAlpacaTradingClient? GetPrivateTradingClient(UserSettingsModel userSettings)
     {
         var alpacaId = userSettings.AlpacaKey;
         var alpacaSecret = userSettings.AlpacaSecret;

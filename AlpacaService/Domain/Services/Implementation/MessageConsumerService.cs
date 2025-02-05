@@ -49,15 +49,10 @@ public class MessageConsumerService : IHostedService
         {
             var strategyService = scope.ServiceProvider.GetRequiredService<IStrategyTestService>();
 
-
             if (message.MessageType == MessageTypeEnum.Order)
             {
-                
                 await strategyService.CreateAlpacaOrder(message);
-
-
-      
-            }          
+            }
         }
     }
 }

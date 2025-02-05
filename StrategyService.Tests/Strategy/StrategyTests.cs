@@ -83,7 +83,7 @@ public class StrategyTests
         };
 
         // Act
-        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings });
+        await _smaStrategy.StartTest(new StrategyMessage { IsBacktest = true, StrategyId = strategySettings.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings });
 
         foreach (var quote in testData)
         {
@@ -93,7 +93,7 @@ public class StrategyTests
         // Assert
         var result = _smaStrategy.GetPositions(strategySettings.Id);
 
-        Assert.Equal(2, result.Count);
+        Assert.Equal(4, result.Count);
         Assert.Equal(1, result.Count(x => x.PriceClose == 0.0m));
     }
 
@@ -132,7 +132,7 @@ public class StrategyTests
         };
 
         // Act
-        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings });
+        await _smaStrategy.StartTest(new StrategyMessage { IsBacktest = true, StrategyId = strategySettings.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings });
 
         foreach (var quote in testData)
         {
@@ -142,7 +142,7 @@ public class StrategyTests
         // Assert
         var result = _smaStrategy.GetPositions(strategySettings.Id);
 
-        Assert.Equal(6, result.Count);
+        Assert.Equal(12, result.Count);
         Assert.Equal(1, result.Count(x => x.PriceClose == 0.0m));
     }
 
@@ -179,7 +179,7 @@ public class StrategyTests
         };
 
         // Act
-        await _breakoutStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings.Id, Strategy = StrategyEnum.Breakout, Settings = strategySettings });
+        await _breakoutStrategy.StartTest(new StrategyMessage { IsBacktest = true, StrategyId = strategySettings.Id, Strategy = StrategyEnum.Breakout, Settings = strategySettings });
 
         foreach (var quote in testData)
         {
@@ -253,8 +253,8 @@ public class StrategyTests
         };
 
         // Act
-        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings1.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings1 });
-        await _smaStrategy.StartTest(new StrategyMessage { StrategyId = strategySettings2.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings2 });
+        await _smaStrategy.StartTest(new StrategyMessage { IsBacktest = true, StrategyId = strategySettings1.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings1 });
+        await _smaStrategy.StartTest(new StrategyMessage { IsBacktest = true, StrategyId = strategySettings2.Id, Strategy = StrategyEnum.SMA, Settings = strategySettings2 });
 
         foreach (var quote in testData)
         {
@@ -266,8 +266,8 @@ public class StrategyTests
         var result1 = _smaStrategy.GetPositions(strategySettings1.Id);
         var result2 = _smaStrategy.GetPositions(strategySettings2.Id);
 
-        Assert.Equal(2, result1.Count);
-        Assert.Equal(2, result2.Count);
+        Assert.Equal(4, result1.Count);
+        Assert.Equal(4, result2.Count);
     }
     public async Task Demo()
     {

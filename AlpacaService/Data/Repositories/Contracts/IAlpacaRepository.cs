@@ -26,13 +26,13 @@ public interface IAlpacaRepository
 
     Task UpdateOrderAsync(AlpacaOrder order);
 
-    Task AddUserSettingsAsync(UserSettings userSettings);
+    Task AddUserSettingsAsync(UserSettingsModel userSettings);
 
-    Task<UserSettings?> GetUserSettingsAsync(string userId);
+    Task<UserSettingsModel?> GetUserSettingsAsync(string userId);
 
-    Task UpdateUserSettingsAsync(UserSettings userSettings);
+    Task UpdateUserSettingsAsync(UserSettingsModel userSettings);
 
-    Task DeleteUserSettingsAsync(UserSettings userSettings);
+    Task DeleteUserSettingsAsync(UserSettingsModel userSettings);
 
     Task AddAlpacaExecutionAsync(AlpacaExecutionModel execution);
 
