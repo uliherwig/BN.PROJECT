@@ -2,11 +2,11 @@ name: CI/CD Pipeline
 
 on:
   workflow_dispatch:
-      inputs:
-        service:
-          description: 'The service to build and deploy'
-          required: true
-          default: 'identity'
+    inputs:
+      service:
+        description: 'The service to build and deploy'
+        required: true
+        default: 'identity'
   push:
     branches: [ "main" ]
   pull_request:
@@ -33,6 +33,8 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: IdentityService/Dockerfile
+        file: ${{ github.event.inputs.service }}/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/identityservice:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.inputs.service }}:latest
+
+
