@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    - name: Start CI/CD Pipeline
+      run: echo "header=Start CI/CD Pipeline" >> $GITHUB_OUTPUT
+
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -31,7 +35,6 @@ jobs:
 
     - name: Get short SHA
       id: vars
-      # run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
       run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
     - name: Build and push IdentityService image
