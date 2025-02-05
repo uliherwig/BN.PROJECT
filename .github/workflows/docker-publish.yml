@@ -19,7 +19,7 @@ jobs:
     steps:
 
     - name: Start CI/CD Pipeline
-      run: echo "header=Start CI/CD Pipeline" >> $GITHUB_OUTPUT
+      run: echo "Start CI/CD Pipeline"
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -34,8 +34,11 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Get short SHA
-      id: vars
+      id: version      
       run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+    - name: Echo Version
+      run: echo "sha_short  ${{ steps.version.outputs.sha_short }}"
 
     - name: Build and push IdentityService image
       uses: docker/build-push-action@v2
