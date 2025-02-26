@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 5044
-EXPOSE 7076
+EXPOSE 7283
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
@@ -25,7 +25,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Definieren Sie Umgebungsvariablen
-ENV ASPNETCORE_URLS=http://+:5044
+ENV ASPNETCORE_URLS=http://+:5044;https://+:7283
 
 ENTRYPOINT ["dotnet", "IdentityService.dll"]
 
