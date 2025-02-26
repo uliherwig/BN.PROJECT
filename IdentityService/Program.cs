@@ -2,6 +2,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services, builder.Configuration);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5044); // HTTP
+    options.ListenAnyIP(7283, listenOptions =>
+    {
+        listenOptions.UseHttps("https/identityservice.pfx", "giwreh");
+    });
+});
+
+
 var app = builder.Build();
 
 ConfigureMiddleware(app);
@@ -21,7 +31,6 @@ static void ConfigureMiddleware(WebApplication app)
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-
     app.UseHttpsRedirection();
     app.UseRouting();
     app.UseAuthentication();
