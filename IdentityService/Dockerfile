@@ -37,8 +37,4 @@ EXPOSE 5044
 # Define environment variables
 ENV ASPNETCORE_URLS=http://+:5044
 
-# Add a health check
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:5044/health || exit 1
-
 ENTRYPOINT ["dotnet", "IdentityService.dll"]
