@@ -2,22 +2,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services, builder.Configuration);
 
-
-
-var path = $"{builder.Configuration["ASPNETCORE_Kestrel:Certificates:Path"]}";
-var password = $"{builder.Configuration["ASPNETCORE_Kestrel:Certificates:Password"]}";
-
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5044); // HTTP
-    options.ListenAnyIP(7283, listenOptions =>
-    {
-        listenOptions.UseHttps(path, password);
-    });
-});
-
-
 var app = builder.Build();
 
 ConfigureMiddleware(app);

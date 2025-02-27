@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Definieren Sie Umgebungsvariablen
-ENV ASPNETCORE_URLS=https://+:7283
+ENV ASPNETCORE_URLS=http://+:5044
 
 ENTRYPOINT ["dotnet", "IdentityService.dll"]
 
