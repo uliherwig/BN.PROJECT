@@ -21,7 +21,7 @@ static void ConfigureMiddleware(WebApplication app)
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-    app.UseHttpsRedirection();
+    //app.UseHttpsRedirection();
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
