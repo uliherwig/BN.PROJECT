@@ -1,18 +1,20 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# Use the Alpine-based ASP.NET runtime image for a smaller final image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS base
 WORKDIR /app
-EXPOSE 80
-Expose 443
-EXPOSE 5044
+
+# Create a non-root user and group
+RUN addgroup --system --gid 1000 appgroup && \
+    adduser --system --uid 1000 --ingroup appgroup appuser
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Kopieren Sie die Projektdateien und Wiederherstellen der Abhängigkeiten
+# Copy and restore dependencies
 COPY ["IdentityService/IdentityService.csproj", "IdentityService/"]
 COPY ["Core/CORE.csproj", "Core/"]
 RUN dotnet restore "IdentityService/IdentityService.csproj"
 
-# Kopieren Sie den Rest des Codes und bauen Sie das Projekt
+# Copy the rest of the code and build the project
 COPY . .
 WORKDIR "/src/IdentityService"
 RUN dotnet build "IdentityService.csproj" -c Release -o /app/build
@@ -24,8 +26,19 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Definieren Sie Umgebungsvariablen
+# Set ownership of the /app directory to the non-root user
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
+
+EXPOSE 5044
+
+# Define environment variables
 ENV ASPNETCORE_URLS=http://+:5044
 
-ENTRYPOINT ["dotnet", "IdentityService.dll"]
+# Add a health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:5044/health || exit 1
 
+ENTRYPOINT ["dotnet", "IdentityService.dll"]
