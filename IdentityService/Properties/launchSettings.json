@@ -9,7 +9,7 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5044"
-    },
+    }
     //"https": {
     //  "commandName": "Project",
     //  "launchBrowser": true,
