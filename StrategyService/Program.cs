@@ -13,6 +13,7 @@ ConfigureMiddleware(app);
 ConfigureEndpoints(app);
 
 MigrateDatabase(app);
+app.MapHealthChecks("/health");
 
 app.Run();
 
@@ -86,6 +87,8 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddHttpClient();
     services.AddHttpClient<KeycloakAuthorizeAttribute>();
+    services.AddHealthChecks();
+
     services.AddScoped<IStrategyRepository, StrategyRepository>();
     services.AddSingleton<IStrategyOperations, StrategyOperations>();
 

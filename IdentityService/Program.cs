@@ -9,6 +9,7 @@ ConfigureMiddleware(app);
 ConfigureEndpoints(app);
 
 MigrateDatabase(app);
+app.MapHealthChecks("/health");
 
 app.Run();
 
@@ -41,7 +42,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddControllers();
     services.AddHttpContextAccessor();
-    //services.AddHealthChecks();
+    services.AddHealthChecks();
 
     services.AddKeyCloakAuthentication(configuration);
 

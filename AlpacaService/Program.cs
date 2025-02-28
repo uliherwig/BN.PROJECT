@@ -11,6 +11,7 @@ ConfigureMiddleware(app);
 ConfigureEndpoints(app);
 
 MigrateDatabase(app);
+app.MapHealthChecks("/health");
 
 app.Run();
 
@@ -78,7 +79,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
     services.AddScoped<IStrategyTestService, StrategyTestService>();
 
-    services.AddHostedService<MessageConsumerService>(); 
+    services.AddHostedService<MessageConsumerService>();
 
     // Quartz-Services
     services.AddQuartz();
@@ -91,6 +92,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHostedService<SendQuoteTaskService>();
     services.AddHostedService<AlpacaHistoryService>();
     services.AddControllers();
+    services.AddHealthChecks();
 }
 static void ConfigureMiddleware(WebApplication app)
 {

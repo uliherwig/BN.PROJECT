@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace BN.PROJECT.Core;
+﻿namespace BN.PROJECT.Core;
 
 public class GlobalExceptionMiddleware
 {
