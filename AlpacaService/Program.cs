@@ -1,6 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
 
-ConfigureLogging(builder.Host);
+//ConfigureLogging(builder.Host);
 
 ConfigureServices(builder.Services, builder.Configuration);
 
@@ -15,15 +15,15 @@ app.MapHealthChecks("/health");
 
 app.Run();
 
-static void ConfigureLogging(IHostBuilder hostBuilder)
-{
-    Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Information()
-        .WriteTo.Console()
-        .WriteTo.Seq("http://localhost:9017")
-        .CreateLogger();
-    hostBuilder.UseSerilog(Log.Logger);
-}
+//static void ConfigureLogging(IHostBuilder hostBuilder)
+//{
+//    Log.Logger = new LoggerConfiguration()
+//        .MinimumLevel.Information()
+//        .WriteTo.Console()
+//        .WriteTo.Seq("http://localhost:9017")
+//        .CreateLogger();
+//    hostBuilder.UseSerilog(Log.Logger);
+//}
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     var connectionString = configuration.GetConnectionString("AlpacaDbConnection");

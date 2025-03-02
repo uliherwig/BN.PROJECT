@@ -22,7 +22,7 @@ static void ConfigureLogging(IHostBuilder hostBuilder)
     Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Information()
         .WriteTo.Console()
-        .WriteTo.Seq("http://localhost:9017")
+        //.WriteTo.Seq("http://localhost:9017")
         .CreateLogger();
     hostBuilder.UseSerilog(Log.Logger);
 }
