@@ -2,19 +2,15 @@ namespace BN.PROJECT.Core;
 
 public class KafkaConsumerService : IKafkaConsumerService
 {
-    private readonly ILogger<KafkaConsumerService> _logger;
-    private readonly string _bootstrapServers = "localhost:9092";
     private string _topic = "kafka-demo";
     private string _groupId = "BN.PROJECT";
     private CancellationTokenSource _cancellationTokenSource;
     private Task _consumingTask;
 
     public event Action<string> MessageReceived;
+    private readonly IConfiguration _configuration;
 
-    public KafkaConsumerService(ILogger<KafkaConsumerService> logger)
-    {
-        _logger = logger;
-    }
+    public KafkaConsumerService(IConfiguration configuration) => _configuration = configuration;
 
     public void Start(string topic)
     {
@@ -30,7 +26,7 @@ public class KafkaConsumerService : IKafkaConsumerService
     {
         var config = new ConsumerConfig
         {
-            BootstrapServers = _bootstrapServers,
+            BootstrapServers = _configuration["KafkaServer"],
             GroupId = _groupId,
             AutoOffsetReset = AutoOffsetReset.Earliest,
 
@@ -58,8 +54,7 @@ public class KafkaConsumerService : IKafkaConsumerService
             }
             catch (ConsumeException ex)
             {
-                _logger.LogError($"Consume error: {ex.Error.Reason}");
-                consumer.Close();
+                throw new Exception($"Consume error: {ex.Error.Reason}");             
             }
             catch (OperationCanceledException)
             {
@@ -78,11 +73,11 @@ public class KafkaConsumerService : IKafkaConsumerService
     {
         var config = new ConsumerConfig
         {
-            BootstrapServers = _bootstrapServers,
+            BootstrapServers = _configuration["KafkaServer"],
             GroupId = _groupId,
             AutoOffsetReset = AutoOffsetReset.Earliest,
         };
-        using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrapServers }).Build())
+        using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _configuration["KafkaServer"] }).Build())
         {
             await adminClient.DeleteTopicsAsync(new List<string> { topic }, null);
         }
