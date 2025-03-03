@@ -3,12 +3,16 @@ namespace BN.PROJECT.AlpacaService;
 public class StrategyServiceClient : IStrategyServiceClient
 {
     private readonly HttpClient _httpClient;
+    private readonly IConfiguration _configuration;
 
-    public StrategyServiceClient(HttpClient httpClient)
+    public StrategyServiceClient(HttpClient httpClient, 
+        IConfiguration configuration)
     {
+        _configuration = configuration;
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri("http://localhost:5101");
+        _httpClient.BaseAddress = new Uri(_configuration["StrategyServiceClient"]); 
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+     
     }
 
     public async Task<StrategySettingsModel?> GetStrategyAsync(string strategyId)
