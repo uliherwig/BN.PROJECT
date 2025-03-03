@@ -7,8 +7,8 @@ public class MessageConsumerService : IHostedService
 {
     private readonly ILogger<MessageConsumerService> _logger;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IConfiguration _configuration;
 
-    private readonly string bootstrapServers = "localhost:9092"; // Passe den Broker an
     private readonly string[] topicNames = ["order", "strategy"];
     private readonly int numPartitions = 3;
     private readonly short replicationFactor = 1;
@@ -16,11 +16,13 @@ public class MessageConsumerService : IHostedService
 
 
     public MessageConsumerService(
+        IConfiguration configuration,
         ILogger<MessageConsumerService> logger,
         IServiceProvider serviceProvider)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
+        _configuration = configuration;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -28,7 +30,7 @@ public class MessageConsumerService : IHostedService
         try
         {
 
-            var adminConfig = new AdminClientConfig { BootstrapServers = bootstrapServers };
+            var adminConfig = new AdminClientConfig { BootstrapServers = _configuration["KafkaServer"] };
 
             using var adminClient = new AdminClientBuilder(adminConfig).Build();
 
