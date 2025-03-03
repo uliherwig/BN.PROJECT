@@ -1,3 +1,6 @@
+using Confluent.Kafka.Admin;
+using System.Threading.Tasks;
+
 namespace BN.PROJECT.Core;
 
 public class KafkaConsumerService : IKafkaConsumerService
@@ -22,7 +25,7 @@ public class KafkaConsumerService : IKafkaConsumerService
         }
     }
 
-    private void Consume(CancellationToken cancellationToken)
+    private async Task Consume(CancellationToken cancellationToken)
     {
         var config = new ConsumerConfig
         {
@@ -43,7 +46,6 @@ public class KafkaConsumerService : IKafkaConsumerService
         using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
         {
             consumer.Subscribe(_topic);
-
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
@@ -54,13 +56,12 @@ public class KafkaConsumerService : IKafkaConsumerService
             }
             catch (ConsumeException ex)
             {
-                throw new Exception($"Consume error: {ex.Error.Reason}");             
+               throw new Exception($"Consume error: {ex.Error.Reason}");             
             }
             catch (OperationCanceledException)
             {
                 consumer.Close();
             }
-
         }
     }
 

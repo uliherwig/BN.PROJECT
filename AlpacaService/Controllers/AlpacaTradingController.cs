@@ -22,6 +22,10 @@ public class AlpacaTradingController : ControllerBase
         {
             return BadRequest("UserId cannot be null or empty");
         }
+        if (!Guid.TryParse(userId, out var userGuid))
+        {
+            return BadRequest("UserId is not a valid GUID");
+        }
         var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
         if (userSettings == null)
         {

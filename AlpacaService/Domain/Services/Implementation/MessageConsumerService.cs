@@ -1,9 +1,19 @@
-﻿namespace BN.PROJECT.AlpacaService;
+﻿using Confluent.Kafka;
+using Confluent.Kafka.Admin;
+
+namespace BN.PROJECT.AlpacaService;
 
 public class MessageConsumerService : IHostedService
 {
     private readonly ILogger<MessageConsumerService> _logger;
     private readonly IServiceProvider _serviceProvider;
+
+    private readonly string bootstrapServers = "localhost:9092"; // Passe den Broker an
+    private readonly string[] topicNames = ["order", "strategy"];
+    private readonly int numPartitions = 3;
+    private readonly short replicationFactor = 1;
+
+
 
     public MessageConsumerService(
         ILogger<MessageConsumerService> logger,
@@ -13,10 +23,39 @@ public class MessageConsumerService : IHostedService
         _serviceProvider = serviceProvider;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
+
+            var adminConfig = new AdminClientConfig { BootstrapServers = bootstrapServers };
+
+            using var adminClient = new AdminClientBuilder(adminConfig).Build();
+
+            var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(5));
+
+            foreach (var topicName in topicNames)
+            {
+                bool topicExists = metadata.Topics.Any(t => t.Topic == topicName);
+
+                if (!topicExists)
+                {
+                    _logger.LogInformation($"Erstelle Kafka-Topic: {topicName}...");
+
+                    await adminClient.CreateTopicsAsync(new[]
+                    {
+                    new TopicSpecification
+                    {
+                        Name = topicName,
+                        NumPartitions = numPartitions,
+                        ReplicationFactor = replicationFactor
+                    }
+                });
+
+                    _logger.LogInformation($"Topic '{topicName}' wurde erfolgreich erstellt!");
+                }
+            }
+
             using (var scope = _serviceProvider.CreateScope())
             {
                 var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
@@ -29,7 +68,6 @@ public class MessageConsumerService : IHostedService
         {
             _logger.LogError(e, "Error in MessageConsumerService");
         }
-        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

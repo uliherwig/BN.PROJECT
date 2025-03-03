@@ -9,4 +9,5 @@ public interface IKafkaConsumerService
     event Action<string> MessageReceived;
 
     Task DeleteMessagesAsync(string topic);
+
 }
