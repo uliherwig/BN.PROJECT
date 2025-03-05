@@ -29,7 +29,7 @@ public class KafkaConsumerService : IKafkaConsumerService
     {
         var config = new ConsumerConfig
         {
-            BootstrapServers = _configuration["KafkaServer"],
+            BootstrapServers = _configuration["Kafka:BootstrapServers"],
             GroupId = _groupId,
             AutoOffsetReset = AutoOffsetReset.Earliest,
 
@@ -71,14 +71,8 @@ public class KafkaConsumerService : IKafkaConsumerService
     }
 
     public async Task DeleteMessagesAsync(string topic)
-    {
-        var config = new ConsumerConfig
-        {
-            BootstrapServers = _configuration["KafkaServer"],
-            GroupId = _groupId,
-            AutoOffsetReset = AutoOffsetReset.Earliest,
-        };
-        using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _configuration["KafkaServer"] }).Build())
+    {      
+        using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _configuration["Kafka:BootstrapServers"] }).Build())
         {
             await adminClient.DeleteTopicsAsync(new List<string> { topic }, null);
         }

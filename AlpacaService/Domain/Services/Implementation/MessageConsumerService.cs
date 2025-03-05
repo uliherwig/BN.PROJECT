@@ -28,9 +28,8 @@ public class MessageConsumerService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         try
-        {
-
-            var adminConfig = new AdminClientConfig { BootstrapServers = _configuration["KafkaServer"] };
+        {           
+            var adminConfig = new AdminClientConfig { BootstrapServers = _configuration["Kafka:BootstrapServers"] };
 
             using var adminClient = new AdminClientBuilder(adminConfig).Build();
 
