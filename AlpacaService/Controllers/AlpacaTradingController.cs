@@ -2,6 +2,7 @@ namespace BN.PROJECT.AlpacaService;
 
 [ApiController]
 [Route("[controller]")]
+[AuthorizeUser(["user","admin"])]
 public class AlpacaTradingController : ControllerBase
 {
     private readonly IAlpacaTradingService _alpacaTradingService;
@@ -14,19 +15,14 @@ public class AlpacaTradingController : ControllerBase
         _alpacaRepository = alpacaRepository;
     }
 
-    [HttpGet("account/{userId}")]
-    public async Task<IActionResult> GetAccount(string userId)
+    [HttpGet("account")]
+    [AuthorizeUser(["user","admin"])]
+    public async Task<IActionResult> GetAccount()
     {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+     
         var result = new BrokerAccount();
-        if (string.IsNullOrEmpty(userId))
-        {
-            return BadRequest("UserId cannot be null or empty");
-        }
-        if (!Guid.TryParse(userId, out var userGuid))
-        {
-            return BadRequest("UserId is not a valid GUID");
-        }
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             result.AccountStatus = AccountStatusEnum.NoCredentials;
@@ -36,12 +32,12 @@ public class AlpacaTradingController : ControllerBase
             var account = await _alpacaTradingService.GetAccountAsync(userSettings);
             if (account != null)
             {
-                result = account.ToBrokerAccount(AccountStatusEnum.AccountLoaded, new Guid(userId));
+                result = account.ToBrokerAccount(AccountStatusEnum.AccountLoaded, new Guid(userId!));
             }
             else
             {
                 result.AccountStatus = AccountStatusEnum.WrongCredentials;
-                result.UserId = new Guid(userId);
+                result.UserId = new Guid(userId!);
             }
         }
         return Ok(result);

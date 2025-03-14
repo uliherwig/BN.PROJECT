@@ -20,7 +20,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         [Fact]
         public async Task GetAccount_ShouldReturnBadRequestUserIdCannotBeNull()
         {
-            var result = await _alpacaTradingController.GetAccount(string.Empty);
+            var result = await _alpacaTradingController.GetAccount();
             var badResult = result as BadRequestObjectResult;
             Assert.NotNull(badResult);
         }
@@ -28,7 +28,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         [Fact]
         public async Task GetAccount_ShouldReturnBadRequestUserSettingsNotFound()
         {
-            var result = await _alpacaTradingController.GetAccount(Guid.Empty.ToString());
+            var result = await _alpacaTradingController.GetAccount();
             var okResult = result as OkObjectResult;
             var account = okResult?.Value as BrokerAccount;
 
@@ -47,7 +47,7 @@ namespace BN.PROJECT.AlpacaService.Tests
             _mockAlpacaRepository.Setup(repo => repo.GetUserSettingsAsync(It.IsAny<string>()))
                 .ReturnsAsync(userSettings);
 
-            var result = await _alpacaTradingController.GetAccount(Guid.Empty.ToString());
+            var result = await _alpacaTradingController.GetAccount();
             var okResult = result as OkObjectResult;
             var account = okResult?.Value as BrokerAccount;
 

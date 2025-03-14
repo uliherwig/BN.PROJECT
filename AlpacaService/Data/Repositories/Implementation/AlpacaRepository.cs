@@ -136,4 +136,11 @@ public class AlpacaRepository : IAlpacaRepository
         var execution = await _context.Executions.FirstOrDefaultAsync(e => e.UserId == userId && e.EndDate == DateTime.MinValue);
         return execution;
     }
+
+    public async Task DeleteAlpacaExecutionsAsync(Guid userId)
+    {
+        var executions = await _context.Executions.Where(e => e.UserId == userId).ToListAsync();
+        _context.Executions.RemoveRange(executions);
+        await _context.SaveChangesAsync();
+    }
 }

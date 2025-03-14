@@ -42,7 +42,8 @@ public interface IAlpacaRepository
 
     Task<List<AlpacaExecutionModel>?> GetActiveAlpacaExecutionsAsync();
     Task<AlpacaExecutionModel?> GetActiveAlpacaExecutionByUserIdAsync(Guid userId);
+    Task DeleteAlpacaExecutionsAsync(Guid userId);
 
 
-    
+
 }

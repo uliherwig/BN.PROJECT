@@ -115,4 +115,20 @@ public class StrategyRepository : IStrategyRepository
             _logger.LogError(e, "Error cleaning up strategies");
         }
     }
+
+    public async Task RemoveUserDataAsync(Guid userId)
+    {
+        try
+        {
+            var strategies = await _context.Strategies.Where(t => t.UserId == userId).ToListAsync();
+            var positions = await _context.Positions.Where(p => strategies.Select(t => t.Id).Contains(p.StrategyId)).ToListAsync();
+            _context.Strategies.RemoveRange(strategies);
+            _context.Positions.RemoveRange(positions);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error removing user data");
+        }
+    }
 }

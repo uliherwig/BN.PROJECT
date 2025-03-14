@@ -2,6 +2,7 @@
 
 [Route("[controller]")]
 [ApiController]
+[AuthorizeUser(["user","admin"])]
 public class StrategyController : ControllerBase
 {
     private readonly ILogger<StrategyController> _logger;
@@ -118,5 +119,13 @@ public class StrategyController : ControllerBase
             SellProfitLoss = positions.Where(p => p.Side == SideEnum.Sell).Sum(p => p.ProfitLoss)
         };
         return Ok(testResult);
+    }
+
+    [HttpDelete("remove-user-data")]
+    public async Task<IActionResult> RemoveUserDataAsync()
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        await _strategyRepository.RemoveUserDataAsync(new Guid(userId!));
+        return Ok(true);
     }
 }

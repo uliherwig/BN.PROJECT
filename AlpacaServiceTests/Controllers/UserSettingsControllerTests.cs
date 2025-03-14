@@ -109,7 +109,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         public async Task DeleteUserSettingsAsync_ShouldReturnBadRequest_WhenUserSettingsIsNull()
         {
             // Act
-            var result = await _controller.DeleteUserSettingsAsync(null);
+            var result = await _controller.DeleteUserSettingsAsync();
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -124,7 +124,7 @@ namespace BN.PROJECT.AlpacaService.Tests
                 .Returns(Task.CompletedTask);
 
             // Act
-            var result = await _controller.DeleteUserSettingsAsync(_userSettings);
+            var result = await _controller.DeleteUserSettingsAsync();
 
             // Assert
             Assert.IsType<NoContentResult>(result);

@@ -64,9 +64,13 @@ public class IdentityRepository : IIdentityRepository
 
     public async Task DeleteUserAsync(Guid userId)
     {
+        var userRoles = await _context.UserRoles.Where(ur => ur.UserId == userId).ToListAsync();
+        var sessions = await _context.Sessions.Where(s => s.UserId == userId).ToListAsync();
         var user = await _context.Users.FindAsync(userId);
         if (user != null)
         {
+            _context.UserRoles.RemoveRange(userRoles);
+            _context.Sessions.RemoveRange(sessions);
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }

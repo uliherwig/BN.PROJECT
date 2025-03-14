@@ -1,10 +1,8 @@
-﻿using BN.PROJECT.AlpacaService.Migrations;
-using NuGet.Configuration;
-
-namespace BN.PROJECT.AlpacaService;
+﻿namespace BN.PROJECT.AlpacaService;
 
 [Route("[controller]")]
 [ApiController]
+[AuthorizeUser(["user","admin"])]
 public class AlpacaTestController : ControllerBase
 {
     private readonly IWebHostEnvironment _env;
@@ -103,7 +101,7 @@ public class AlpacaTestController : ControllerBase
         return Ok(alpacaExecution);
     }
 
-    [HttpDelete("stop-execution/{userId}")]
+    [HttpPost("stop-execution/{userId}")]
     public async Task<IActionResult> StopAlpacaExecution(Guid userId)
     {
         var execution = await _alpacaRepository.GetActiveAlpacaExecutionByUserIdAsync(userId);
@@ -113,6 +111,14 @@ public class AlpacaTestController : ControllerBase
         }
         execution.EndDate = DateTime.UtcNow.ToUniversalTime();
         await _alpacaRepository.UpdateAlpacaExecutionAsync(execution);
+        return Ok();
+    }
+
+    [HttpDelete("delete-executions")]
+    public async Task<IActionResult> DeleteExecutionsByUserId()
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        await _alpacaRepository.DeleteAlpacaExecutionsAsync(new Guid(userId!));
         return Ok();
     }
 

@@ -13,8 +13,6 @@ public class MessageConsumerService : IHostedService
     private readonly int numPartitions = 3;
     private readonly short replicationFactor = 1;
 
-
-
     public MessageConsumerService(
         IConfiguration configuration,
         ILogger<MessageConsumerService> logger,

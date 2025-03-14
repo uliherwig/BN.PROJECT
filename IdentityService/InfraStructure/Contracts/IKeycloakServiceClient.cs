@@ -11,5 +11,9 @@
         Task<JwtToken> RefreshToken(RefreshTokenRequest refreshTokenRequest);
 
         Task<User> GetUserByName(string username);
+
+        Task<SignOutResponse> DeleteUser(string userId);
+
+        Task<bool> UserExistsById(string userId);
     }
 }

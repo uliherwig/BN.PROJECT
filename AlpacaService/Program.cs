@@ -69,16 +69,14 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddMessageBus(configuration);
 
     services.AddHttpClient();
-    services.AddHttpClient<KeycloakAuthorizeAttribute>();
-
     services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
+
 
     services.AddScoped<IAlpacaClient, AlpacaClient>();
     services.AddScoped<IAlpacaRepository, AlpacaRepository>();
     services.AddScoped<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
     services.AddScoped<IStrategyTestService, StrategyTestService>();
-
     services.AddHostedService<MessageConsumerService>();
 
     // Quartz-Services

@@ -2,6 +2,11 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2025.03.1
+
+- Authorization and authentication with Keycloak
+- AuthorizeUser attribute for controllers
+
 ## Version 2025.02.4
 
 - Health check added

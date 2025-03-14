@@ -103,6 +103,8 @@ public class KeycloakServiceClient : IKeycloakServiceClient
         };
 
         var endpoint = $"{_authority}/protocol/openid-connect/logout";
+        // var endpoint = $"{_authority}/admin/realms/{_realm}/users/{signOutRequest.UserId}/logout";
+
 
         var parameters = new Dictionary<string, string>
             {
@@ -128,6 +130,7 @@ public class KeycloakServiceClient : IKeycloakServiceClient
     }
 
     public async Task<SignUpResponse> SignUp(SignUpRequest registerRequest)
+
     {
         var signUpResponse = new SignUpResponse();
         var adminToken = await GetAdminAccessToken();
@@ -321,4 +324,55 @@ public class KeycloakServiceClient : IKeycloakServiceClient
             throw new Exception("Unable to retrieve admin access token.");
         }
     }
+
+    public async Task<SignOutResponse> DeleteUser(string userId)
+    {
+        var signOutResponse = new SignOutResponse();
+    
+        var adminToken = await GetAdminAccessToken();
+        var endpoint = $"/admin/realms/{_realm}/users/{userId}";
+        var userRequest = new HttpRequestMessage(HttpMethod.Delete, endpoint);
+        userRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+        var userResponse = await _httpClient.SendAsync(userRequest);
+        signOutResponse.Success = userResponse.IsSuccessStatusCode;
+        if (!userResponse.IsSuccessStatusCode)
+        {
+            var roleErrorContent = await userResponse.Content.ReadAsStringAsync();
+            _logger.LogError(roleErrorContent);
+            signOutResponse.Errors = roleErrorContent;
+        }
+        return signOutResponse;
+    }
+
+    public async Task<bool> UserExistsById(string userId)
+    {
+        var endpoint = $"/admin/realms/{_realm}/users/{userId}";
+        var adminToken = await GetAdminAccessToken();
+
+        var userRequest = new HttpRequestMessage(HttpMethod.Get, endpoint);
+        userRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+
+        var userResponse = await _httpClient.SendAsync(userRequest);
+        return userResponse.IsSuccessStatusCode;
+    }
+
+    //public static async Task<bool> IsUserLoggedIn(string token)
+    //{
+    //    var request = new HttpRequestMessage(HttpMethod.Post, $"{KeycloakBaseUrl}/realms/{_realm}/protocol/openid-connect/token/introspect");
+    //    request.Content = new FormUrlEncodedContent(new[]
+    //    {
+    //        new KeyValuePair<string, string>("client_id", ClientId),
+    //        new KeyValuePair<string, string>("client_secret", ClientSecret),
+    //        new KeyValuePair<string, string>("token", token)
+    //    });
+
+    //    var response = await _httpClient.SendAsync(request);
+    //    if (!response.IsSuccessStatusCode) return false;
+
+    //    var json = await response.Content.ReadAsStringAsync();
+    //    using var doc = JsonDocument.Parse(json);
+    //    return doc.RootElement.GetProperty("active").GetBoolean(); // true = Token gültig
+    //}
+
+
 }

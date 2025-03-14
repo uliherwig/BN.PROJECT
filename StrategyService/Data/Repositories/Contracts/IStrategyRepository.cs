@@ -23,4 +23,5 @@ public interface IStrategyRepository
     Task DeletePositionsAsync(List<PositionModel> positions);
 
     Task CleanupStrategiesAsync();
+    Task RemoveUserDataAsync(Guid userId);
 }

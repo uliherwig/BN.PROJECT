@@ -3,18 +3,36 @@
 [Route("[controller]")]
 [ApiController]
 public class AccountController : ControllerBase
-{
-    // GlobalExceptionMiddleware for logging exceptions
+{ 
 
     private readonly IIdentityRepository _identityRepository;
     private readonly IKeycloakServiceClient _keycloakServiceClient;
+    private readonly IStrategyServiceClient _strategyServiceClient;
+    private readonly IAlpacaServiceClient _alpacaServiceClient;
 
     public AccountController(
         IIdentityRepository identityRepository,
+        IStrategyServiceClient strategyServiceClient,
+        IAlpacaServiceClient alpacaServiceClient,
         IKeycloakServiceClient keycloakServiceClient)
     {
         _identityRepository = identityRepository;
         _keycloakServiceClient = keycloakServiceClient;
+        _strategyServiceClient = strategyServiceClient;
+        _alpacaServiceClient = alpacaServiceClient;
+    }
+
+    [HttpGet("my-account")]
+    [AuthorizeUser(["user","admin"])]
+    public async Task<IActionResult> GetMyAccount()
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var user = await _identityRepository.GetUserByIdAsync(new Guid(userId!));
+        if (user != null)
+        {
+            return Ok(user);
+        }
+        return NotFound();
     }
 
     [HttpPost("sign-in")]
@@ -43,25 +61,29 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("sign-out")]
+    [AuthorizeUser(["user","admin"])]
     public async Task<IActionResult> Logout([FromBody] SignOutRequest signOutRequest)
     {
-        var response = await _keycloakServiceClient.SignOut(signOutRequest);
-        if (response != null && response.Success == true)
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        signOutRequest.UserId = userId!;
+        var response = await _keycloakServiceClient.SignOut(signOutRequest!);
+        if (response != null)
         {
-            var claims = JwtTokenDecoder.DecodeJwtToken(signOutRequest.RefreshToken);
-            var userId = new Guid(claims["sub"]);
-            var session = await _identityRepository.GetSessionByUserIdAsync(userId);
+            var session = await _identityRepository.GetSessionByUserIdAsync(new Guid(userId!));
             if (session != null)
             {
                 session.SignedOutAt = DateTime.UtcNow;
                 session.LastActive = DateTime.UtcNow;
                 await _identityRepository.UpdateSessionAsync(session);
             }
+            return Ok(true);
         }
-        return Ok(response);
+        return Ok(false);
     }
 
     [HttpPost("refresh-token")]
+    [AuthorizeUser(["user","admin"])]
+
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
         var response = await _keycloakServiceClient.RefreshToken(refreshTokenRequest);
@@ -105,9 +127,44 @@ public class AccountController : ControllerBase
         return BadRequest();
     }
 
-    [KeycloakAuthorize("admin")]
+    [HttpDelete]
+    [AuthorizeUser(["user","admin"])]
+    public async Task<IActionResult> Delete()
+    {
+        // to delete
+        // 1.  postions strategies
+        // 2.  sessions, userroles, user
+        // 3.  usersettings, positions, orders, executions
+
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var token = HttpContext.Items["token"]?.ToString();
+
+      
+            await _strategyServiceClient.RemoveUserData(token!);
+
+            await _alpacaServiceClient.DeleteExecutions(token!);
+            await _alpacaServiceClient.DeleteUserSettings(token!);
+
+            await _identityRepository.DeleteUserAsync(new Guid(userId!));
+
+            var response = await _keycloakServiceClient.DeleteUser(userId!);
+
+
+            return Ok(response);
+      
+    }
+
+    [HttpGet("get-user")]
+    [AuthorizeUser(["user","admin"])]
+    public async Task<IActionResult> GetUserByName(string userName)
+    {
+        var response = await _keycloakServiceClient.GetUserByName(userName);
+        return Ok(new { Message = $"User {userName} Exists =  {response.FirstName} {response.LastName}" });
+    }
+
+    [AuthorizeUser("admin")]
     [HttpGet("test-auth")]
-    public IActionResult TestAuthorization()
+    public IActionResult TestAuthorizationAdmin()
     {
         // Only accessible to users with the "admin" role
         return Ok(new { Message = "Access granted!" });

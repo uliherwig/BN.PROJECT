@@ -2,6 +2,7 @@
 
 [Route("[controller]")]
 [ApiController]
+[AuthorizeUser(["user","admin"])]
 public class UserSettingsController : ControllerBase
 {
     private readonly IAlpacaRepository _alpacaRepository;
@@ -11,18 +12,6 @@ public class UserSettingsController : ControllerBase
     {
         _alpacaRepository = alpacaRepository;
         _logger = logger;
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> AddUserSettingsAsync([FromBody] UserSettingsModel userSettings)
-    {
-        if (userSettings == null)
-        {
-            return BadRequest("UserSettings cannot be null");
-        }
-
-        await _alpacaRepository.AddUserSettingsAsync(userSettings);
-        return Ok(true);
     }
 
     [HttpGet("{userId}")]
@@ -37,6 +26,18 @@ public class UserSettingsController : ControllerBase
         return Ok(userSettings);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> AddUserSettingsAsync([FromBody] UserSettingsModel userSettings)
+    {
+        if (userSettings == null)
+        {
+            return BadRequest("UserSettings cannot be null");
+        }
+
+        await _alpacaRepository.AddUserSettingsAsync(userSettings);
+        return Ok(true);
+    }
+
     [HttpPut]
     public async Task<IActionResult> UpdateUserSettingsAsync([FromBody] UserSettingsModel userSettings)
     {
@@ -49,15 +50,16 @@ public class UserSettingsController : ControllerBase
         return Ok(true);
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> DeleteUserSettingsAsync([FromBody] UserSettingsModel userSettings)
+    [HttpDelete]  
+    public async Task<IActionResult> DeleteUserSettingsAsync()
     {
-        if (userSettings == null)
-        {
-            return BadRequest("UserSettings cannot be null");
-        }
+        var userId = HttpContext.Items["UserId"]?.ToString();
 
-        await _alpacaRepository.DeleteUserSettingsAsync(userSettings);
-        return NoContent();
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
+        if(userSettings != null)
+        {
+            await _alpacaRepository.DeleteUserSettingsAsync(userSettings);
+        }       
+        return Ok();
     }
 }

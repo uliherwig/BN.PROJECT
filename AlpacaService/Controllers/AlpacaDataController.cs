@@ -2,6 +2,7 @@ namespace BN.PROJECT.AlpacaService;
 
 [ApiController]
 [Route("[controller]")]
+[AuthorizeUser(["user","admin"])]
 public class AlpacaDataController : ControllerBase
 {
     private readonly IAlpacaDataService _alpacaDataService;

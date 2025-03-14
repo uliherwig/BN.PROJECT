@@ -77,15 +77,17 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
                 },
                 Array.Empty<string>()
             }
-        });
+        });     
+
     });
 
     services.AddHttpClient();
-    services.AddHttpClient<KeycloakAuthorizeAttribute>();
     services.AddHttpClient<IKeycloakServiceClient, KeycloakServiceClient>();
     services.AddHostedService<SeedDatabaseService>();
 
     services.AddScoped<IIdentityRepository, IdentityRepository>();
+    services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
+    services.AddHttpClient<IAlpacaServiceClient, AlpacaServiceClient>();
 }
 static void MigrateDatabase(WebApplication app)
 {

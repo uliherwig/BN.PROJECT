@@ -86,7 +86,6 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddMessageBus(configuration);
 
     services.AddHttpClient();
-    services.AddHttpClient<KeycloakAuthorizeAttribute>();
     services.AddHealthChecks();
 
     services.AddScoped<IStrategyRepository, StrategyRepository>();
