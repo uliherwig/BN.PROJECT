@@ -86,6 +86,8 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHostedService<SeedDatabaseService>();
 
     services.AddScoped<IIdentityRepository, IdentityRepository>();
+    services.AddScoped<IEmailService, EmailService>();
+
     services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
     services.AddHttpClient<IAlpacaServiceClient, AlpacaServiceClient>();
 }

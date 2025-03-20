@@ -9,17 +9,20 @@ public class AccountController : ControllerBase
     private readonly IKeycloakServiceClient _keycloakServiceClient;
     private readonly IStrategyServiceClient _strategyServiceClient;
     private readonly IAlpacaServiceClient _alpacaServiceClient;
+    private readonly IEmailService _emailService;
 
     public AccountController(
         IIdentityRepository identityRepository,
         IStrategyServiceClient strategyServiceClient,
         IAlpacaServiceClient alpacaServiceClient,
-        IKeycloakServiceClient keycloakServiceClient)
+        IKeycloakServiceClient keycloakServiceClient,
+        IEmailService emailService)
     {
         _identityRepository = identityRepository;
         _keycloakServiceClient = keycloakServiceClient;
         _strategyServiceClient = strategyServiceClient;
         _alpacaServiceClient = alpacaServiceClient;
+        _emailService = emailService;
     }
 
     [HttpGet("my-account")]
@@ -99,12 +102,15 @@ public class AccountController : ControllerBase
                 await _identityRepository.UpdateSessionAsync(session);
             }
         }
+
         return Ok(response);
     }
 
     [HttpPost("sign-up")]
     public async Task<IActionResult> SignUp([FromBody] SignUpRequest signUpRequest)
     {
+
+
         var response = await _keycloakServiceClient.SignUp(signUpRequest);
 
         if (response != null && response.Success == true)
@@ -124,6 +130,14 @@ public class AccountController : ControllerBase
 
             return Ok(response);
         }
+
+        // E-Mail senden
+        var subject = "Willkommen bei BN Project!";
+        var body = $"Hallo {signUpRequest.FirstName},<br/><br/>" +
+                   "Vielen Dank für Ihre Registrierung bei BN Project.<br/><br/>" +
+                   "Mit freundlichen Grüßen,<br/>Das BN Project Team";
+        await _emailService.SendEmailAsync(signUpRequest.Email, subject, body);
+
         return BadRequest();
     }
 
