@@ -186,7 +186,7 @@ public class AccountController : ControllerBase
 
 
     [HttpGet("send-testmail")]  
-    public async Task<IActionResult> SendTestMail(string email)
+    public async Task<IActionResult> SendTestMail([FromQuery] string email)
     {
         // E-Mail senden
         var subject = "Willkommen bei BN Project!";
