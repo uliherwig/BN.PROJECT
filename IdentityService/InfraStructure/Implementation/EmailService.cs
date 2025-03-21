@@ -14,10 +14,10 @@ public class EmailService : IEmailService
         {
             Host = _configuration["Email:Smtp:Host"],
             Port = int.Parse(_configuration["Email:Smtp:Port"]),
-            Credentials = new NetworkCredential(
-                _configuration["Email:Smtp:Username"],
-                _configuration["Email:Smtp:Password"]),
-            EnableSsl = true
+            //Credentials = new NetworkCredential(
+            //    _configuration["Email:Smtp:Username"],
+            //    _configuration["Email:Smtp:Password"]),
+            //EnableSsl = true
         };
     }
 

@@ -183,4 +183,16 @@ public class AccountController : ControllerBase
         // Only accessible to users with the "admin" role
         return Ok(new { Message = "Access granted!" });
     }
+
+
+    [HttpGet("send-testmail")]  
+    public async Task<IActionResult> SendTestMail(string email)
+    {
+        // E-Mail senden
+        var subject = "Willkommen bei BN Project!";
+        var body = $"Hallo {email}," +
+                   "Vielen Dank für Ihre Registrierung bei BN Project.";
+        await _emailService.SendEmailAsync(email, subject, body);
+        return Ok(new { Message = "Mail sent!" });
+    }
 }
