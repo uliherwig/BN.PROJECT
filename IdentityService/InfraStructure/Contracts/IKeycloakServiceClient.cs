@@ -15,5 +15,7 @@
         Task<SignOutResponse> DeleteUser(string userId);
 
         Task<bool> UserExistsById(string userId);
+
+        Task<bool> VerifyEmail(User user);
     }
 }

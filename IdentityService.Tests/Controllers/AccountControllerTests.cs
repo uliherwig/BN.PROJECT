@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace BN.PROJECT.IdentityService.Tests
@@ -11,6 +12,8 @@ namespace BN.PROJECT.IdentityService.Tests
         private readonly Mock<IAlpacaServiceClient> _mockAlpacaServiceClient;
 
         private readonly Mock<IEmailService> _mockEmailService;
+        private readonly Mock<IConfiguration> _mockConfiguration;
+
 
 
         private readonly AccountController _controller;
@@ -24,14 +27,16 @@ namespace BN.PROJECT.IdentityService.Tests
             _mockStrategyServiceClient = new Mock<IStrategyServiceClient>();
             _mockAlpacaServiceClient = new Mock<IAlpacaServiceClient>();
             _mockEmailService = new Mock<IEmailService>();
+            _mockConfiguration = new Mock<IConfiguration>();
 
             _controller = new AccountController(
                 _mockIdentityRepository.Object,
                 _mockStrategyServiceClient.Object,
                 _mockAlpacaServiceClient.Object,
                 _mockKeycloakServiceClient.Object,
-                _mockEmailService.Object);
-                
+                _mockEmailService.Object,
+                _mockConfiguration.Object);
+
         }
 
         [Fact]

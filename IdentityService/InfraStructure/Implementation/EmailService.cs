@@ -17,22 +17,35 @@ public class EmailService : IEmailService
             //Credentials = new NetworkCredential(
             //    _configuration["Email:Smtp:Username"],
             //    _configuration["Email:Smtp:Password"]),
-            //EnableSsl = true
+            EnableSsl = false
         };
     }
 
-    public async Task SendEmailAsync(string to, string subject, string body)
+    public async Task<bool> SendEmailAsync(string to, string subject, string body)
     {
-        var mailMessage = new MailMessage
+        try
         {
-            From = new MailAddress(_configuration["Email:From"]),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = true
-        };
-        mailMessage.To.Add(to);
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(_configuration["Email:From"]),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(to);
 
-        await _smtpClient.SendMailAsync(mailMessage);
+            await _smtpClient.SendMailAsync(mailMessage);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+
+
+
+
+
     }
 }
 

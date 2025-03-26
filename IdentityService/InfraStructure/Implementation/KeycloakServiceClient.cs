@@ -1,3 +1,5 @@
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+
 namespace BN.PROJECT.IdentityService;
 
 public class KeycloakServiceClient : IKeycloakServiceClient
@@ -328,7 +330,7 @@ public class KeycloakServiceClient : IKeycloakServiceClient
     public async Task<SignOutResponse> DeleteUser(string userId)
     {
         var signOutResponse = new SignOutResponse();
-    
+
         var adminToken = await GetAdminAccessToken();
         var endpoint = $"/admin/realms/{_realm}/users/{userId}";
         var userRequest = new HttpRequestMessage(HttpMethod.Delete, endpoint);
@@ -356,23 +358,44 @@ public class KeycloakServiceClient : IKeycloakServiceClient
         return userResponse.IsSuccessStatusCode;
     }
 
-    //public static async Task<bool> IsUserLoggedIn(string token)
-    //{
-    //    var request = new HttpRequestMessage(HttpMethod.Post, $"{KeycloakBaseUrl}/realms/{_realm}/protocol/openid-connect/token/introspect");
-    //    request.Content = new FormUrlEncodedContent(new[]
-    //    {
-    //        new KeyValuePair<string, string>("client_id", ClientId),
-    //        new KeyValuePair<string, string>("client_secret", ClientSecret),
-    //        new KeyValuePair<string, string>("token", token)
-    //    });
+    // Set Email as verified
+    public async Task<bool> VerifyEmail(User user)
+    {
+        var getUserEndpoint = $"/admin/realms/{_realm}/users?username={user.Username}";
+        var adminToken = await GetAdminAccessToken();
 
-    //    var response = await _httpClient.SendAsync(request);
-    //    if (!response.IsSuccessStatusCode) return false;
+        var userRequest = new HttpRequestMessage(HttpMethod.Get, getUserEndpoint);
+        userRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
 
-    //    var json = await response.Content.ReadAsStringAsync();
-    //    using var doc = JsonDocument.Parse(json);
-    //    return doc.RootElement.GetProperty("active").GetBoolean(); // true = Token gültig
-    //}
+        var userResponse = await _httpClient.SendAsync(userRequest);
+        if (!userResponse.IsSuccessStatusCode)
+        {
+            var roleErrorContent = await userResponse.Content.ReadAsStringAsync();
+            _logger.LogError(roleErrorContent);
+            return false;
+        }
+        if (userResponse.IsSuccessStatusCode)
+        {
+            var responseContent = await userResponse.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
+            var endpoint = $"/admin/realms/{_realm}/users/{user.UserId}";
 
+            var userUpdate = new
+            {             
+                username = result[0].username,
+                email = result[0].email,
+                emailVerified = true
+            };
 
+            var content = new StringContent(JsonConvert.SerializeObject(userUpdate), Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(HttpMethod.Put, endpoint)
+            {
+                Content = content
+            };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+            var response = await _httpClient.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+        return false;
+    }
 }

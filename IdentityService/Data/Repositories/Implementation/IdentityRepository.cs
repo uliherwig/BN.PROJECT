@@ -32,9 +32,24 @@ public class IdentityRepository : IIdentityRepository
 
     public async Task AddUserAsync(User user)
     {
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
+        try
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            if (existingUser != null)
+            {
+                throw new Exception("Ein Benutzer mit dieser E-Mail-Adresse existiert bereits.");
+            }
+
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Fehler beim Hinzufügen des Benutzers");
+            throw;
+        }
     }
+
 
     public async Task AddUserRoleAsync(UserRole userRole)
     {

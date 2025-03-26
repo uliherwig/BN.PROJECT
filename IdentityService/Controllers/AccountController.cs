@@ -3,30 +3,33 @@
 [Route("[controller]")]
 [ApiController]
 public class AccountController : ControllerBase
-{ 
+{
 
     private readonly IIdentityRepository _identityRepository;
     private readonly IKeycloakServiceClient _keycloakServiceClient;
     private readonly IStrategyServiceClient _strategyServiceClient;
     private readonly IAlpacaServiceClient _alpacaServiceClient;
     private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
     public AccountController(
         IIdentityRepository identityRepository,
         IStrategyServiceClient strategyServiceClient,
         IAlpacaServiceClient alpacaServiceClient,
         IKeycloakServiceClient keycloakServiceClient,
-        IEmailService emailService)
+        IEmailService emailService,
+        IConfiguration configuration)
     {
         _identityRepository = identityRepository;
         _keycloakServiceClient = keycloakServiceClient;
         _strategyServiceClient = strategyServiceClient;
         _alpacaServiceClient = alpacaServiceClient;
         _emailService = emailService;
+        _configuration = configuration;
     }
 
     [HttpGet("my-account")]
-    [AuthorizeUser(["user","admin"])]
+    [AuthorizeUser(["user", "admin"])]
     public async Task<IActionResult> GetMyAccount()
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
@@ -41,11 +44,18 @@ public class AccountController : ControllerBase
     [HttpPost("sign-in")]
     public async Task<IActionResult> SignIn([FromBody] SignInRequest signInRequest)
     {
+        var user = await _identityRepository.GetUserByNameAsync(signInRequest.Username);  
         var response = await _keycloakServiceClient.SignIn(signInRequest);
+
+        if (user != null && user.IsEmailVerified == false)
+        {
+            response.Success = false;
+            response.Errors = "Email not verified";
+            response.JwtToken = null;
+        }
 
         if ((bool)response.Success)
         {
-            var user = await _identityRepository.GetUserByNameAsync(signInRequest.Username);
             if (user != null)
             {
                 var session = new Session
@@ -64,7 +74,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("sign-out")]
-    [AuthorizeUser(["user","admin"])]
+    [AuthorizeUser(["user", "admin"])]
     public async Task<IActionResult> Logout([FromBody] SignOutRequest signOutRequest)
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
@@ -85,7 +95,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
-    [AuthorizeUser(["user","admin"])]
+    [AuthorizeUser(["user", "admin"])]
 
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
@@ -109,10 +119,7 @@ public class AccountController : ControllerBase
     [HttpPost("sign-up")]
     public async Task<IActionResult> SignUp([FromBody] SignUpRequest signUpRequest)
     {
-
-
         var response = await _keycloakServiceClient.SignUp(signUpRequest);
-
         if (response != null && response.Success == true)
         {
             var user = new User
@@ -124,25 +131,53 @@ public class AccountController : ControllerBase
                 LastName = signUpRequest.LastName,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                IsEmailVerified = false
+                IsEmailVerified = false,
+
             };
             await _identityRepository.AddUserAsync(user);
 
-            return Ok(response);
+            // E-Mail senden
+            var subject = "Willkommen bei BN Project!";
+            var body = $"Hallo {signUpRequest.FirstName},<br/><br/>" +
+                       "Vielen Dank für Ihre Registrierung bei BN Project.<br/><br/>" +
+                       "Bitte klicken Sie auf den folgenden Link, um Ihre E-Mail-Adresse zu bestätigen:<br/>" +
+                         $"<a href='{_configuration["UI"]}/auth/confirm?token={user.UserId}'>E-Mail-Adresse bestätigen</a><br/><br/>" +
+                       "Mit freundlichen Grüßen,<br/>Das BN Project Team";
+            var success = await _emailService.SendEmailAsync(signUpRequest.Email, subject, body);
+            if (success)
+            {
+
+                return Ok(response);
+            }
+            return BadRequest(new { Error = "Email not valid" });
         }
 
-        // E-Mail senden
-        var subject = "Willkommen bei BN Project!";
-        var body = $"Hallo {signUpRequest.FirstName},<br/><br/>" +
-                   "Vielen Dank für Ihre Registrierung bei BN Project.<br/><br/>" +
-                   "Mit freundlichen Grüßen,<br/>Das BN Project Team";
-        await _emailService.SendEmailAsync(signUpRequest.Email, subject, body);
+        return BadRequest(new { response.Errors });
+    }
 
-        return BadRequest();
+    [HttpPut("confirm")]
+    public async Task<IActionResult> ConfirmSignUp([FromBody] ConfirmSignUpRequest confirmSignUp)
+    {
+        var userId = new Guid(confirmSignUp.Token!);
+        var user = await _identityRepository.GetUserByIdAsync(userId);      
+
+        if (user != null)
+        {
+            if (user.IsEmailVerified)
+            {
+                return BadRequest(new { Success = false, Message = "EmailVerified" });
+            }
+            user.IsEmailVerified = true;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _identityRepository.UpdateUserAsync(user);
+            await _keycloakServiceClient.VerifyEmail(user);
+            return Ok(new { Success = true, Data = user});
+        }
+        return BadRequest(new { Success = false, Message = ErrorCode.NotFound });
     }
 
     [HttpDelete]
-    [AuthorizeUser(["user","admin"])]
+    [AuthorizeUser(["user", "admin"])]
     public async Task<IActionResult> Delete()
     {
         // to delete
@@ -153,23 +188,22 @@ public class AccountController : ControllerBase
         var userId = HttpContext.Items["UserId"]?.ToString();
         var token = HttpContext.Items["token"]?.ToString();
 
-      
-            await _strategyServiceClient.RemoveUserData(token!);
 
-            await _alpacaServiceClient.DeleteExecutions(token!);
-            await _alpacaServiceClient.DeleteUserSettings(token!);
+        await _strategyServiceClient.RemoveUserData(token!);
 
-            await _identityRepository.DeleteUserAsync(new Guid(userId!));
+        await _alpacaServiceClient.DeleteExecutions(token!);
+        await _alpacaServiceClient.DeleteUserSettings(token!);
 
-            var response = await _keycloakServiceClient.DeleteUser(userId!);
+        await _identityRepository.DeleteUserAsync(new Guid(userId!));
 
+        var response = await _keycloakServiceClient.DeleteUser(userId!);
 
-            return Ok(response);
-      
+        return Ok(response);
+
     }
 
     [HttpGet("get-user")]
-    [AuthorizeUser(["user","admin"])]
+    [AuthorizeUser(["user", "admin"])]
     public async Task<IActionResult> GetUserByName(string userName)
     {
         var response = await _keycloakServiceClient.GetUserByName(userName);
@@ -185,7 +219,7 @@ public class AccountController : ControllerBase
     }
 
 
-    [HttpGet("send-testmail")]  
+    [HttpGet("send-testmail")]
     public async Task<IActionResult> SendTestMail([FromQuery] string email)
     {
         // E-Mail senden
