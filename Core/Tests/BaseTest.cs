@@ -27,7 +27,7 @@ public class BaseTest
     {
         var parts = new List<string> { "TestData" };
 
-        if (!TestCaseFolder.IsNullOrEmpty())
+        if (TestCaseFolder == null)
         {
             parts.Add(TestCaseFolder);
         }

@@ -2,25 +2,27 @@ namespace BN.PROJECT.AlpacaService;
 
 [ApiController]
 [Route("[controller]")]
-[AuthorizeUser(["user","admin"])]
+[AuthorizeUser(["user", "admin"])]
 public class AlpacaTradingController : ControllerBase
 {
     private readonly IAlpacaTradingService _alpacaTradingService;
     private readonly IAlpacaRepository _alpacaRepository;
+    private readonly IStrategyTestService _strategyTestService;
+    private readonly IStrategyServiceClient _strategyServiceClient;
 
     public AlpacaTradingController(
-        IAlpacaTradingService alpacaTradingService, IAlpacaRepository alpacaRepository)
+        IAlpacaTradingService alpacaTradingService, IAlpacaRepository alpacaRepository, IStrategyTestService strategyTestService, IStrategyServiceClient strategyServiceClient)
     {
         _alpacaTradingService = alpacaTradingService;
         _alpacaRepository = alpacaRepository;
+        _strategyTestService = strategyTestService;
+        _strategyServiceClient = strategyServiceClient;
     }
 
     [HttpGet("account")]
-    [AuthorizeUser(["user","admin"])]
     public async Task<IActionResult> GetAccount()
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
-     
         var result = new BrokerAccount();
         var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
@@ -43,6 +45,64 @@ public class AlpacaTradingController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("get-execution")]
+    public async Task<IActionResult> GetActiveExecutionByUserId()
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var exec = await _alpacaRepository.GetActiveAlpacaExecutionByUserIdAsync(Guid.Parse(userId!));
+        if (exec == null)
+        {
+            exec = new AlpacaExecutionModel();
+        }
+        return Ok(exec);
+    }
+
+    [HttpPost("start-execution/{strategyId}")]
+    public async Task<IActionResult> StartAlpacaExecution(Guid strategyId)
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var strategy = await _strategyServiceClient.GetStrategyAsync(strategyId.ToString());
+        if (strategy == null)
+        {
+            return BadRequest("Strategy not found");
+        }
+        if (strategy.UserId != Guid.Parse(userId!))
+        {
+            return BadRequest("User is not the owner of the strategy");
+        }
+        var alpacaExecution = new AlpacaExecutionModel
+        {
+            Id = Guid.NewGuid(),
+            UserId = strategy.UserId,
+            StrategyId = strategy.Id,
+            Assets = strategy.Asset,
+            StrategyType = strategy.StrategyType,
+            StartDate = DateTime.UtcNow,
+            EndDate = DateTime.MinValue
+        };
+
+        await _alpacaRepository.AddAlpacaExecutionAsync(alpacaExecution);
+
+        await _strategyTestService.StartExecution(strategy.UserId, strategyId);
+
+        return Ok(alpacaExecution);
+    }
+
+    [HttpPut("stop-execution")]
+    public async Task<IActionResult> StopAlpacaExecution()
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var execution = await _alpacaRepository.GetActiveAlpacaExecutionByUserIdAsync(Guid.Parse(userId!));
+        if (execution == null)
+        {
+            return BadRequest("No active execution found");
+        }
+        execution.EndDate = DateTime.UtcNow.ToUniversalTime();
+        await _alpacaRepository.UpdateAlpacaExecutionAsync(execution);
+        return Ok();
+    }
+
+
     [HttpGet("assets")]
     public async Task<IActionResult> GetAssets()
     {
@@ -58,9 +118,11 @@ public class AlpacaTradingController : ControllerBase
     }
 
     [HttpGet("orders")]
-    public async Task<IActionResult> GetAllOrders(string userId, OrderStatusFilter orderStatusFilter)
+    public async Task<IActionResult> GetAllOrders(OrderStatusFilter orderStatusFilter)
     {
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             return NotFound("User settings not found");
@@ -71,9 +133,11 @@ public class AlpacaTradingController : ControllerBase
     }
 
     [HttpGet("order/{orderId}")]
-    public async Task<IActionResult> GetOrderById(string userId, string orderId)
+    public async Task<IActionResult> GetOrderById(string orderId)
     {
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             return NotFound("User settings not found");
@@ -84,9 +148,11 @@ public class AlpacaTradingController : ControllerBase
     }
 
     [HttpDelete("order/{orderId}")]
-    public async Task<IActionResult> CancelOrderById(string userId, Guid orderId)
+    public async Task<IActionResult> CancelOrderById(Guid orderId)
     {
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             return NotFound("User settings not found");
@@ -97,9 +163,10 @@ public class AlpacaTradingController : ControllerBase
     }
 
     [HttpGet("positions")]
-    public async Task<IActionResult> GetPositions(string userId)
+    public async Task<IActionResult> GetPositions()
     {
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             return NotFound("User settings not found");
@@ -111,14 +178,15 @@ public class AlpacaTradingController : ControllerBase
             position.Symbol = position.Symbol.ToUpper();
         }
 
-
         return Ok(positions);
     }
 
     [HttpGet("position/{symbol}")]
-    public async Task<IActionResult> GetPositionsBySymbol(string userId, string symbol)
+    public async Task<IActionResult> GetPositionsBySymbol(string symbol)
     {
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             return NotFound("User settings not found");
@@ -129,9 +197,11 @@ public class AlpacaTradingController : ControllerBase
     }
 
     [HttpDelete("position/{symbol}")]
-    public async Task<IActionResult> ClosePosition(string userId, string symbol)
+    public async Task<IActionResult> ClosePosition(string symbol)
     {
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             return NotFound("User settings not found");

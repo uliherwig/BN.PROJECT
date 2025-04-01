@@ -2,7 +2,7 @@
 
 [Route("[controller]")]
 [ApiController]
-[AuthorizeUser(["user","admin"])]
+[AuthorizeUser(["user", "admin"])]
 public class StrategyController : ControllerBase
 {
     private readonly ILogger<StrategyController> _logger;
@@ -29,18 +29,26 @@ public class StrategyController : ControllerBase
         return Ok(test);
     }
 
-    [HttpGet("{name}/{userId}")]
-    public async Task<IActionResult> GetStrategyNameExists(string name, Guid userId)
+    [HttpGet("exists/{name}")]
+    public async Task<IActionResult> GetStrategyNameExists(string name)
     {
-        var strategies = await _strategyRepository.GetStrategiesByUserIdAsync(userId, false);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var strategies = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), false);
         var isStrategy = strategies.Any(s => s.Name == name);
         return Ok(isStrategy);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddStrategy([FromBody] StrategySettingsModel testSettings)
+    //[HttpPost]
+    //public async Task<IActionResult> AddStrategy([FromBody] StrategySettingsModel testSettings)
+    //{
+    //    await _strategyRepository.AddStrategyAsync(testSettings);
+    //    return Ok(true);
+    //}
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateStrategy([FromBody] StrategySettingsModel strategy)
     {
-        await _strategyRepository.AddStrategyAsync(testSettings);
+        var result = await _strategyRepository.UpdateStrategyAsync(strategy);
         return Ok(true);
     }
 
@@ -58,25 +66,20 @@ public class StrategyController : ControllerBase
         await _strategyRepository.DeletePositionsAsync(positions);
         return Ok(true);
     }
-
-    [HttpPut]
-    public async Task<IActionResult> UpdateStrategy([FromBody] StrategySettingsModel strategy)
+ 
+    [HttpGet("settings")]
+    public async Task<IActionResult> GetStrategiesByUserId(bool bookmarked = false)
     {
-        var result = await _strategyRepository.UpdateStrategyAsync(strategy);
-        return Ok(true);
-    }
-    //[KeycloakAuthorize("admin")]
-    [HttpGet("settings/{userId}")]
-    public async Task<IActionResult> GetStrategiesByUserId(Guid userId, bool bookmarked = false)
-    {
-        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(userId, bookmarked);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), bookmarked);
         return Ok(settings);
     }
 
-    [HttpGet("infos/{userId}/{strategyType}")]
-    public async Task<IActionResult> GetStrategyInfosByUserId(Guid userId, StrategyEnum strategyType)
+    [HttpGet("infos/{strategyType}")]
+    public async Task<IActionResult> GetStrategyInfosByUserId(StrategyEnum strategyType)
     {
-        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(userId, false);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), false);
         if (strategyType != StrategyEnum.None)
         {
             settings = settings.Where(s => s.StrategyType == strategyType).ToList();

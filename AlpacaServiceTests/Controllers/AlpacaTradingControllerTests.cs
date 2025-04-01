@@ -9,12 +9,20 @@ namespace BN.PROJECT.AlpacaService.Tests
         private readonly Mock<IAlpacaRepository> _mockAlpacaRepository;
         private readonly Mock<IAlpacaTradingService> _mockTradingService;
         private readonly AlpacaTradingController _alpacaTradingController;
+        private readonly Mock<IStrategyTestService> _mockBacktestService;
+        private readonly Mock<IStrategyServiceClient> _mockStrategyServiceClient;
 
         public AlpacaTradingControllerTests()
         {
             _mockAlpacaRepository = new Mock<IAlpacaRepository>();
             _mockTradingService = new Mock<IAlpacaTradingService>();
-            _alpacaTradingController = new AlpacaTradingController(_mockTradingService.Object, _mockAlpacaRepository.Object);
+            _mockBacktestService = new Mock<IStrategyTestService>();
+            _mockStrategyServiceClient = new Mock<IStrategyServiceClient>();
+            _alpacaTradingController = new AlpacaTradingController(
+                _mockTradingService.Object,
+                _mockAlpacaRepository.Object,
+                _mockBacktestService.Object,
+                _mockStrategyServiceClient.Object);
         }
 
         [Fact]

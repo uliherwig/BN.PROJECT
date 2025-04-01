@@ -1,3 +1,4 @@
+
 var builder = WebApplication.CreateBuilder(args);
 
 //ConfigureLogging(builder.Host);
@@ -11,6 +12,8 @@ ConfigureMiddleware(app);
 ConfigureEndpoints(app);
 
 MigrateDatabase(app);
+
+app.MapHub<AlpacaHub>("/alpacahub");
 app.MapHealthChecks("/health");
 
 app.Run();
@@ -79,6 +82,17 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IStrategyTestService, StrategyTestService>();
     services.AddHostedService<MessageConsumerService>();
 
+    var redisConnection = configuration["Redis_Connection"]; 
+    var redis = ConnectionMultiplexer.Connect(redisConnection);
+    services.AddSingleton<IConnectionMultiplexer>(redis);
+
+    services.AddSignalR()
+    .AddStackExchangeRedis(redisConnection, options =>
+    {
+        options.Configuration.AbortOnConnectFail = false;
+        options.Configuration.ChannelPrefix = "SignalR";
+    }); 
+
     // Quartz-Services
     services.AddQuartz();
     services.AddQuartzHostedService(opt =>
@@ -86,11 +100,21 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         opt.WaitForJobsToComplete = true;
     });
 
-    // Register QuartzHostedService
+
     services.AddHostedService<SendQuoteTaskService>();
     services.AddHostedService<AlpacaHistoryService>();
     services.AddControllers();
     services.AddHealthChecks();
+    services.AddCors(options =>
+    {
+        options.AddPolicy("CorsPolicy", builder =>
+        {
+            builder.WithOrigins("http://localhost:3000") 
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+        });
+    });
 }
 static void ConfigureMiddleware(WebApplication app)
 {
@@ -104,7 +128,7 @@ static void ConfigureMiddleware(WebApplication app)
 
     app.UseHttpsRedirection();
     app.UseRouting();
-    app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+    app.UseCors("CorsPolicy");
     app.UseAuthentication();
     app.UseAuthorization();
 }

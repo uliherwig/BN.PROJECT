@@ -14,10 +14,12 @@ public class UserSettingsController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("{userId}")]
-    public async Task<IActionResult> GetUserSettingsAsync(string userId)
+    [HttpGet]
+    public async Task<IActionResult> GetUserSettingsAsync()
     {
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             return NotFound(ErrorCode.NotFound);

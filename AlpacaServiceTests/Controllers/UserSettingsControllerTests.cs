@@ -55,7 +55,7 @@ namespace BN.PROJECT.AlpacaService.Tests
                 .ReturnsAsync((UserSettingsModel)null);
 
             // Act
-            var result = await _controller.GetUserSettingsAsync(userId);
+            var result = await _controller.GetUserSettingsAsync();
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -72,7 +72,7 @@ namespace BN.PROJECT.AlpacaService.Tests
                 .ReturnsAsync(_userSettings);
 
             // Act
-            var result = await _controller.GetUserSettingsAsync(userId);
+            var result = await _controller.GetUserSettingsAsync();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);

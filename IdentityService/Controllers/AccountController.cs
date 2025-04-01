@@ -95,7 +95,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
-    [AuthorizeUser(["user", "admin"])]
+ 
 
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
     {

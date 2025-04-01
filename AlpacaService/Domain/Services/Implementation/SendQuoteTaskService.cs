@@ -31,7 +31,7 @@ public class SendQuoteTaskService : IHostedService, IDisposable
                 .WithIdentity("quoteTrigger", "alpacaGroup")
                 .StartNow()
                 .WithSimpleSchedule(x => x
-                    .WithIntervalInMinutes(1)
+                    .WithIntervalInSeconds(1)
                     .RepeatForever())
                 .Build();
 

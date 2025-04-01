@@ -2,7 +2,6 @@ namespace BN.PROJECT.AlpacaService;
 
 [ApiController]
 [Route("[controller]")]
-[AuthorizeUser(["user","admin"])]
 public class AlpacaDataController : ControllerBase
 {
     private readonly IAlpacaDataService _alpacaDataService;
@@ -12,7 +11,6 @@ public class AlpacaDataController : ControllerBase
         _alpacaDataService = alpacaDataService;
     }
 
-    //[KeycloakAuthorize("user")]
     [HttpGet("historical-bars/{symbol}")]
     public async Task<IActionResult> GetHistoricalBarsBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
@@ -20,7 +18,6 @@ public class AlpacaDataController : ControllerBase
         return Ok(bars);
     }
 
-    //[KeycloakAuthorize("admin")]
     [HttpGet("latest-bar/{symbol}")]
     public async Task<IActionResult> GetLatestBarBySymbol(string symbol)
     {

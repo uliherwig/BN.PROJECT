@@ -17,7 +17,7 @@ public class StrategyServiceClient : IStrategyServiceClient
 
     public async Task<StrategySettingsModel?> GetStrategyAsync(string strategyId)
     {
-        var response = await _httpClient.GetAsync($"/strategy/{strategyId}");
+        var response = await _httpClient.GetAsync($"/internalstrategy/{strategyId}");
         response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadAsStringAsync();
 
@@ -31,7 +31,7 @@ public class StrategyServiceClient : IStrategyServiceClient
         {
             var json = JsonConvert.SerializeObject(testSettings);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"/strategy", content);
+            var response = await _httpClient.PostAsync($"/internalstrategy", content);
 
             var result = await response.Content.ReadAsStringAsync();
             return result;
