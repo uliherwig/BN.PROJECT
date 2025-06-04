@@ -27,8 +27,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityService.Tests", "Id
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaintenanceApp", "MaintenanceApp\MaintenanceApp.csproj", "{7C2270F9-D9B1-4AEF-9A85-38CB4DA20C14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService", "TestService\TestService.csproj", "{F45739BC-F608-4140-8E9E-E3045B64E452}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,10 +69,6 @@ Global
 		{7C2270F9-D9B1-4AEF-9A85-38CB4DA20C14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C2270F9-D9B1-4AEF-9A85-38CB4DA20C14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C2270F9-D9B1-4AEF-9A85-38CB4DA20C14}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F45739BC-F608-4140-8E9E-E3045B64E452}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F45739BC-F608-4140-8E9E-E3045B64E452}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F45739BC-F608-4140-8E9E-E3045B64E452}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F45739BC-F608-4140-8E9E-E3045B64E452}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
