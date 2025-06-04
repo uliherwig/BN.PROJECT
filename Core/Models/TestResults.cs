@@ -3,7 +3,7 @@
 public class TestResult
 {
     public Guid Id { get; set; }
-    public required string Asset { get; set; }
+    public string Asset { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public int NumberOfPositions { get; set; }
@@ -12,5 +12,4 @@ public class TestResult
     public decimal TotalProfitLoss { get; set; }
     public decimal BuyProfitLoss { get; set; }
     public decimal SellProfitLoss { get; set; }
-
 }

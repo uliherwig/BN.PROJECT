@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 
 namespace BN.PROJECT.StrategyService;
+
 public class MessageConsumerService : IHostedService
 {
     private readonly ILogger<MessageConsumerService> _logger;
@@ -28,7 +29,7 @@ public class MessageConsumerService : IHostedService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error in QuoteConsumerService");           
+            _logger.LogError(e, "Error in MessageConsumerService");
         }
         return Task.CompletedTask;
     }
@@ -38,7 +39,7 @@ public class MessageConsumerService : IHostedService
         return Task.CompletedTask;
     }
 
-    private async void ConsumeMessage(string messageJson)
+    public async void ConsumeMessage(string messageJson)
     {
         var message = JsonConvert.DeserializeObject<StrategyMessage>(messageJson);
         if (message == null)
@@ -63,7 +64,7 @@ public class MessageConsumerService : IHostedService
 
                 foreach (var quote in message.Quotes)
                 {
-                    await strategyService.EvaluateQuote(message.StrategyId, quote);
+                    await strategyService.EvaluateQuote(message.StrategyId,message.UserId, quote);
                 }
                 stopwatch.Stop();
                 _logger.LogInformation($"EvaluateQuote done in {stopwatch.Elapsed.TotalMilliseconds} ms. Number of quotes = {message.Quotes.Count}");
@@ -76,5 +77,3 @@ public class MessageConsumerService : IHostedService
         }
     }
 }
-
-

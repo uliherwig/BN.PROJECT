@@ -5,6 +5,7 @@ public class AlpacaQuote
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
+
     public string Symbol { get; set; } = "";
     public DateTime TimestampUtc { get; set; }
     public string BidExchange { get; set; } = "";

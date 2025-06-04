@@ -4,34 +4,35 @@ ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+ConfigureMiddleware(app);
 
-app.UseHttpsRedirection();
+ConfigureEndpoints(app);
 
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<IdentityDbContext>();
-    context.Database.Migrate();
-}
+MigrateDatabase(app);
+app.MapHealthChecks("/health");
 
 app.Run();
 
+static void ConfigureMiddleware(WebApplication app)
+{
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+    app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
+static void ConfigureEndpoints(WebApplication app)
+{
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+}
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     var connectionString = configuration.GetConnectionString("IdentityDbConnection");
@@ -41,7 +42,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddControllers();
     services.AddHttpContextAccessor();
-    //services.AddHealthChecks();
+    services.AddHealthChecks();
 
     services.AddKeyCloakAuthentication(configuration);
 
@@ -76,19 +77,26 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
                 },
                 Array.Empty<string>()
             }
-        });
+        });     
+
     });
-    //services.AddHostedService<KeycloakConfigStartUp>();
 
     services.AddHttpClient();
-    services.AddHttpClient<KeycloakAuthorizeAttribute>();
     services.AddHttpClient<IKeycloakServiceClient, KeycloakServiceClient>();
     services.AddHostedService<SeedDatabaseService>();
-    //services.AddSingleton<IConfiguration>(configuration);
-    //services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
-    //services.AddSingleton<IAuthorizationHandler, MinimumAgeAuthorizationHandler>();
 
     services.AddScoped<IIdentityRepository, IdentityRepository>();
+    services.AddScoped<IEmailService, EmailService>();
 
-
+    services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
+    services.AddHttpClient<IAlpacaServiceClient, AlpacaServiceClient>();
+}
+static void MigrateDatabase(WebApplication app)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<IdentityDbContext>();
+        context.Database.Migrate();
+    }
 }

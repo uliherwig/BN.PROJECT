@@ -1,19 +1,19 @@
+using Confluent.Kafka.Admin;
+using System.Threading.Tasks;
+
 namespace BN.PROJECT.Core;
 
 public class KafkaConsumerService : IKafkaConsumerService
 {
-    private readonly ILogger<KafkaConsumerService> _logger;
-    private readonly string _bootstrapServers = "localhost:9092";
     private string _topic = "kafka-demo";
     private string _groupId = "BN.PROJECT";
     private CancellationTokenSource _cancellationTokenSource;
     private Task _consumingTask;
-    public event Action<string> MessageReceived;
 
-    public KafkaConsumerService(ILogger<KafkaConsumerService> logger)
-    {
-        _logger = logger;
-    }
+    public event Action<string> MessageReceived;
+    private readonly IConfiguration _configuration;
+
+    public KafkaConsumerService(IConfiguration configuration) => _configuration = configuration;
 
     public void Start(string topic)
     {
@@ -22,15 +22,14 @@ public class KafkaConsumerService : IKafkaConsumerService
             _cancellationTokenSource = new CancellationTokenSource();
             _topic = topic;
             _consumingTask = Task.Run(() => Consume(_cancellationTokenSource.Token));
-
         }
     }
 
-    private void Consume(CancellationToken cancellationToken)
+    private async Task Consume(CancellationToken cancellationToken)
     {
         var config = new ConsumerConfig
         {
-            BootstrapServers = _bootstrapServers,
+            BootstrapServers = _configuration["Kafka:BootstrapServers"],
             GroupId = _groupId,
             AutoOffsetReset = AutoOffsetReset.Earliest,
 
@@ -47,16 +46,17 @@ public class KafkaConsumerService : IKafkaConsumerService
         using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
         {
             consumer.Subscribe(_topic);
-
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var consumeResult = consumer.Consume(cancellationToken);
                     MessageReceived?.Invoke(consumeResult.Message.Value);
-
-                    // _logger.LogInformation($"Nachricht empfangen: {consumeResult.Message.Value}");
                 }
+            }
+            catch (ConsumeException ex)
+            {
+               throw new Exception($"Consume error: {ex.Error.Reason}");             
             }
             catch (OperationCanceledException)
             {
@@ -71,18 +71,10 @@ public class KafkaConsumerService : IKafkaConsumerService
     }
 
     public async Task DeleteMessagesAsync(string topic)
-    {
-        var config = new ConsumerConfig
-        {
-            BootstrapServers = _bootstrapServers,
-            GroupId = _groupId,
-            AutoOffsetReset = AutoOffsetReset.Earliest,
-        };
-        using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrapServers }).Build())
+    {      
+        using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _configuration["Kafka:BootstrapServers"] }).Build())
         {
             await adminClient.DeleteTopicsAsync(new List<string> { topic }, null);
-
         }
     }
-
 }

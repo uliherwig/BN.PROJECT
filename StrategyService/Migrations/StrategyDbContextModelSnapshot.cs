@@ -17,12 +17,12 @@ namespace BN.PROJECT.StrategyService.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("BN.PROJECT.Core.Position", b =>
+            modelBuilder.Entity("BN.PROJECT.Core.PositionModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,6 +31,9 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<string>("CloseSignal")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid>("ExecutionId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("PriceClose")
                         .HasColumnType("numeric");
@@ -41,8 +44,8 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<decimal>("ProfitLoss")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("Side")
                         .HasColumnType("integer");

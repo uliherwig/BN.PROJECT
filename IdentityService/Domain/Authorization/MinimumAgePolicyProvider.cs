@@ -2,7 +2,7 @@
 {
     internal class MinimumAgePolicyProvider : IAuthorizationPolicyProvider
     {
-        const string POLICY_PREFIX = "MinimumAge";
+        private const string POLICY_PREFIX = "MinimumAge";
         public DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
 
         public MinimumAgePolicyProvider(IOptions<AuthorizationOptions> options)
@@ -11,7 +11,7 @@
             // doesn't handle all policies (including default policies, etc.) it should fall back to an
             // alternate provider.
             //
-            // In this sample, a default authorization policy provider (constructed with options from the 
+            // In this sample, a default authorization policy provider (constructed with options from the
             // dependency injection container) is used if this custom provider isn't able to handle a given
             // policy name.
             //
@@ -39,7 +39,7 @@
             }
 
             // If the policy name doesn't match the format expected by this policy provider,
-            // try the fallback provider. If no fallback provider is used, this would return 
+            // try the fallback provider. If no fallback provider is used, this would return
             // Task.FromResult<AuthorizationPolicy>(null) instead.
             return FallbackPolicyProvider.GetPolicyAsync(policyName);
         }

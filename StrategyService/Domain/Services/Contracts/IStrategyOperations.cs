@@ -3,6 +3,10 @@
 public interface IStrategyOperations
 {
     DateTime GetStartOfTimeSpan(DateTime dateTime, TimeSpan timeSpan);
+
     TimeSpan GetTimeSpanByBreakoutPeriod(BreakoutPeriodEnum tradeInterval);
-    BreakoutModel GetBreakoutModel(StrategySettingsModel settings);
+
+    void UpdateOrCloseOpenPosition(ref PositionModel openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent);
+
+    OrderMessage CreateOrderMessage(Guid strategyId, Guid userId, PositionModel position);
 }

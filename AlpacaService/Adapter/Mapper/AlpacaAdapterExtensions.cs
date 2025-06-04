@@ -2,6 +2,21 @@
 {
     public static class AlpacaAdapterExtensions
     {
+
+        public static BrokerAccount ToBrokerAccount(this IAccount account, AccountStatusEnum accountStatus, Guid userId)
+        {
+            return new BrokerAccount
+            {
+                AccountStatus = accountStatus,
+                UserId = userId,
+                AccountId = account.AccountId,
+                AccountNumber = account.AccountNumber,
+                AccruedFees = account.AccruedFees,
+                BuyingPower = account.BuyingPower,
+                CreatedAtUtc = account.CreatedAtUtc
+
+            };
+        }
         public static AlpacaBar ToAlpacaBar(this IBar bar, string symbol)
         {
             return new AlpacaBar
@@ -89,7 +104,7 @@
                 AssetLastPrice = position.AssetLastPrice,
                 AssetChangePercent = position.AssetChangePercent
             };
-        }
+        }     
 
         public static AlpacaQuote ToAlpacaQuote(this IQuote quote)
         {
@@ -106,6 +121,5 @@
                 Tape = quote.Tape
             };
         }
-
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using NuGet.Protocol;
+using System.Diagnostics;
 
 namespace BN.PROJECT.StrategyService;
 
@@ -7,18 +9,21 @@ public class BreakoutStrategy : IStrategyService
     private readonly ILogger<BreakoutStrategy> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IStrategyOperations _strategyOperations;
+    private readonly IKafkaProducerService _kafkaProducer;
 
-    private readonly ConcurrentDictionary<Guid, List<Position>> _positions = new();
+    private readonly ConcurrentDictionary<Guid, List<PositionModel>> _positions = new();
     private readonly ConcurrentDictionary<Guid, BreakoutProcessModel> _strategyProcesses = new();
 
     public BreakoutStrategy(
         ILogger<BreakoutStrategy> logger,
         IServiceProvider serviceProvider,
-        IStrategyOperations strategyOperations)
+        IStrategyOperations strategyOperations,
+        IKafkaProducerService kafkaProducer)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
         _strategyOperations = strategyOperations;
+        _kafkaProducer = kafkaProducer;
     }
 
     public Task StartTest(StrategyMessage message)
@@ -28,10 +33,11 @@ public class BreakoutStrategy : IStrategyService
             return Task.CompletedTask;
         }
         var strategySettings = message.Settings;
-        var breakOutSettings = _strategyOperations.GetBreakoutModel(strategySettings);
+        var breakOutSettings = JsonConvert.DeserializeObject<BreakoutModel>(strategySettings.StrategyParams);
 
         var tpm = new BreakoutProcessModel
         {
+            IsBacktest = message.IsBacktest,
             StartDate = DateTime.MinValue,
             BreakoutTimeSpan = _strategyOperations.GetTimeSpanByBreakoutPeriod(breakOutSettings.BreakoutPeriod),
             CurrentHigh = 10000.0m,
@@ -50,18 +56,18 @@ public class BreakoutStrategy : IStrategyService
             TakeProfitPercent = strategySettings.TakeProfitPercent,
             StopLossPercent = strategySettings.StopLossPercent,
             TrailingStop = strategySettings.TrailingStop,
+            StopLossType = breakOutSettings.StopLossType,
         };
         _ = _strategyProcesses.TryAdd(message.StrategyId, tpm);
-        _ = _positions.TryAdd(message.StrategyId, new List<Position>());
+        _ = _positions.TryAdd(message.StrategyId, []);
         return Task.CompletedTask;
     }
 
-
-    public Task EvaluateQuote(Guid testId, Quote quote)
+    public Task EvaluateQuote(Guid strategyId, Guid userId, Quote quote)
     {
         var stopwatch = Stopwatch.StartNew();
 
-        if (!_strategyProcesses.ContainsKey(testId))
+        if (!_strategyProcesses.ContainsKey(strategyId))
         {
             return Task.CompletedTask;
         }
@@ -71,12 +77,10 @@ public class BreakoutStrategy : IStrategyService
             return Task.CompletedTask;
         }
 
-
-        var tpm = _strategyProcesses[testId];
+        var tpm = _strategyProcesses[strategyId];
         var quoteStamp = quote.TimestampUtc;
         if (tpm.StartDate == DateTime.MinValue)
         {
-
             tpm.StartDate = quoteStamp;
             tpm.TimeFrameStart = _strategyOperations.GetStartOfTimeSpan(quoteStamp, tpm.BreakoutTimeSpan);
             tpm.PrevTimeFrameStart = tpm.TimeFrameStart;
@@ -128,11 +132,7 @@ public class BreakoutStrategy : IStrategyService
             return Task.CompletedTask;
         }
 
-
-
-
-
-        var openPosition = _positions[testId].Where(p => p.PriceClose == 0).FirstOrDefault();
+        var openPosition = _positions[strategyId].Where(p => p.PriceClose == 0).FirstOrDefault();
         if (openPosition == null)
         {
             var breakoutParams = JsonConvert.SerializeObject(new
@@ -146,90 +146,72 @@ public class BreakoutStrategy : IStrategyService
             // check breakout high
             if (quote.AskPrice > tpm.PrevHigh && quote.AskPrice - tpm.PrevHigh < 1)
             {
+                var sl = tpm.StopLossType == StopLossTypeEnum.None ? quote.BidPrice + (quote.BidPrice * tpm.StopLossPercent / 100) : tpm.PrevLow;
                 var position = PositionExtensions.CreatePosition(
                                      tpm.StrategyId,
                                      tpm.Asset,
                                      tpm.Quantity,
                                      SideEnum.Buy,
                                      quote.AskPrice,
-                                     tpm.PrevLow,
+                                     sl,
                                      quote.BidPrice + (quote.BidPrice * tpm.TakeProfitPercent / 100),
                                      quote.TimestampUtc,
                                      StrategyEnum.Breakout,
                                      breakoutParams);
 
-
-                _positions[testId].Add(position);
+                _positions[strategyId].Add(position);
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, position).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
             }
 
             // check breakout low
             if (quote.BidPrice < tpm.PrevLow && tpm.PrevLow - quote.BidPrice < 1)
             {
+                var sl = tpm.StopLossType == StopLossTypeEnum.None ? quote.AskPrice - (quote.AskPrice * tpm.StopLossPercent / 100) : tpm.PrevHigh;
                 var position = PositionExtensions.CreatePosition(
                                    tpm.StrategyId,
                                    tpm.Asset,
                                    tpm.Quantity,
                                    SideEnum.Sell,
                                    quote.AskPrice,
-                                   tpm.PrevHigh,
+                                   sl,
                                    quote.BidPrice - (quote.BidPrice * tpm.TakeProfitPercent / 100),
                                    quote.TimestampUtc,
                                    StrategyEnum.Breakout,
                                    breakoutParams);
 
-                _positions[testId].Add(position);
+                _positions[strategyId].Add(position);
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, position).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
             }
         }
         else
         {
-            // check if we need to close position at EoD 
+            // check if we need to close position at EoD
             if (tpm.AllowOvernight == false && quoteStamp.TimeOfDay > tpm.MarketCloseTime)
             {
                 var closePrice = openPosition.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
+                if (!tpm.IsBacktest)
+                {
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, openPosition).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
+                }
                 openPosition.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close");
-                return Task.CompletedTask;
+           
             }
-            if (openPosition.Side == SideEnum.Buy)
+            else
             {
-                if (quote.BidPrice > openPosition.TakeProfit)
+                _strategyOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, tpm.TrailingStop, tpm.TakeProfitPercent);
+                if (!tpm.IsBacktest)
                 {
-                    if (tpm.TrailingStop > 0m)
-                    {
-                        var tp = quote.BidPrice + (quote.BidPrice * tpm.TakeProfitPercent / 100);
-                        var sl = quote.BidPrice - (quote.BidPrice * tpm.TrailingStop / 100);
-                        openPosition.UpdateTakeProfitAndStopLoss(tp, sl);
-                    }
-                    else
-                    {
-                        openPosition.ClosePosition(quote.TimestampUtc, quote.BidPrice, "TP");
-                    }
-                }
-
-                if (quote.BidPrice < openPosition.StopLoss)
-                {
-                    openPosition.ClosePosition(quote.TimestampUtc, quote.BidPrice, "SL");
-                }
-            }
-
-            if (openPosition.Side == SideEnum.Sell)
-            {
-                if (quote.AskPrice < openPosition.TakeProfit)
-                {
-                    if (tpm.TrailingStop > 0m)
-                    {
-                        var tp = quote.AskPrice - (quote.AskPrice * tpm.TakeProfitPercent / 100);
-                        var sl = quote.AskPrice + (quote.AskPrice * tpm.TrailingStop / 100);
-                        openPosition.UpdateTakeProfitAndStopLoss(tp, sl);
-                    }
-                    else
-                    {
-                        openPosition.ClosePosition(quote.TimestampUtc, quote.AskPrice, "TP");
-                    }
-                }
-
-                if (quote.AskPrice > openPosition.StopLoss)
-                {
-                    openPosition.ClosePosition(quote.TimestampUtc, quote.AskPrice, "SL");
+                    var message = _strategyOperations.CreateOrderMessage(strategyId, userId, openPosition).ToJson();
+                    _kafkaProducer.SendMessageAsync("order", message);
                 }
             }
         }
@@ -237,42 +219,35 @@ public class BreakoutStrategy : IStrategyService
         _logger.LogInformation($"Breakout EvaluateQuote done in {stopwatch.Elapsed.TotalNanoseconds} ns");
         return Task.CompletedTask;
     }
+
     public async Task StopTest(StrategyMessage message)
     {
+
         _logger.LogInformation("Backtest stopped");
-        var testId = message.StrategyId;
+        var strategyId = message.StrategyId;
 
-        var pos = _positions[testId].ToList();
-
-        var overNight = pos.Where(p => p.StampOpened.Day != p.StampClosed.Day).ToList();
-        var profits = pos.Where(p => p.ProfitLoss > 0).ToList();
-        var losses = pos.Where(p => p.ProfitLoss < 0).ToList();
-
-        var buys = pos.Where(p => p.Side == SideEnum.Buy).ToList();
-        var sells = pos.Where(p => p.Side == SideEnum.Sell).ToList();
-
-
-        _logger.LogInformation($"#BT OVERNIGHT POSITIONS: {overNight.Count}  Profit: {overNight.Sum(p => p.ProfitLoss)}");
-        _logger.LogInformation($"#BT PROFIT POSITIONS: {profits.Count}  Profit: {profits.Sum(p => p.ProfitLoss)}");
-        _logger.LogInformation($"#BT LOSS POSITIONS: {losses.Count}  Loss: {losses.Sum(p => p.ProfitLoss)}");
-
-        _logger.LogInformation($"#BT BUY POSITIONS: {profits.Count}  Profit: {profits.Sum(p => p.ProfitLoss)}");
-        _logger.LogInformation($"#BT SELL POSITIONS: {losses.Count}  Profit: {losses.Sum(p => p.ProfitLoss)}");
-
-        var profit = pos.Sum(p => p.ProfitLoss);
-        _logger.LogInformation($"#BT POSITIONS: {pos.Count}  Profit: {profit}");
-        using (var scope = _serviceProvider.CreateScope())
+        if (_strategyProcesses.ContainsKey(strategyId) == false)
         {
-            var strategyRepository = scope.ServiceProvider.GetRequiredService<IStrategyRepository>();
-            await strategyRepository.AddPositionsAsync(pos);
+            return;
         }
+        if (_strategyProcesses[strategyId].IsBacktest)
+        {
+            var pos = _positions[strategyId].ToList();
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var strategyRepository = scope.ServiceProvider.GetRequiredService<IStrategyRepository>();
+                await strategyRepository.AddPositionsAsync(pos);
+            }
+        }
+        _strategyProcesses.TryRemove(strategyId, out _);
+        _positions.TryRemove(strategyId, out _);
+        _logger.LogInformation($"#BT {strategyId} Test stopped");
+    }
 
-
-
-        _strategyProcesses.TryRemove(testId, out _);
-        _positions.TryRemove(testId, out _);
-        _logger.LogInformation($"#BT {testId} Test stopped");
-
+    public List<PositionModel>? GetPositions(Guid strategyId)
+    {
+        var positions = _positions.ContainsKey(strategyId) ? _positions[strategyId] : null;
+        return positions;
     }
 
     public bool CanHandle(StrategyEnum strategy) =>

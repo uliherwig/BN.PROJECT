@@ -2,7 +2,7 @@
 
 public static class PositionExtensions
 {
-    public static Position CreatePosition(
+    public static PositionModel CreatePosition(
         Guid strategyId,
         string symbol,
         int quantity,
@@ -14,7 +14,7 @@ public static class PositionExtensions
         StrategyEnum strategyType,
         string StrategyParameter)
     {
-        var position = new Position
+        var position = new PositionModel
         {
             Id = Guid.NewGuid(),
             StrategyId = strategyId,
@@ -31,22 +31,20 @@ public static class PositionExtensions
             CloseSignal = "",
             StrategyType = strategyType,
             StrategyParams = StrategyParameter
-
         };
 
         return position;
-    }   
+    }
 
-    public static bool UpdateTakeProfitAndStopLoss(this Position position, decimal newTakeProfit, decimal newStopLoss)
+    public static bool UpdateTakeProfitAndStopLoss(this PositionModel position, decimal newTakeProfit, decimal newStopLoss)
     {
-
         position.TakeProfit = newTakeProfit;
         position.StopLoss = newStopLoss;
         position.CloseSignal = "Update ";
         return true;
     }
 
-    public static void ClosePosition(this Position position, DateTime stampClose, decimal priceClose, string closeSignal)
+    public static void ClosePosition(this PositionModel position, DateTime stampClose, decimal priceClose, string closeSignal)
     {
         position.PriceClose = priceClose;
         position.StampClosed = stampClose.ToUniversalTime();

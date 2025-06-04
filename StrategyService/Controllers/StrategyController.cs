@@ -1,13 +1,14 @@
-﻿using NuGet.Configuration;
-
-namespace BN.PROJECT.StrategyService;
+﻿namespace BN.PROJECT.StrategyService;
 
 [Route("[controller]")]
 [ApiController]
+[AuthorizeUser(["user", "admin"])]
 public class StrategyController : ControllerBase
 {
     private readonly ILogger<StrategyController> _logger;
     private readonly IStrategyRepository _strategyRepository;
+
+    // GlobalExceptionMiddleware for logging exceptions
 
     public StrategyController(ILogger<StrategyController> logger,
         IStrategyRepository strategyRepository)
@@ -16,149 +17,118 @@ public class StrategyController : ControllerBase
         _strategyRepository = strategyRepository;
     }
 
-    [HttpGet("{testId}")]
-    public async Task<IActionResult> GetStrategyById(Guid testId)
+    //[KeycloakAuthorize("user")]
+    [HttpGet("{strategyId}")]
+    public async Task<IActionResult> GetStrategyById(Guid strategyId)
     {
-        try
+        var test = await _strategyRepository.GetStrategyByIdAsync(strategyId);
+        if (test == null)
         {
-            var test = await _strategyRepository.GetStrategyByIdAsync(testId);
-            return Ok(test);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting strategy");
-        }
-        return Ok(false);
+        return Ok(test);
     }
 
-    [HttpGet("{name}/{userId}")]
-    public async Task<IActionResult> GetStrategyNameExists(string name, Guid userId)
+    [HttpGet("exists/{name}")]
+    public async Task<IActionResult> GetStrategyNameExists(string name)
     {
-        try
-        {
-            var strategies = await _strategyRepository.GetStrategiesByUserIdAsync(userId, false);
-            var result = strategies.Any(s => s.Name == name);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting strategy");
-        }
-        return Ok(false);
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var strategies = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), false);
+        var isStrategy = strategies.Any(s => s.Name == name);
+        return Ok(isStrategy);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddStrategy([FromBody] StrategySettingsModel testSettings)
-    {
-        try
-        {
-            await _strategyRepository.AddStrategyAsync(testSettings);
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error starting strategy");
-            return BadRequest(ex);
-        }
-    }
-
-    [HttpDelete("{testId}")]
-    public async Task<IActionResult> DeleteTestAndPositions(Guid testId)
-    {
-        try
-        {
-            var test = await _strategyRepository.GetStrategyByIdAsync(testId);
-            if (test == null)
-            {
-                return NotFound();
-            }
-
-            var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(testId);
-            await _strategyRepository.DeleteStrategyAsync(test);
-            await _strategyRepository.DeletePositionsAsync(positions);
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error starting strategy");
-            return BadRequest(ex);
-        }
-    }
+    //[HttpPost]
+    //public async Task<IActionResult> AddStrategy([FromBody] StrategySettingsModel testSettings)
+    //{
+    //    await _strategyRepository.AddStrategyAsync(testSettings);
+    //    return Ok(true);
+    //}
 
     [HttpPut]
     public async Task<IActionResult> UpdateStrategy([FromBody] StrategySettingsModel strategy)
     {
-        try
-        {
-            var result = await _strategyRepository.UpdateStrategyAsync(strategy);
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating strategy");
-            return BadRequest(ex);
-        }
+        var result = await _strategyRepository.UpdateStrategyAsync(strategy);
+        return Ok(true);
     }
 
-    [HttpGet("settings/{userId}")]
-    public async Task<IActionResult> GetStrategiesByUserId(Guid userId, bool bookmarked = false)
+    [HttpDelete("{strategyId}")]
+    public async Task<IActionResult> DeleteTestAndPositions(Guid strategyId)
     {
-        try
+        var test = await _strategyRepository.GetStrategyByIdAsync(strategyId);
+        if (test == null)
         {
-            var settings = await _strategyRepository.GetStrategiesByUserIdAsync(userId, bookmarked);
-            return Ok(settings);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error GetTestSettingsByEmail");
-        }
-        return Ok(false);
+
+        var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(strategyId);
+        await _strategyRepository.DeleteStrategyAsync(test);
+        await _strategyRepository.DeletePositionsAsync(positions);
+        return Ok(true);
+    }
+ 
+    [HttpGet("settings")]
+    public async Task<IActionResult> GetStrategiesByUserId(bool bookmarked = false)
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), bookmarked);
+        return Ok(settings);
     }
 
-    [HttpGet("positions/{testId}")]
-    public async Task<IActionResult> GetTestPositionsByStrategyId(Guid testId)
+    [HttpGet("infos/{strategyType}")]
+    public async Task<IActionResult> GetStrategyInfosByUserId(StrategyEnum strategyType)
     {
-        try
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), false);
+        if (strategyType != StrategyEnum.None)
         {
-            var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(testId);
+            settings = settings.Where(s => s.StrategyType == strategyType).ToList();
+        }
+        var strategyInfos = settings.Select(s => new StrategyInfo
+        {
+            Id = s.Id,
+            Label = s.Name,
+        }).ToList();
 
-            return Ok(positions.Where(p => p.PriceClose > 0));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error GetTestPositionsByStrategyId");
-        }
-        return Ok(false);
+        return Ok(strategyInfos);
     }
 
-    [HttpGet("results/{testId}")]
-    public async Task<IActionResult> GetTestResultsByStrategyId(Guid testId)
+    [HttpGet("positions/{strategyId}")]
+    public async Task<IActionResult> GetTestPositionsByStrategyId(Guid strategyId)
     {
-        try
-        {
-            var strategySettings = await _strategyRepository.GetStrategyByIdAsync(testId);
-            if (strategySettings == null) return Ok(false);
-            var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(testId);
+        var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(strategyId);
+        return Ok(positions.Where(p => p.PriceClose > 0));
+    }
 
-            var testResult = new TestResult
-            {
-                Id = testId,
-                Asset = strategySettings.Asset,
-                StartDate = strategySettings.StartDate,
-                EndDate = strategySettings.EndDate,
-                NumberOfPositions = positions.Count,
-                NumberOfBuyPositions = positions.Count(p => p.Side == SideEnum.Buy),
-                NumberOfSellPositions = positions.Count(p => p.Side == SideEnum.Sell),
-                TotalProfitLoss = positions.Sum(p => p.ProfitLoss),
-                BuyProfitLoss = positions.Where(p => p.Side == SideEnum.Buy).Sum(p => p.ProfitLoss),
-                SellProfitLoss = positions.Where(p => p.Side == SideEnum.Sell).Sum(p => p.ProfitLoss)
-            };        
-            return Ok(testResult);
-        }
-        catch (Exception ex)
+    [HttpGet("results/{strategyId}")]
+    public async Task<IActionResult> GetTestResultsByStrategyId(Guid strategyId)
+    {
+        var strategySettings = await _strategyRepository.GetStrategyByIdAsync(strategyId);
+        if (strategySettings == null) return Ok(false);
+        var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(strategyId);
+        positions = positions.Where(p => p.PriceClose > 0).ToList();
+
+        var testResult = new TestResult
         {
-            _logger.LogError(ex, "Error GetTestResultsByStrategyId");
-        }
-        return Ok(false);
+            Id = strategyId,
+            Asset = strategySettings.Asset,
+            StartDate = strategySettings.StartDate,
+            EndDate = strategySettings.EndDate,
+            NumberOfPositions = positions.Count,
+            NumberOfBuyPositions = positions.Count(p => p.Side == SideEnum.Buy),
+            NumberOfSellPositions = positions.Count(p => p.Side == SideEnum.Sell),
+            TotalProfitLoss = positions.Sum(p => p.ProfitLoss),
+            BuyProfitLoss = positions.Where(p => p.Side == SideEnum.Buy).Sum(p => p.ProfitLoss),
+            SellProfitLoss = positions.Where(p => p.Side == SideEnum.Sell).Sum(p => p.ProfitLoss)
+        };
+        return Ok(testResult);
+    }
+
+    [HttpDelete("remove-user-data")]
+    public async Task<IActionResult> RemoveUserDataAsync()
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        await _strategyRepository.RemoveUserDataAsync(new Guid(userId!));
+        return Ok(true);
     }
 }

@@ -13,7 +13,6 @@ public class SeedDatabaseService : IHostedService
     {
         using (var scope = _serviceProvider.CreateScope())
         {
-
             var keycloakServiceClient = scope.ServiceProvider.GetRequiredService<IKeycloakServiceClient>();
             var identityRepository = scope.ServiceProvider.GetRequiredService<IIdentityRepository>();
 
@@ -70,5 +69,3 @@ public class SeedDatabaseService : IHostedService
         return Task.CompletedTask;
     }
 }
-
-

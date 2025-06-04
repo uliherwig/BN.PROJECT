@@ -2,16 +2,62 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2025.06.1
 
-## to be done
+- Environment configuration redis added
+- Alpaca datafeed enabled parameter added
 
-- add unit tests for all services
-- implement code coverage tool coverlet
-- implement code coverage report generator 
+## Version 2025.04.1
+
+- Redis cache added
+- Ratefeed via SignalR 
+
+## Version 2025.03.3
+
+- email confirmation feature added
+- registration process finalized
+
+## Version 2025.03.2
+
+- email service added
+
+## Version 2025.03.1
+
+- Authorization and authentication with Keycloak
+- AuthorizeUser attribute for controllers
+
+## Version 2025.02.4
+
+- Health check added
+
+## Version 2025.02.3
+
+- testservice added for ci/cd testing
+
+## Version 2025.02.2
+
+- identityservice improvement
+
+## Version 2025.02.1
+
+- alpaca execution
+
+## Version 2025.01.2
+
+- maintenance page
+- alpaca execution 
+
+## Version 2025.01.1
+
+- unit tests for all services
+
+## Version 2024.12.1
+
+- SMA strategy refactoring
 
 ## Version 2024.11.2
 
-- sma strategy implementation
+- SMA strategy implementation
 
 ## Version 2024.11.1
 

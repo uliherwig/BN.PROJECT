@@ -2,79 +2,66 @@
 
 [Route("[controller]")]
 [ApiController]
+[AuthorizeUser(["user","admin"])]
 public class UserSettingsController : ControllerBase
 {
     private readonly IAlpacaRepository _alpacaRepository;
     private readonly ILogger<UserSettingsController> _logger;
+
     public UserSettingsController(IAlpacaRepository alpacaRepository, ILogger<UserSettingsController> logger)
     {
         _alpacaRepository = alpacaRepository;
         _logger = logger;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddUserSettingsAsync([FromBody] UserSettings userSettings)
+    [HttpGet]
+    public async Task<IActionResult> GetUserSettingsAsync()
     {
-        try
-        {
-            if (userSettings == null)
-            {
-                return BadRequest("UserSettings cannot be null");
-            }
+        var userId = HttpContext.Items["UserId"]?.ToString();
 
-            await _alpacaRepository.AddUserSettingsAsync(userSettings);
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error adding user settings");
-        }
-        return Ok(false);
-
-    }
-
-    [HttpGet("{userId}")]
-    public async Task<IActionResult> GetUserSettingsAsync(string userId)
-    {
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId);
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
             return NotFound(ErrorCode.NotFound);
         }
 
         return Ok(userSettings);
-
     }
 
-    [HttpPut]
-    public async Task<IActionResult> UpdateUserSettingsAsync([FromBody] UserSettings userSettings)
-    {
-        try
-        {
-            if (userSettings == null)
-            {
-                return BadRequest("UserSettings cannot be null");
-            }
-
-            await _alpacaRepository.UpdateUserSettingsAsync(userSettings);
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating user settings");
-        }
-        return Ok(false);
-    }
-
-    [HttpDelete]
-    public async Task<IActionResult> DeleteUserSettingsAsync([FromBody] UserSettings userSettings)
+    [HttpPost]
+    public async Task<IActionResult> AddUserSettingsAsync([FromBody] UserSettingsModel userSettings)
     {
         if (userSettings == null)
         {
             return BadRequest("UserSettings cannot be null");
         }
 
-        await _alpacaRepository.DeleteUserSettingsAsync(userSettings);
-        return NoContent();
+        await _alpacaRepository.AddUserSettingsAsync(userSettings);
+        return Ok(true);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateUserSettingsAsync([FromBody] UserSettingsModel userSettings)
+    {
+        if (userSettings == null)
+        {
+            return BadRequest("UserSettings cannot be null");
+        }
+
+        await _alpacaRepository.UpdateUserSettingsAsync(userSettings);
+        return Ok(true);
+    }
+
+    [HttpDelete]  
+    public async Task<IActionResult> DeleteUserSettingsAsync()
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+
+        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
+        if(userSettings != null)
+        {
+            await _alpacaRepository.DeleteUserSettingsAsync(userSettings);
+        }       
+        return Ok();
     }
 }
