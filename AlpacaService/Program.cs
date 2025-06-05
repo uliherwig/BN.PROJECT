@@ -82,7 +82,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IStrategyTestService, StrategyTestService>();
     services.AddHostedService<MessageConsumerService>();
 
-    var redisConnection = configuration["Redis_Connection"]; 
+    var redisConnection = configuration["RedisConnection"]; 
     var redis = ConnectionMultiplexer.Connect(redisConnection);
     services.AddSingleton<IConnectionMultiplexer>(redis);
 
