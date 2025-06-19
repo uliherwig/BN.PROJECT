@@ -23,7 +23,14 @@ public class MessageConsumerService : IHostedService
             {
                 var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
 
-                kafkaConsumer.Start("strategy");
+                var topicName = Enum.GetName(KafkaTopicEnum.Strategy)?.ToLowerInvariant();
+                if (string.IsNullOrEmpty(topicName))
+                {
+                    _logger.LogError("Kafka topic name is null or empty.");
+                    return Task.CompletedTask;
+                }
+
+                kafkaConsumer.Start(topicName);
                 kafkaConsumer.MessageReceived += ConsumeMessage;
             }
         }

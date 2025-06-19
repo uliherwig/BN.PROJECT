@@ -12,7 +12,6 @@ public class SendQuoteJob : IJob
     private readonly IHubContext<AlpacaHub> _hubContext;
     private readonly IDatabase _redisDatabase;
 
-
     public SendQuoteJob(
         ILogger<SendQuoteJob> logger,
         IConfiguration configuration,
@@ -35,7 +34,7 @@ public class SendQuoteJob : IJob
     public async Task Execute(IJobExecutionContext context)
     {
         JobKey key = context.JobDetail.Key;
-
+        // TODO use Redis
         var executions = await _alpacaRepository.GetActiveAlpacaExecutionsAsync();
         if (executions == null || executions?.Count == 0)
         {

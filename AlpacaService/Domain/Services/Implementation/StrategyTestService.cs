@@ -9,18 +9,24 @@ public class StrategyTestService : IStrategyTestService
     private readonly IAlpacaTradingService _alpacaTradingService;
     private readonly IStrategyServiceClient _strategyServiceClient;
     private readonly ILogger<StrategyTestService> _logger;
+    private readonly IHubContext<AlpacaHub> _hubContext;
+    private readonly IDatabase _redisDatabase;
 
     public StrategyTestService(IAlpacaRepository alpacaRepository,
         ILogger<StrategyTestService> logger,
         IKafkaProducerService kafkaProducer,
         IStrategyServiceClient strategyServiceClient,
-        IAlpacaTradingService alpacaTradingService)
+        IAlpacaTradingService alpacaTradingService,
+        IHubContext<AlpacaHub> hubContext,
+        IConnectionMultiplexer redis)
     {
         _alpacaRepository = alpacaRepository;
         _logger = logger;
         _kafkaProducer = kafkaProducer;
         _alpacaTradingService = alpacaTradingService;
         _strategyServiceClient = strategyServiceClient;
+        _hubContext = hubContext;
+        _redisDatabase = redis.GetDatabase();
     }
 
     public async Task RunBacktest(StrategySettingsModel testSettings)
@@ -36,6 +42,14 @@ public class StrategyTestService : IStrategyTestService
         };
 
         await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
+        await _kafkaProducer.SendMessageAsync($"ui.infobox.{testSettings.UserId.ToString().ToLower()}", message.ToJson());
+
+
+        var connectionId = await _redisDatabase.StringGetAsync(testSettings.UserId.ToString());
+        if (!string.IsNullOrEmpty(connectionId.ToString()))
+        {
+            await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveQuote", message);
+        }
 
         var symbol = testSettings.Asset;
         var startDate = testSettings.StartDate.ToUniversalTime();
@@ -85,7 +99,70 @@ public class StrategyTestService : IStrategyTestService
         stopwatch.Stop();
         _logger.LogInformation($"RunBacktest {testSettings.Id} completed in {stopwatch.ElapsedMilliseconds} ms");
     }
+    public async Task OptimizeStratgy(StrategySettingsModel testSettings)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var topic = Enum.GetName(KafkaTopicEnum.Optimize).ToLowerInvariant() ?? "optimize";
+        var message = new StrategyMessage
+        {
+            IsBacktest = true,
+            StrategyId = testSettings.Id,
+            Strategy = testSettings.StrategyType,
+            MessageType = MessageTypeEnum.StartTest,
+            Settings = testSettings
+        };
 
+        await _kafkaProducer.SendMessageAsync(topic, message.ToJson());
+
+        var symbol = testSettings.Asset;
+        var startDate = testSettings.StartDate.ToUniversalTime();
+        var endDate = testSettings.EndDate.ToUniversalTime();
+
+        // send quotes per day
+        TimeSpan timeFrame = TimeSpan.FromDays(1);
+
+        var stamp = startDate.ToUniversalTime();
+
+        while (stamp < endDate)
+        {
+            var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
+            var bars = await _alpacaRepository.GetHistoricalBars(symbol, stamp, stampEnd);
+            if (bars.Count == 0)
+            {
+                stamp = stamp.Add(timeFrame).ToUniversalTime();
+                continue;
+            }
+            var quotesDay = new List<Quote>();
+            foreach (var bar in bars)
+            {
+                var q = new Quote
+                {
+                    Symbol = symbol,
+                    AskPrice = bar.C + 0.1m,
+                    BidPrice = bar.C - 0.1m,
+                    TimestampUtc = bar.T.ToUniversalTime()
+                };
+                quotesDay.Add(q);
+            }
+            message.MessageType = MessageTypeEnum.Quotes;
+            message.Settings = null;
+            message.Quotes = quotesDay;
+
+            await _kafkaProducer.SendMessageAsync(topic, message.ToJson());
+            _logger.LogInformation($"RunBacktest {stamp.ToLocalTime()} current time {stopwatch.ElapsedMilliseconds} ms");
+            stamp = stamp.Add(timeFrame).ToUniversalTime();
+        }
+
+
+        message.MessageType = MessageTypeEnum.StopTest;
+        message.Settings = null;
+        message.Quotes = null;
+
+        await _kafkaProducer.SendMessageAsync(topic, message.ToJson());
+
+        stopwatch.Stop();
+        _logger.LogInformation($"RunBacktest {testSettings.Id} completed in {stopwatch.ElapsedMilliseconds} ms");
+    }
     public async Task StartExecution(Guid userId, Guid strategyId)
     {
         var testSettings = await _strategyServiceClient.GetStrategyAsync(strategyId.ToString());

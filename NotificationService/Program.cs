@@ -1,4 +1,3 @@
-
 var builder = WebApplication.CreateBuilder(args);
 
 //ConfigureLogging(builder.Host);
@@ -11,28 +10,13 @@ ConfigureMiddleware(app);
 
 ConfigureEndpoints(app);
 
-MigrateDatabase(app);
-
-app.MapHub<AlpacaHub>("/alpacahub");
+app.MapHub<NotificationHub>("/notificationhub");
 app.MapHealthChecks("/health");
 
 app.Run();
 
-//static void ConfigureLogging(IHostBuilder hostBuilder)
-//{
-//    Log.Logger = new LoggerConfiguration()
-//        .MinimumLevel.Information()
-//        .WriteTo.Console()
-//        .WriteTo.Seq("http://localhost:9017")
-//        .CreateLogger();
-//    hostBuilder.UseSerilog(Log.Logger);
-//}
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-{
-    var connectionString = configuration.GetConnectionString("AlpacaDbConnection");
-    services.AddDbContext<AlpacaDbContext>(options =>
-        options.UseNpgsql(connectionString));
-
+{ 
     services.AddControllers();
     services.AddHttpContextAccessor();
 
@@ -40,7 +24,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddSwaggerGen(c =>
     {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "BN Project Alpaca API", Version = "v1" });
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "BN Project Socket API", Version = "v1" });
 
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
@@ -72,17 +56,10 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddMessageBus(configuration);
 
     services.AddHttpClient();
-    services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
-    services.AddHttpClient<IOptimizerServiceClient, OptimizerServiceClient>();
-
-    services.AddScoped<IAlpacaClient, AlpacaClient>();
-    services.AddScoped<IAlpacaRepository, AlpacaRepository>();
-    services.AddScoped<IAlpacaDataService, AlpacaDataService>();
-    services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
-    services.AddScoped<IStrategyTestService, StrategyTestService>();
+   
     services.AddHostedService<MessageConsumerService>();
 
-    var redisConnection = configuration["RedisConnection"]; 
+    var redisConnection = configuration["RedisConnection"];
     var redis = ConnectionMultiplexer.Connect(redisConnection);
     services.AddSingleton<IConnectionMultiplexer>(redis);
 
@@ -91,25 +68,16 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     {
         options.Configuration.AbortOnConnectFail = false;
         options.Configuration.ChannelPrefix = "SignalR";
-    }); 
-
-    // Quartz-Services
-    services.AddQuartz();
-    services.AddQuartzHostedService(opt =>
-    {
-        opt.WaitForJobsToComplete = true;
     });
 
 
-    services.AddHostedService<SendQuoteTaskService>();
-    services.AddHostedService<AlpacaHistoryService>();
     services.AddControllers();
     services.AddHealthChecks();
     services.AddCors(options =>
     {
         options.AddPolicy("CorsPolicy", builder =>
         {
-            builder.WithOrigins("http://localhost:3000") 
+            builder.WithOrigins("http://localhost:3000")
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                    .AllowCredentials();
@@ -138,13 +106,4 @@ static void ConfigureEndpoints(WebApplication app)
     {
         endpoints.MapControllers();
     });
-}
-static void MigrateDatabase(WebApplication app)
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        var context = services.GetRequiredService<AlpacaDbContext>();
-        context.Database.Migrate();
-    }
 }

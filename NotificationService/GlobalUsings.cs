@@ -1,7 +1,5 @@
 ﻿// GlobalUsings.cs
-
-global using Alpaca.Markets;
-global using BN.PROJECT.AlpacaService;
+global using BN.PROJECT.NotificationService;
 global using BN.PROJECT.Core;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;

@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.Core;
 
-public enum ErrorCode
+public enum BnErrorCode
 {
     None,
     NotFound,

@@ -22,7 +22,7 @@ public class UserSettingsController : ControllerBase
         var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId!);
         if (userSettings == null)
         {
-            return NotFound(ErrorCode.NotFound);
+            return base.NotFound(Core.BnErrorCode.NotFound);
         }
 
         return Ok(userSettings);

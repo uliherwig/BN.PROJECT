@@ -9,6 +9,7 @@ public class AlpacaTestController : ControllerBase
     private readonly IAlpacaRepository _alpacaRepository;
     private readonly IStrategyTestService _strategyTestService;
     private readonly IStrategyServiceClient _strategyServiceClient;
+    private readonly IOptimizerServiceClient _optimizerServiceClient;
     private readonly ILogger<AlpacaTestController> _logger;
 
     public AlpacaTestController(
@@ -16,12 +17,14 @@ public class AlpacaTestController : ControllerBase
         IAlpacaRepository alpacaRepository,
         IStrategyTestService backtestService,
         IStrategyServiceClient strategyServiceClient,
+        IOptimizerServiceClient optimizerServiceClient,
         ILogger<AlpacaTestController> logger)
     {
         _env = env;
         _alpacaRepository = alpacaRepository;
         _strategyTestService = backtestService;
         _strategyServiceClient = strategyServiceClient;
+        _optimizerServiceClient = optimizerServiceClient;
         _logger = logger;
     }
 
@@ -35,6 +38,8 @@ public class AlpacaTestController : ControllerBase
     [HttpPost("run-test")]
     public async Task<IActionResult> RunBacktest([FromBody] StrategySettingsModel settings)
     {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        settings.UserId = new Guid(userId!);
         settings.Id = Guid.NewGuid();
         settings.StartDate = settings.StartDate.ToUniversalTime();
         settings.EndDate = settings.EndDate.ToUniversalTime();
@@ -46,9 +51,9 @@ public class AlpacaTestController : ControllerBase
         }
 
         var result = await _strategyServiceClient.StartStrategyAsync(settings);
-        if (Enum.TryParse(result, out ErrorCode errorCode))
+        if (Enum.TryParse(result, out Core.BnErrorCode errorCode))
         {
-            return BadRequest(errorCode);
+            return base.BadRequest(errorCode);
         }
 
         if (result == "true")
@@ -59,6 +64,43 @@ public class AlpacaTestController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("test-optimization-service")]
+    public async Task<IActionResult> TestOptimizationAsync()
+    {
+
+        var test = await _optimizerServiceClient.TestOptimizationAsync();
+     
+        return Ok(test);
+    }
+
+    [HttpPost("optimize")]
+    public async Task<IActionResult> RunOptimization([FromBody] StrategySettingsModel settings)
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        settings.UserId = new Guid(userId!);
+        settings.Id = Guid.NewGuid();
+        settings.StartDate = settings.StartDate.ToUniversalTime();
+        settings.EndDate = settings.EndDate.ToUniversalTime();
+        settings.TestStamp = DateTime.UtcNow;
+
+        if (settings == null)
+        {
+            return BadRequest("BacktestSettings cannot be null");
+        }
+
+        var result = await _optimizerServiceClient.StartOptimizerAsync(settings);
+        if (Enum.TryParse(result, out Core.BnErrorCode errorCode))
+        {
+            return base.BadRequest(errorCode);
+        }
+
+        if (result == "true")
+        {
+            await _strategyTestService.OptimizeStratgy(settings);
+        }
+
+        return Ok(result);
+    }
 
     [HttpDelete("delete-executions")]
     public async Task<IActionResult> DeleteExecutionsByUserId()

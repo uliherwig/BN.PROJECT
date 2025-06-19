@@ -17,7 +17,6 @@ public class StrategyController : ControllerBase
         _strategyRepository = strategyRepository;
     }
 
-    //[KeycloakAuthorize("user")]
     [HttpGet("{strategyId}")]
     public async Task<IActionResult> GetStrategyById(Guid strategyId)
     {

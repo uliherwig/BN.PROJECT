@@ -1,7 +1,4 @@
-﻿using Confluent.Kafka;
-using Confluent.Kafka.Admin;
-
-namespace BN.PROJECT.AlpacaService;
+﻿namespace BN.PROJECT.AlpacaService;
 
 public class MessageConsumerService : IHostedService
 {
@@ -9,9 +6,16 @@ public class MessageConsumerService : IHostedService
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
 
-    private readonly string[] topicNames = ["order", "strategy"];
-    private readonly int numPartitions = 3;
-    private readonly short replicationFactor = 1;
+
+
+    //private readonly string[] topicNames = ["order", "strategy"];
+    private readonly string[] topicNames = Enum.GetNames(typeof(KafkaTopicEnum))
+    .Select(x => x.ToLowerInvariant())
+    .ToArray();
+
+
+    private readonly int numPartitions = 1; // TODO should be configurable
+    private readonly short replicationFactor = 1;  // TODO should be configurable
 
     public MessageConsumerService(
         IConfiguration configuration,
@@ -26,7 +30,7 @@ public class MessageConsumerService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         try
-        {           
+        {
             var adminConfig = new AdminClientConfig { BootstrapServers = _configuration["Kafka:BootstrapServers"] };
 
             using var adminClient = new AdminClientBuilder(adminConfig).Build();

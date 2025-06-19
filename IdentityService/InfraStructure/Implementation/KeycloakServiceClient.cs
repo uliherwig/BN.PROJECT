@@ -184,7 +184,8 @@ public class KeycloakServiceClient : IKeycloakServiceClient
     }
 
     public async Task<JwtToken> RefreshToken(RefreshTokenRequest refreshTokenRequest)
-    {
+    {      
+      
         var endpoint = $"{_authority}/protocol/openid-connect/token";
 
         var parameters = new Dictionary<string, string>
@@ -211,7 +212,8 @@ public class KeycloakServiceClient : IKeycloakServiceClient
             {
                 throw new UnauthorizedAccessException(errorContent);
             }
-            throw new Exception(errorContent);
+            return null;
+            //throw new Exception(errorContent);
         }
     }
 

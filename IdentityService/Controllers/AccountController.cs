@@ -100,6 +100,10 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
         var response = await _keycloakServiceClient.RefreshToken(refreshTokenRequest);
+        if (response == null || string.IsNullOrEmpty(response.AccessToken))
+        {
+            return BadRequest(new { Error = "Invalid refresh token" });
+        }
         if (!string.IsNullOrEmpty(response.RefreshToken))
         {
             var claims = JwtTokenDecoder.DecodeJwtToken(response.RefreshToken);
@@ -173,7 +177,7 @@ public class AccountController : ControllerBase
             await _keycloakServiceClient.VerifyEmail(user);
             return Ok(new { Success = true, Data = user});
         }
-        return BadRequest(new { Success = false, Message = ErrorCode.NotFound });
+        return BadRequest(new { Success = false, Message = BnErrorCode.NotFound });
     }
 
     [HttpDelete]

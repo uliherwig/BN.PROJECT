@@ -59,7 +59,7 @@ namespace BN.PROJECT.AlpacaService.Tests
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal(ErrorCode.NotFound, notFoundResult.Value);
+            Assert.Equal(BnErrorCode.NotFound, notFoundResult.Value);
         }
 
         [Fact]

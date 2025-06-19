@@ -1,6 +1,8 @@
 using BN.PROJECT.Core;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Moq;
+using StackExchange.Redis;
 
 namespace BN.PROJECT.AlpacaService.Tests
 {
@@ -12,6 +14,8 @@ namespace BN.PROJECT.AlpacaService.Tests
         private readonly Mock<IStrategyServiceClient> _mockStrategyServiceClient;
         private readonly Mock<ILogger<StrategyTestService>> _mockLogger;
         private readonly StrategyTestService _backtestService;
+        private readonly Mock<IHubContext<AlpacaHub>> _mockHubContext; // Mock for IHubContext<AlpacaHub>
+        private readonly Mock<IConnectionMultiplexer> _mockRedisDatabase; // Mock for IConnectionMultiplexer
 
         private readonly StrategySettingsModel _settings = new()
         {
@@ -28,9 +32,11 @@ namespace BN.PROJECT.AlpacaService.Tests
         public StrategyTestServiceTests()
         {
             _mockAlpacaRepository = new Mock<IAlpacaRepository>();
+            _mockRedisDatabase = new Mock<IConnectionMultiplexer>();
             _mockAlpacaTradingService = new Mock<IAlpacaTradingService>();
             _mockKafkaProducer = new Mock<IKafkaProducerService>();
             _mockStrategyServiceClient = new Mock<IStrategyServiceClient>();
+            _mockHubContext = new Mock<IHubContext<AlpacaHub>>();
 
             _mockKafkaProducer.Setup(producer => producer.SendMessageAsync("strategy", It.IsAny<string>(), It.IsAny<CancellationToken>()))
                               .Returns(Task.CompletedTask);
@@ -40,7 +46,9 @@ namespace BN.PROJECT.AlpacaService.Tests
                 _mockLogger.Object, 
                 _mockKafkaProducer.Object,
                 _mockStrategyServiceClient.Object,
-                _mockAlpacaTradingService.Object);
+                _mockAlpacaTradingService.Object,
+                _mockHubContext.Object,
+                _mockRedisDatabase.Object);
         }
 
         [Fact]

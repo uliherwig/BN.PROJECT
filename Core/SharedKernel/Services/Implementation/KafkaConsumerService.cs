@@ -1,6 +1,3 @@
-using Confluent.Kafka.Admin;
-using System.Threading.Tasks;
-
 namespace BN.PROJECT.Core;
 
 public class KafkaConsumerService : IKafkaConsumerService

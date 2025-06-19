@@ -1,7 +1,7 @@
 ﻿
-namespace BN.PROJECT.AlpacaService;
+namespace BN.PROJECT.Core;
 
-internal class QuoteMessage
+public class QuoteMessage
 {
     public Guid UserId { get; set; }
     public string Symbol { get; set; }
