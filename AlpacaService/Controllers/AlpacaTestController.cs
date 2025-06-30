@@ -47,7 +47,7 @@ public class AlpacaTestController : ControllerBase
 
         if (settings == null)
         {
-            return BadRequest("BacktestSettings cannot be null");
+            return BadRequest("StrategySettingsModel cannot be null");
         }
 
         var result = await _strategyServiceClient.StartStrategyAsync(settings);
@@ -85,7 +85,7 @@ public class AlpacaTestController : ControllerBase
 
         if (settings == null)
         {
-            return BadRequest("BacktestSettings cannot be null");
+            return BadRequest("StrategySettingsModel cannot be null");
         }
 
         var result = await _optimizerServiceClient.StartOptimizerAsync(settings);

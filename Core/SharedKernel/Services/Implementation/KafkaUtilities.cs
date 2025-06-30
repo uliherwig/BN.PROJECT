@@ -6,4 +6,7 @@ public static class KafkaUtilities
     {
         return $"{topic}_{email.ToLower().Replace('@', '-').Replace('.', '-')}";
     }
+
+    public static string GetTopicName(KafkaTopicEnum topic) => topic.ToString().ToLowerInvariant();
+
 }

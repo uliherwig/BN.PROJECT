@@ -16,7 +16,6 @@ public class SmaProcessModel
     public int ShortPeriod { get; set; }
     public int LongPeriod { get; set; }
     public StopLossTypeEnum StopLossType { get; set; }
-    public decimal IntersectionThreshold { get; set; }
     public List<Quote> LastQuotes { get; set; } = [];
     public List<SmaTick> LastSmas { get; set; } = [];
 }

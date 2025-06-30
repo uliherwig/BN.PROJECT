@@ -108,7 +108,7 @@ public class StrategyTests
         {
             ShortPeriod = 20,
             LongPeriod = 30,
-            StopLossType = StopLossTypeEnum.SMANextCrossing,
+            StopLossType = StopLossTypeEnum.SMAIntersection,
             IntersectionThreshold = 0.01m
         });
 

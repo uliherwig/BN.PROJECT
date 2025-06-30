@@ -4,5 +4,5 @@ namespace BN.PROJECT.NotificationService;
 
 public interface INotificationHub
 {
-    Task<string> GetConnectinId(string userId);
+    Task<string> GetConnectionId(string userId);
 }

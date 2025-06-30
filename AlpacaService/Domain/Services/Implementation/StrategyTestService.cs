@@ -31,25 +31,19 @@ public class StrategyTestService : IStrategyTestService
 
     public async Task RunBacktest(StrategySettingsModel testSettings)
     {
-        var stopwatch = Stopwatch.StartNew();
+        var strategyTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Strategy);
+
         var message = new StrategyMessage
         {
             IsBacktest = true,
+            UserId = testSettings.UserId,
             StrategyId = testSettings.Id,
             Strategy = testSettings.StrategyType,
             MessageType = MessageTypeEnum.StartTest,
             Settings = testSettings
         };
 
-        await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-        await _kafkaProducer.SendMessageAsync($"ui.infobox.{testSettings.UserId.ToString().ToLower()}", message.ToJson());
-
-
-        var connectionId = await _redisDatabase.StringGetAsync(testSettings.UserId.ToString());
-        if (!string.IsNullOrEmpty(connectionId.ToString()))
-        {
-            await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveQuote", message);
-        }
+        await _kafkaProducer.SendMessageAsync(strategyTopic, message.ToJson());
 
         var symbol = testSettings.Asset;
         var startDate = testSettings.StartDate.ToUniversalTime();
@@ -75,7 +69,7 @@ public class StrategyTestService : IStrategyTestService
                 var q = new Quote
                 {
                     Symbol = symbol,
-                    AskPrice = bar.C + 0.1m,
+                    AskPrice = bar.C + 0.1m, // fake spread for testing
                     BidPrice = bar.C - 0.1m,
                     TimestampUtc = bar.T.ToUniversalTime()
                 };
@@ -85,34 +79,35 @@ public class StrategyTestService : IStrategyTestService
             message.Settings = null;
             message.Quotes = quotesDay;
 
-            await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-            _logger.LogInformation($"RunBacktest {stamp.ToLocalTime()} current time {stopwatch.ElapsedMilliseconds} ms");
+            await _kafkaProducer.SendMessageAsync(strategyTopic, message.ToJson());
             stamp = stamp.Add(timeFrame).ToUniversalTime();
-        };
+        }
+        ;
 
         message.MessageType = MessageTypeEnum.StopTest;
         message.Settings = null;
         message.Quotes = null;
 
-        await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-
-        stopwatch.Stop();
-        _logger.LogInformation($"RunBacktest {testSettings.Id} completed in {stopwatch.ElapsedMilliseconds} ms");
+        await _kafkaProducer.SendMessageAsync(strategyTopic, message.ToJson());
     }
     public async Task OptimizeStratgy(StrategySettingsModel testSettings)
     {
         var stopwatch = Stopwatch.StartNew();
-        var topic = Enum.GetName(KafkaTopicEnum.Optimize).ToLowerInvariant() ?? "optimize";
+        var optimizeTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Optimize);
+        var notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
         var message = new StrategyMessage
         {
             IsBacktest = true,
+            UserId = testSettings.UserId,
             StrategyId = testSettings.Id,
             Strategy = testSettings.StrategyType,
             MessageType = MessageTypeEnum.StartTest,
             Settings = testSettings
         };
 
-        await _kafkaProducer.SendMessageAsync(topic, message.ToJson());
+        await _kafkaProducer.SendMessageAsync(optimizeTopic, message.ToJson());
+        await _kafkaProducer.SendMessageAsync(notificationTopic, message.ToJson());
+
 
         var symbol = testSettings.Asset;
         var startDate = testSettings.StartDate.ToUniversalTime();
@@ -148,8 +143,7 @@ public class StrategyTestService : IStrategyTestService
             message.Settings = null;
             message.Quotes = quotesDay;
 
-            await _kafkaProducer.SendMessageAsync(topic, message.ToJson());
-            _logger.LogInformation($"RunBacktest {stamp.ToLocalTime()} current time {stopwatch.ElapsedMilliseconds} ms");
+            await _kafkaProducer.SendMessageAsync(optimizeTopic, message.ToJson());
             stamp = stamp.Add(timeFrame).ToUniversalTime();
         }
 
@@ -158,7 +152,9 @@ public class StrategyTestService : IStrategyTestService
         message.Settings = null;
         message.Quotes = null;
 
-        await _kafkaProducer.SendMessageAsync(topic, message.ToJson());
+        await _kafkaProducer.SendMessageAsync(optimizeTopic, message.ToJson());
+        await _kafkaProducer.SendMessageAsync(notificationTopic, message.ToJson());
+
 
         stopwatch.Stop();
         _logger.LogInformation($"RunBacktest {testSettings.Id} completed in {stopwatch.ElapsedMilliseconds} ms");
@@ -183,8 +179,8 @@ public class StrategyTestService : IStrategyTestService
 
         await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
 
-   
- 
+
+
 
         //// send quotes per day
         //TimeSpan timeFrame = TimeSpan.FromDays(1);
@@ -220,7 +216,7 @@ public class StrategyTestService : IStrategyTestService
         //    stamp = stamp.Add(timeFrame).ToUniversalTime();
         //};
 
-   
+
     }
     public async Task StopExecution(Guid userId, Guid strategyId)
     {
@@ -242,11 +238,11 @@ public class StrategyTestService : IStrategyTestService
         var symbol = orderMessage.Position.Symbol;
         var qty = (int)orderMessage.Position.Quantity;
         var side = orderMessage.Position.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell;
-        if (orderMessage.Position.PriceClose > 0 )
+        if (orderMessage.Position.PriceClose > 0)
         {
-          side =  orderMessage.Position.Side == SideEnum.Sell ? OrderSide.Buy : OrderSide.Sell;
+            side = orderMessage.Position.Side == SideEnum.Sell ? OrderSide.Buy : OrderSide.Sell;
         }
-    
+
         var orderType = OrderType.Market;
         var timeInForce = TimeInForce.Day;
 
@@ -261,5 +257,5 @@ public class StrategyTestService : IStrategyTestService
 
     }
 
-    
+
 }

@@ -37,12 +37,21 @@ Integration with Keycloak
 
 StrategyService - contains and applies the trading strategies
 
+### NotificationService
+
+NotificationService - provides notifications to React FE per signalR/Redis
+
 ## CI/CD
 
 The CI/CD pipeline is implemented with Github Actions. 
 The pipeline is triggered on push to the main branch. 
 The pipeline builds the docker image and pushes it to the docker hub.
+The application is deployed to the Kubernetes cluster with Helm.
 
 ## Installation
 
 local setup with docker-compose (https://github.com/uliherwig/bn-docker)	
+
+dev setup - local VM - linux ubuntu server - rancher kubernetes - install with helm
+
+production setup - pending

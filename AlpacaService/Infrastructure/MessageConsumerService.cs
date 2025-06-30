@@ -27,43 +27,22 @@ public class MessageConsumerService : IHostedService
         _configuration = configuration;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
-            var adminConfig = new AdminClientConfig { BootstrapServers = _configuration["Kafka:BootstrapServers"] };
-
-            using var adminClient = new AdminClientBuilder(adminConfig).Build();
-
-            var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(5));
-
-            foreach (var topicName in topicNames)
-            {
-                bool topicExists = metadata.Topics.Any(t => t.Topic == topicName);
-
-                if (!topicExists)
-                {
-                    _logger.LogInformation($"Erstelle Kafka-Topic: {topicName}...");
-
-                    await adminClient.CreateTopicsAsync(new[]
-                    {
-                    new TopicSpecification
-                    {
-                        Name = topicName,
-                        NumPartitions = numPartitions,
-                        ReplicationFactor = replicationFactor
-                    }
-                });
-
-                    _logger.LogInformation($"Topic '{topicName}' wurde erfolgreich erstellt!");
-                }
-            }
-
             using (var scope = _serviceProvider.CreateScope())
             {
                 var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
 
-                kafkaConsumer.Start("order");
+                var topicName = Enum.GetName(KafkaTopicEnum.Order)?.ToLowerInvariant();
+                if (string.IsNullOrEmpty(topicName))
+                {
+                    _logger.LogError("Kafka topic name is null or empty.");
+                    return Task.CompletedTask;
+                }
+
+                kafkaConsumer.Start(topicName);
                 kafkaConsumer.MessageReceived += ConsumeMessage;
             }
         }
@@ -71,6 +50,7 @@ public class MessageConsumerService : IHostedService
         {
             _logger.LogError(e, "Error in MessageConsumerService");
         }
+        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

@@ -10,13 +10,13 @@ public class NotificationHub : Hub, INotificationHub
         _redisDatabase = redis.GetDatabase();
     }
 
-    public async Task RegisterRateFeed(string userId)
+    public async Task RegisterNotificationFeed(string userId)
     {
         var senderId = Context.ConnectionId;
         await _redisDatabase.StringSetAsync(userId, Context.ConnectionId);
     }
 
-    public async Task<string> GetConnectinId(string userId)
+    public async Task<string> GetConnectionId(string userId)
     {
         var connectionId = await _redisDatabase.StringGetAsync(userId);
         return connectionId.ToString();
@@ -24,13 +24,13 @@ public class NotificationHub : Hub, INotificationHub
     public async Task RetrieveMessageHistory() =>
         await Clients.Caller.SendAsync("MessageHistory", "");
 
-    public async Task SendMessageToRecipient(string quoteMessage)
+    public async Task SendMessageToRecipient(string notificationMessage)
     {
-        var qm = quoteMessage.FromJson<QuoteMessage>();
+        var qm = notificationMessage.FromJson<NotificationMessage>();
         var connectionId = await _redisDatabase.StringGetAsync(qm.UserId.ToString());
         if (!string.IsNullOrEmpty(connectionId.ToString()))
         {
-            await Clients.Client(connectionId).SendAsync("ReceiveQuote", quoteMessage);
+            await Clients.Client(connectionId).SendAsync("ReceiveNotification", notificationMessage);
         }
     }
 }

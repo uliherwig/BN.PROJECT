@@ -2,6 +2,11 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2025.06.3
+
+- Kafka consumer added
+- NotificationHub added
+
 ## Version 2025.06.2
 
 - Endpoint: Start optimization of strategy parameters

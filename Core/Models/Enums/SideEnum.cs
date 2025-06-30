@@ -1,7 +1,7 @@
 ﻿namespace BN.PROJECT.Core;
 
 public enum SideEnum
-{  
-    Buy,
+{
+    Buy = 0,
     Sell
 }
