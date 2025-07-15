@@ -12,6 +12,7 @@ public class MessageConsumerServiceTests
     private readonly Mock<IServiceScope> _serviceScopeMock;
     private readonly Mock<IServiceScopeFactory> _serviceScopeFactoryMock;
     private readonly Mock<IKafkaConsumerService> _kafkaConsumerServiceMock;
+    private readonly Mock<IStrategyServiceStore> _strategyServiceStoreMock;
     private readonly TestLogger<MessageConsumerService> _testLogger;
     private readonly MessageConsumerService _messageConsumerService;
 
@@ -21,13 +22,12 @@ public class MessageConsumerServiceTests
         _serviceProviderMock = new Mock<IServiceProvider>();
         _serviceScopeMock = new Mock<IServiceScope>();
         _serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
-
+        _strategyServiceStoreMock = new Mock<IStrategyServiceStore>();
         _kafkaConsumerServiceMock = new Mock<IKafkaConsumerService>();
 
         _serviceScopeMock.Setup(x => x.ServiceProvider).Returns(_serviceProviderMock.Object);
         _serviceProviderMock.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(_serviceScopeFactoryMock.Object);
         _serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(_serviceScopeMock.Object);
-
         _messageConsumerService = new MessageConsumerService(_testLogger, _serviceProviderMock.Object);
     }
 
@@ -64,7 +64,7 @@ public class MessageConsumerServiceTests
     public void ConsumeMessage_ShouldDeserializeMessage_WhenMessageIsNotNull()
     {
         // Arrange
-        var message = new StrategyMessage { Strategy = StrategyEnum.SMA, MessageType = MessageTypeEnum.StartTest };
+        var message = new StrategyMessage { Strategy = StrategyEnum.SMA, MessageType = MessageTypeEnum.Start };
         var messageJson = message.ToJson();
 
         var strategyServiceMock = new Mock<IStrategyService>();

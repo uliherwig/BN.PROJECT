@@ -1,13 +1,18 @@
+using System.Configuration;
+
 namespace BN.PROJECT.StrategyService;
 
 public class BrokerServiceClient
 {
     private readonly HttpClient _httpClient;
+    private readonly IConfiguration _configuration;
 
-    public BrokerServiceClient(HttpClient httpClient)
+    public BrokerServiceClient(HttpClient httpClient, 
+        IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri("https://localhost:7167");
+        _configuration = configuration;
+        _httpClient.BaseAddress = new Uri(_configuration["AlpacaServiceClient"]);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 

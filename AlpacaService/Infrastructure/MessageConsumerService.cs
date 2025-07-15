@@ -35,7 +35,7 @@ public class MessageConsumerService : IHostedService
             {
                 var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
 
-                var topicName = Enum.GetName(KafkaTopicEnum.Order)?.ToLowerInvariant();
+                var topicName = KafkaUtilities.GetTopicName(KafkaTopicEnum.Order);
                 if (string.IsNullOrEmpty(topicName))
                 {
                     _logger.LogError("Kafka topic name is null or empty.");

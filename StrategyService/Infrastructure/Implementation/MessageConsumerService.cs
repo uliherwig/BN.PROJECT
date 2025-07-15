@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace BN.PROJECT.StrategyService;
+﻿namespace BN.PROJECT.StrategyService;
 
 public class MessageConsumerService : IHostedService
 {
@@ -22,15 +20,7 @@ public class MessageConsumerService : IHostedService
             using (var scope = _serviceProvider.CreateScope())
             {
                 var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
-
-                var topicName = Enum.GetName(KafkaTopicEnum.Strategy)?.ToLowerInvariant();
-                if (string.IsNullOrEmpty(topicName))
-                {
-                    _logger.LogError("Kafka topic name is null or empty.");
-                    return Task.CompletedTask;
-                }
-
-                kafkaConsumer.Start(topicName);
+                kafkaConsumer.Start(KafkaUtilities.GetTopicName(KafkaTopicEnum.Strategy));
                 kafkaConsumer.MessageReceived += ConsumeMessage;
             }
         }
@@ -48,39 +38,39 @@ public class MessageConsumerService : IHostedService
 
     public async void ConsumeMessage(string messageJson)
     {
-        var message = JsonConvert.DeserializeObject<StrategyMessage>(messageJson);
-        if (message == null)
+        var message = JsonConvert.DeserializeObject<StrategyMessage>(messageJson); 
+
+        if (message != null && message.StrategyTask == StrategyTaskEnum.Backtest || message.StrategyTask == StrategyTaskEnum.Optimize)
         {
-            return;
-        }
-
-        using (var scope = _serviceProvider.CreateScope())
-        {
-            var services = scope.ServiceProvider.GetServices<IStrategyService>();
-
-            var strategyService = services.Single(s => s.CanHandle(message.Strategy));
-
-            if (message.MessageType == MessageTypeEnum.StartTest)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                await strategyService.StartTest(message);
-            }
-
-            if (message.MessageType == MessageTypeEnum.Quotes && message.Quotes != null)
-            {
-                var stopwatch = Stopwatch.StartNew();
-
-                foreach (var quote in message.Quotes)
+                var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
+                var scheduler = await schedulerFactory.GetScheduler();
+                var jobKey = new JobKey($"{message.StrategyTask.ToString().ToLower()}Job_{message.StrategyId}", "strategyGroup");
+                Type jobType = message.StrategyTask switch
                 {
-                    await strategyService.EvaluateQuote(message.StrategyId,message.UserId, quote);
-                }
-                stopwatch.Stop();
-                _logger.LogInformation($"EvaluateQuote done in {stopwatch.Elapsed.TotalMilliseconds} ms. Number of quotes = {message.Quotes.Count}");
-            }
+                    StrategyTaskEnum.Backtest => typeof(BacktestJob),
+                    StrategyTaskEnum.Optimize => typeof(OptimizeJob),
+                    _ => throw new ArgumentException("Unknown strategy task", nameof(message.StrategyTask))
+                };
+                var strategyJob = JobBuilder.Create(jobType)
+                    .WithIdentity(jobKey)
+                    .SetJobData(new JobDataMap
+                        {
+                            { "key", jobKey },
+                            { "strategyId", message.StrategyId }
+                        })
+                    .Build();
 
-            if (message.MessageType == MessageTypeEnum.StopTest)
-            {
-                await strategyService.StopTest(message);
+                var trigger = TriggerBuilder.Create()
+                   .StartNow()
+                   .Build();
+
+                await scheduler.ScheduleJob(strategyJob, trigger);
             }
         }
+        return;
+
+
     }
 }

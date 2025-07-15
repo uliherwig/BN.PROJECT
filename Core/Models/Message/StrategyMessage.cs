@@ -4,9 +4,10 @@ public class StrategyMessage
 {
     public Guid UserId { get; set; }
     public Guid StrategyId { get; set; }
-    public bool IsBacktest { get; set; }
-    public StrategyEnum Strategy { get; set; }
-    public MessageTypeEnum MessageType { get; set; }
-    public StrategySettingsModel? Settings { get; set; }
-    public List<Quote>? Quotes { get; set; }
+    public StrategyTaskEnum StrategyTask { get; set; } = StrategyTaskEnum.None;
+    public bool IsBacktest { get; set; } = false;
+    public StrategyEnum Strategy { get; set; } = StrategyEnum.None;
+    public MessageTypeEnum MessageType { get; set; } = MessageTypeEnum.Init;
+    public StrategySettingsModel? Settings { get; set; } = null;
+    public List<Quote>? Quotes { get; set; } = null;
 }

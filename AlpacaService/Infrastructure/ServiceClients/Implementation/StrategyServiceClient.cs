@@ -5,14 +5,14 @@ public class StrategyServiceClient : IStrategyServiceClient
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
 
-    public StrategyServiceClient(HttpClient httpClient, 
+    public StrategyServiceClient(HttpClient httpClient,
         IConfiguration configuration)
     {
         _configuration = configuration;
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(_configuration["StrategyServiceClient"]); 
+        _httpClient.BaseAddress = new Uri(_configuration["StrategyServiceClient"]);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-     
+
     }
 
     public async Task<StrategySettingsModel?> GetStrategyAsync(string strategyId)
@@ -31,7 +31,24 @@ public class StrategyServiceClient : IStrategyServiceClient
         {
             var json = JsonConvert.SerializeObject(testSettings);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"/internalstrategy", content);
+            var response = await _httpClient.PostAsync($"/internalstrategy/test", content);
+
+            var result = await response.Content.ReadAsStringAsync();
+            return result;
+        }
+        catch (Exception e)
+        {
+            return e.Message;
+        }
+    }
+
+    public async Task<string> OptimizeStrategyAsync(StrategySettingsModel testSettings)
+    {
+        try
+        {
+            var json = JsonConvert.SerializeObject(testSettings);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"/internalstrategy/optimize", content);
 
             var result = await response.Content.ReadAsStringAsync();
             return result;

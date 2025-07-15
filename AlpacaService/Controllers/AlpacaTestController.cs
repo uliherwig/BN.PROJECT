@@ -1,4 +1,6 @@
-﻿namespace BN.PROJECT.AlpacaService;
+﻿using Alpaca.Markets;
+
+namespace BN.PROJECT.AlpacaService;
 
 [Route("[controller]")]
 [ApiController]
@@ -35,79 +37,77 @@ public class AlpacaTestController : ControllerBase
         return Ok(bars);
     }
 
+    [HttpGet("historical-quotes/{symbol}")]
+    public async Task<IActionResult> GetHistoricalQuotesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var bars = await _alpacaRepository.GetHistoricalBars(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
+
+        var quotes = new List<Quote>();
+        foreach (var bar in bars)
+        {
+            var q = new Quote
+            {
+                Symbol = symbol,
+                AskPrice = bar.C + 0.1m,
+                BidPrice = bar.C - 0.1m,
+                TimestampUtc = bar.T.ToUniversalTime()
+            };
+            quotes.Add(q);
+        }
+        return Ok(quotes);
+    }
+
     [HttpPost("run-test")]
     public async Task<IActionResult> RunBacktest([FromBody] StrategySettingsModel settings)
     {
+        if (settings == null)
+        {
+            return BadRequest("StrategySettingsModel cannot be null");
+        }
         var userId = HttpContext.Items["UserId"]?.ToString();
         settings.UserId = new Guid(userId!);
         settings.Id = Guid.NewGuid();
         settings.StartDate = settings.StartDate.ToUniversalTime();
         settings.EndDate = settings.EndDate.ToUniversalTime();
-        settings.TestStamp = DateTime.UtcNow;
-
-        if (settings == null)
-        {
-            return BadRequest("StrategySettingsModel cannot be null");
-        }
+        settings.StampStart = DateTime.UtcNow.ToUniversalTime();
+        settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
 
         var result = await _strategyServiceClient.StartStrategyAsync(settings);
-        if (Enum.TryParse(result, out Core.BnErrorCode errorCode))
-        {
-            return base.BadRequest(errorCode);
-        }
-
         if (result == "true")
         {
             await _strategyTestService.RunBacktest(settings);
         }
-
         return Ok(result);
     }
 
     [HttpGet("test-optimization-service")]
     public async Task<IActionResult> TestOptimizationAsync()
     {
-
         var test = await _optimizerServiceClient.TestOptimizationAsync();
-     
         return Ok(test);
     }
 
     [HttpPost("optimize")]
     public async Task<IActionResult> RunOptimization([FromBody] StrategySettingsModel settings)
     {
+        if (settings == null)
+        {
+            return BadRequest("StrategySettingsModel cannot be null");
+        }
         var userId = HttpContext.Items["UserId"]?.ToString();
         settings.UserId = new Guid(userId!);
         settings.Id = Guid.NewGuid();
         settings.StartDate = settings.StartDate.ToUniversalTime();
         settings.EndDate = settings.EndDate.ToUniversalTime();
-        settings.TestStamp = DateTime.UtcNow;
-
-        if (settings == null)
-        {
-            return BadRequest("StrategySettingsModel cannot be null");
-        }
-
-        var result = await _optimizerServiceClient.StartOptimizerAsync(settings);
-        if (Enum.TryParse(result, out Core.BnErrorCode errorCode))
-        {
-            return base.BadRequest(errorCode);
-        }
-
+        settings.StampStart = DateTime.UtcNow.ToUniversalTime();
+        settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
+        settings.Optimized = true;
+        var result = await _strategyServiceClient.StartStrategyAsync(settings);
         if (result == "true")
         {
-            await _strategyTestService.OptimizeStratgy(settings);
+            await _strategyTestService.OptimizeStrategy(settings);
         }
-
         return Ok(result);
-    }
-
-    [HttpDelete("delete-executions")]
-    public async Task<IActionResult> DeleteExecutionsByUserId()
-    {
-        var userId = HttpContext.Items["UserId"]?.ToString();
-        await _alpacaRepository.DeleteAlpacaExecutionsAsync(new Guid(userId!));
-        return Ok();
     }
 
     [HttpGet("save-assets")]

@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
-
+using Quartz.Impl;
+using StackExchange.Redis;
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureLogging(builder.Host);
@@ -22,7 +23,7 @@ static void ConfigureLogging(IHostBuilder hostBuilder)
     Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Information()
         .WriteTo.Console()
-        //.WriteTo.Seq("http://localhost:9017")
+        .WriteTo.Seq("http://localhost:9017")
         .CreateLogger();
     hostBuilder.UseSerilog(Log.Logger);
 }
@@ -88,10 +89,9 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHttpClient();
     services.AddHealthChecks();
 
-    services.AddScoped<IStrategyRepository, StrategyRepository>();
-    services.AddSingleton<IStrategyOperations, StrategyOperations>();
-
-    services.AddHostedService<MessageConsumerService>();
+    var redisConnection = configuration["RedisConnection"];
+    var redis = ConnectionMultiplexer.Connect(redisConnection);
+    services.AddSingleton<IConnectionMultiplexer>(redis);
 
     // Quartz-Services
     services.AddQuartz();
@@ -100,7 +100,13 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         opt.WaitForJobsToComplete = true;
     });
 
-    services.AddHostedService<BacktestCleanUpService>();
+    services.AddHostedService<CleanUpService>();
+    services.AddHostedService<MessageConsumerService>();
+
+    services.AddSingleton<IStrategyServiceStore, StrategyServiceStore>();
+
+    services.AddScoped<IStrategyRepository, StrategyRepository>();
+    services.AddScoped<IOptimizerService, OptimizerService>();
 
     services.AddWithAllDerivedTypes<IStrategyService>();  // adds all classes that implement IStrategyService as Singleton
 }

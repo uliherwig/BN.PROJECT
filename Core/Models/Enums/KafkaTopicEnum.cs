@@ -4,7 +4,6 @@ public enum KafkaTopicEnum
 {
     Strategy,
     Order,
-    Optimize,
     Notification,
     AlpacaRateFeed,
 }

@@ -5,6 +5,7 @@ public interface IStrategyService
     Task StartTest(StrategyMessage message);
     Task EvaluateQuote(Guid strategyId, Guid userId, Quote quote);
     Task StopTest(StrategyMessage message);
-    List<PositionModel>? GetPositions(Guid strategyId);
+    Task<TestResult> GetTestResult();
+    List<PositionModel> GetPositions();
     bool CanHandle(StrategyEnum strategy);
 }

@@ -18,14 +18,10 @@ public class StrategyTests
     private readonly IStrategyService _breakoutStrategy;
     private readonly TestLogger<SmaStrategy> _testLoggerSma;
     private readonly TestLogger<BreakoutStrategy> _testLoggerBreakout;
-    private readonly IStrategyOperations _strategyOperations;
     private readonly Mock<IKafkaProducerService> _mockKafkaProducer;
-
-
 
     public StrategyTests()
     {
-        _strategyOperations = new StrategyOperations(new TestLogger<StrategyOperations>());
         _testLoggerSma = new TestLogger<SmaStrategy>();
         _testLoggerBreakout = new TestLogger<BreakoutStrategy>();
         _serviceProviderMock = new Mock<IServiceProvider>();
@@ -44,8 +40,8 @@ public class StrategyTests
         _mockKafkaProducer.Setup(producer => producer.SendMessageAsync("order", It.IsAny<string>(), It.IsAny<CancellationToken>()))
                            .Returns(Task.CompletedTask);
 
-        _smaStrategy = new SmaStrategy(_testLoggerSma, _serviceProviderMock.Object, _strategyOperations, _mockKafkaProducer.Object);
-        _breakoutStrategy = new BreakoutStrategy(_testLoggerBreakout, _serviceProviderMock.Object, _strategyOperations, _mockKafkaProducer.Object);
+        _smaStrategy = new SmaStrategy(_testLoggerSma, _serviceProviderMock.Object, _mockKafkaProducer.Object);
+        _breakoutStrategy = new BreakoutStrategy(_testLoggerBreakout, _serviceProviderMock.Object,  _mockKafkaProducer.Object);
     }
 
     [Fact]
@@ -77,8 +73,7 @@ public class StrategyTests
             EndDate = DateTime.Parse("2024-11-27T21:08:00.000Z").ToUniversalTime(),
             TrailingStop = 0.0m,
             AllowOvernight = true,
-            Bookmarked = false,
-            TestStamp = DateTime.UtcNow,
+            Bookmarked = false,         
             StrategyParams = smaParams
         };
 
@@ -91,7 +86,7 @@ public class StrategyTests
         }
 
         // Assert
-        var result = _smaStrategy.GetPositions(strategySettings.Id);
+        var result = _smaStrategy.GetPositions();
 
         Assert.Equal(4, result.Count);
         Assert.Equal(1, result.Count(x => x.PriceClose == 0.0m));
@@ -127,7 +122,6 @@ public class StrategyTests
             TrailingStop = 0.0m,
             AllowOvernight = true,
             Bookmarked = false,
-            TestStamp = DateTime.UtcNow,
             StrategyParams = smaParams
         };
 
@@ -140,7 +134,7 @@ public class StrategyTests
         }
 
         // Assert
-        var result = _smaStrategy.GetPositions(strategySettings.Id);
+        var result = _smaStrategy.GetPositions();
 
         Assert.Equal(12, result.Count);
         Assert.Equal(1, result.Count(x => x.PriceClose == 0.0m));
@@ -174,7 +168,6 @@ public class StrategyTests
             TrailingStop = 0.0m,
             AllowOvernight = true,
             Bookmarked = false,
-            TestStamp = DateTime.UtcNow,
             StrategyParams = testparams
         };
 
@@ -187,7 +180,7 @@ public class StrategyTests
         }
 
         // Assert
-        var result = _breakoutStrategy.GetPositions(strategySettings.Id);
+        var result = _breakoutStrategy.GetPositions();
 
         Assert.Equal(3, result.Count);
         Assert.Equal(1, result.Count(x => x.PriceClose == 0.0m));
@@ -221,7 +214,6 @@ public class StrategyTests
             TrailingStop = 0.0m,
             AllowOvernight = true,
             Bookmarked = false,
-            TestStamp = DateTime.UtcNow,
             StrategyParams = smaParams1
         };
 
@@ -248,7 +240,6 @@ public class StrategyTests
             TrailingStop = 0.0m,
             AllowOvernight = true,
             Bookmarked = false,
-            TestStamp = DateTime.UtcNow,
             StrategyParams = smaParams2
         };
 
@@ -263,8 +254,8 @@ public class StrategyTests
         }
 
         // Assert
-        var result1 = _smaStrategy.GetPositions(strategySettings1.Id);
-        var result2 = _smaStrategy.GetPositions(strategySettings2.Id);
+        var result1 = _smaStrategy.GetPositions();
+        var result2 = _smaStrategy.GetPositions();
 
         Assert.Equal(4, result1.Count);
         Assert.Equal(4, result2.Count);
@@ -272,12 +263,7 @@ public class StrategyTests
     public async Task Demo()
     {
         var testInjection = TestInjection.Use(builder =>
-        {
-            builder.ConfigureServices(services =>
-            {
-                // Fügen Sie benutzerdefinierte Dienste hinzu
-                services.AddSingleton<IStrategyOperations, StrategyOperations>();
-            });
+        { 
 
             builder.Configure(app =>
             {

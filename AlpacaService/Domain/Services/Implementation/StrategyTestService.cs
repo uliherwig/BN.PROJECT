@@ -32,132 +32,31 @@ public class StrategyTestService : IStrategyTestService
     public async Task RunBacktest(StrategySettingsModel testSettings)
     {
         var strategyTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Strategy);
+        await StoreQuotesToRedis(testSettings);
 
         var message = new StrategyMessage
         {
             IsBacktest = true,
+            StrategyTask = StrategyTaskEnum.Backtest,
             UserId = testSettings.UserId,
-            StrategyId = testSettings.Id,
-            Strategy = testSettings.StrategyType,
-            MessageType = MessageTypeEnum.StartTest,
-            Settings = testSettings
-        };
-
-        await _kafkaProducer.SendMessageAsync(strategyTopic, message.ToJson());
-
-        var symbol = testSettings.Asset;
-        var startDate = testSettings.StartDate.ToUniversalTime();
-        var endDate = testSettings.EndDate.ToUniversalTime();
-
-        // send quotes per day
-        TimeSpan timeFrame = TimeSpan.FromDays(1);
-
-        var stamp = startDate.ToUniversalTime();
-
-        while (stamp < endDate)
-        {
-            var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
-            var bars = await _alpacaRepository.GetHistoricalBars(symbol, stamp, stampEnd);
-            if (bars.Count == 0)
-            {
-                stamp = stamp.Add(timeFrame).ToUniversalTime();
-                continue;
-            }
-            var quotesDay = new List<Quote>();
-            foreach (var bar in bars)
-            {
-                var q = new Quote
-                {
-                    Symbol = symbol,
-                    AskPrice = bar.C + 0.1m, // fake spread for testing
-                    BidPrice = bar.C - 0.1m,
-                    TimestampUtc = bar.T.ToUniversalTime()
-                };
-                quotesDay.Add(q);
-            }
-            message.MessageType = MessageTypeEnum.Quotes;
-            message.Settings = null;
-            message.Quotes = quotesDay;
-
-            await _kafkaProducer.SendMessageAsync(strategyTopic, message.ToJson());
-            stamp = stamp.Add(timeFrame).ToUniversalTime();
-        }
-        ;
-
-        message.MessageType = MessageTypeEnum.StopTest;
-        message.Settings = null;
-        message.Quotes = null;
+            StrategyId = testSettings.Id
+        }; 
 
         await _kafkaProducer.SendMessageAsync(strategyTopic, message.ToJson());
     }
-    public async Task OptimizeStratgy(StrategySettingsModel testSettings)
+    public async Task OptimizeStrategy(StrategySettingsModel testSettings)
     {
-        var stopwatch = Stopwatch.StartNew();
-        var optimizeTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Optimize);
-        var notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
+        var optimizeTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Strategy);
+        await StoreQuotesToRedis(testSettings);
+
         var message = new StrategyMessage
         {
             IsBacktest = true,
+            StrategyTask = StrategyTaskEnum.Optimize,
             UserId = testSettings.UserId,
-            StrategyId = testSettings.Id,
-            Strategy = testSettings.StrategyType,
-            MessageType = MessageTypeEnum.StartTest,
-            Settings = testSettings
-        };
-
+            StrategyId = testSettings.Id
+        };       
         await _kafkaProducer.SendMessageAsync(optimizeTopic, message.ToJson());
-        await _kafkaProducer.SendMessageAsync(notificationTopic, message.ToJson());
-
-
-        var symbol = testSettings.Asset;
-        var startDate = testSettings.StartDate.ToUniversalTime();
-        var endDate = testSettings.EndDate.ToUniversalTime();
-
-        // send quotes per day
-        TimeSpan timeFrame = TimeSpan.FromDays(1);
-
-        var stamp = startDate.ToUniversalTime();
-
-        while (stamp < endDate)
-        {
-            var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
-            var bars = await _alpacaRepository.GetHistoricalBars(symbol, stamp, stampEnd);
-            if (bars.Count == 0)
-            {
-                stamp = stamp.Add(timeFrame).ToUniversalTime();
-                continue;
-            }
-            var quotesDay = new List<Quote>();
-            foreach (var bar in bars)
-            {
-                var q = new Quote
-                {
-                    Symbol = symbol,
-                    AskPrice = bar.C + 0.1m,
-                    BidPrice = bar.C - 0.1m,
-                    TimestampUtc = bar.T.ToUniversalTime()
-                };
-                quotesDay.Add(q);
-            }
-            message.MessageType = MessageTypeEnum.Quotes;
-            message.Settings = null;
-            message.Quotes = quotesDay;
-
-            await _kafkaProducer.SendMessageAsync(optimizeTopic, message.ToJson());
-            stamp = stamp.Add(timeFrame).ToUniversalTime();
-        }
-
-
-        message.MessageType = MessageTypeEnum.StopTest;
-        message.Settings = null;
-        message.Quotes = null;
-
-        await _kafkaProducer.SendMessageAsync(optimizeTopic, message.ToJson());
-        await _kafkaProducer.SendMessageAsync(notificationTopic, message.ToJson());
-
-
-        stopwatch.Stop();
-        _logger.LogInformation($"RunBacktest {testSettings.Id} completed in {stopwatch.ElapsedMilliseconds} ms");
     }
     public async Task StartExecution(Guid userId, Guid strategyId)
     {
@@ -173,48 +72,11 @@ public class StrategyTestService : IStrategyTestService
             UserId = userId,
             StrategyId = testSettings.Id,
             Strategy = testSettings.StrategyType,
-            MessageType = MessageTypeEnum.StartTest,
+            MessageType = MessageTypeEnum.Start,
             Settings = testSettings
         };
 
         await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-
-
-
-
-        //// send quotes per day
-        //TimeSpan timeFrame = TimeSpan.FromDays(1);
-
-        //var stamp = startDate.ToUniversalTime();
-
-        //while (stamp < endDate)
-        //{
-        //    var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
-        //    var bars = await _alpacaRepository.GetHistoricalBars(symbol, stamp, stampEnd);
-        //    if (bars.Count == 0)
-        //    {
-        //        stamp = stamp.Add(timeFrame).ToUniversalTime();
-        //        continue;
-        //    }
-        //    var quotesDay = new List<Quote>();
-        //    foreach (var bar in bars)
-        //    {
-        //        var q = new Quote
-        //        {
-        //            Symbol = symbol,
-        //            AskPrice = bar.C + 0.1m,
-        //            BidPrice = bar.C - 0.1m,
-        //            TimestampUtc = bar.T.ToUniversalTime()
-        //        };
-        //        quotesDay.Add(q);
-        //    }
-        //    message.MessageType = MessageTypeEnum.Quotes;
-        //    message.Settings = null;
-        //    message.Quotes = quotesDay;
-
-        //    await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-        //    stamp = stamp.Add(timeFrame).ToUniversalTime();
-        //};
 
 
     }
@@ -222,14 +84,13 @@ public class StrategyTestService : IStrategyTestService
     {
         var message = new StrategyMessage
         {
-            MessageType = MessageTypeEnum.StopTest,
+            MessageType = MessageTypeEnum.Stop,
             IsBacktest = false,
             UserId = userId,
             StrategyId = strategyId
         };
         await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
     }
-
     public async Task CreateAlpacaOrder(OrderMessage orderMessage)
     {
         _logger.LogInformation($"Run Alpaca Execution");
@@ -255,6 +116,49 @@ public class StrategyTestService : IStrategyTestService
 
         await _alpacaTradingService.CreateOrderAsync(userSettings, symbol, qty, side, orderType, timeInForce);
 
+    }
+
+    private async Task StoreQuotesToRedis(StrategySettingsModel testSettings)
+    {
+        var symbol = testSettings.Asset;
+        var startDate = testSettings.StartDate.ToUniversalTime();
+        var endDate = testSettings.EndDate.ToUniversalTime();
+
+        var bars = await _alpacaRepository.GetHistoricalBars(symbol, startDate, endDate);
+
+        // send quotes per day
+        TimeSpan timeFrame = TimeSpan.FromDays(1);
+        var stamp = startDate.ToUniversalTime();
+
+        while (stamp < endDate)
+        {
+            var key = $"quotes:{symbol}:{stamp:yyyy-MM-dd}";
+            if (!_redisDatabase.KeyExists(key))
+            {
+                var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
+                if (bars.Count == 0)
+                {
+                    stamp = stamp.Add(timeFrame).ToUniversalTime();
+                    continue;
+                }
+                var quotesDay = new List<Quote>();
+                foreach (var bar in bars.Where(b => b.T > stamp && b.T < stampEnd))
+                {
+                    var q = new Quote
+                    {
+                        Symbol = symbol,
+                        AskPrice = bar.C + 0.1m,
+                        BidPrice = bar.C - 0.1m,
+                        TimestampUtc = bar.T.ToUniversalTime()
+                    };
+                    quotesDay.Add(q);
+                }
+
+                _redisDatabase.StringSet($"quotes:{symbol}:{stamp:yyyy-MM-dd}", quotesDay.ToJson(), TimeSpan.FromDays(1));
+            }
+
+            stamp = stamp.Add(timeFrame).ToUniversalTime();
+        }
     }
 
 

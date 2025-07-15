@@ -1,10 +1,10 @@
 namespace BN.PROJECT.StrategyService;
 
-public class BacktestCleanUpService : IHostedService
+public class CleanUpService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public BacktestCleanUpService(IServiceProvider serviceProvider)
+    public CleanUpService(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
@@ -16,17 +16,18 @@ public class BacktestCleanUpService : IHostedService
             var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
             var scheduler = await schedulerFactory.GetScheduler();
 
-            var job = JobBuilder.Create<CleanUpJob>()
+            var cleanUpJob = JobBuilder.Create<CleanUpJob>()
                 .WithIdentity("cleanUpJob", "strategyGroup")
                 .SetJobData(new JobDataMap { { "key", "TestCleanUpJob" } })
                 .Build();
 
-            var trigger = TriggerBuilder.Create()
-               .WithIdentity("strategyTrigger", "strategyGroup")
+            var triggerCleanUpJob = TriggerBuilder.Create()
+               .WithIdentity("cleanUpTrigger", "strategyGroup")
                .WithDailyTimeIntervalSchedule(x => x.WithIntervalInHours(24).OnEveryDay())
                .Build();
 
-            await scheduler.ScheduleJob(job, trigger);
+            await scheduler.ScheduleJob(cleanUpJob, triggerCleanUpJob);       
+
         }
     }
 

@@ -12,23 +12,22 @@ public class StrategyRepository : IStrategyRepository
     }
 
     public async Task<List<StrategySettingsModel>> GetStrategiesByUserIdAsync(Guid userId, bool bookmarked) =>
-        bookmarked ? await _context.Strategies.Where(s => s.UserId == userId && s.Bookmarked).OrderByDescending(s => s.TestStamp).ToListAsync()
-        : await _context.Strategies.Where(s => s.UserId == userId).OrderByDescending(s => s.TestStamp).ToListAsync();
+        bookmarked ? await _context.Strategies.Where(s => s.UserId == userId && s.Bookmarked).OrderByDescending(s => s.StampStart).ToListAsync()
+        : await _context.Strategies.Where(s => s.UserId == userId).OrderByDescending(s => s.StampStart).ToListAsync();
+
+    public async Task<List<StrategySettingsModel>> GetStartedStrategies()
+    {
+        var started = await _context.Strategies.Where(s => s.StampStart > s.StampEnd).ToListAsync();
+        return started;
+    }
 
     public async Task<StrategySettingsModel?> GetStrategyByIdAsync(Guid testId) =>
         await _context.Strategies.Where(s => s.Id == testId).FirstOrDefaultAsync();
 
     public async Task AddStrategyAsync(StrategySettingsModel strategySettings)
     {
-        try
-        {
-            await _context.Strategies.AddAsync(strategySettings);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error adding strategy settings");
-        }
+        await _context.Strategies.AddAsync(strategySettings);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<int> UpdateStrategyAsync(StrategySettingsModel strategySettings)
@@ -50,41 +49,20 @@ public class StrategyRepository : IStrategyRepository
 
     public async Task AddPositionAsync(PositionModel position)
     {
-        try
-        {
-            await _context.Positions.AddAsync(position);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error adding strategy positions");
-        }
+        await _context.Positions.AddAsync(position);
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdatePositionAsync(PositionModel position)
     {
-        try
-        {
-            _context.Positions.Update(position);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error updating strategy positions");
-        }
+        _context.Positions.Update(position);
+        await _context.SaveChangesAsync();
     }
 
     public async Task AddPositionsAsync(List<PositionModel> positions)
     {
-        try
-        {
-            await _context.Positions.AddRangeAsync(positions);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error adding strategy positions");
-        }
+        await _context.Positions.AddRangeAsync(positions);
+        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteStrategyAsync(StrategySettingsModel strategySettings)
@@ -101,34 +79,20 @@ public class StrategyRepository : IStrategyRepository
 
     public async Task CleanupStrategiesAsync()
     {
-        try
-        {
-            var threshold = DateTime.UtcNow.AddDays(-30);
-            var strategies = await _context.Strategies.Where(t => t.TestStamp < threshold && t.Bookmarked == false).ToListAsync();
-            var positions = await _context.Positions.Where(p => strategies.Select(t => t.Id).Contains(p.StrategyId)).ToListAsync();
-            _context.Strategies.RemoveRange(strategies);
-            _context.Positions.RemoveRange(positions);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error cleaning up strategies");
-        }
+        var threshold = DateTime.UtcNow.AddDays(-30);
+        var strategies = await _context.Strategies.Where(t => t.StampEnd < threshold && t.Bookmarked == false).ToListAsync();
+        var positions = await _context.Positions.Where(p => p.StrategyId == p.StrategyId).ToListAsync();
+        _context.Strategies.RemoveRange(strategies);
+        _context.Positions.RemoveRange(positions);
+        await _context.SaveChangesAsync();
     }
 
     public async Task RemoveUserDataAsync(Guid userId)
     {
-        try
-        {
-            var strategies = await _context.Strategies.Where(t => t.UserId == userId).ToListAsync();
-            var positions = await _context.Positions.Where(p => strategies.Select(t => t.Id).Contains(p.StrategyId)).ToListAsync();
-            _context.Strategies.RemoveRange(strategies);
-            _context.Positions.RemoveRange(positions);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error removing user data");
-        }
+        var strategies = await _context.Strategies.Where(t => t.UserId == userId).ToListAsync();
+        var positions = await _context.Positions.Where(p => strategies.Select(t => t.Id).Contains(p.StrategyId)).ToListAsync();
+        _context.Strategies.RemoveRange(strategies);
+        _context.Positions.RemoveRange(positions);
+        await _context.SaveChangesAsync();
     }
 }

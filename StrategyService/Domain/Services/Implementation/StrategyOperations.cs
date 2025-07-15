@@ -1,22 +1,14 @@
 ﻿namespace BN.PROJECT.StrategyService;
-
-public class StrategyOperations : IStrategyOperations
+public static class StrategyOperations
 {
-    private readonly ILogger<StrategyOperations> _logger;
-
-    public StrategyOperations(ILogger<StrategyOperations> logger)
-    {
-        _logger = logger;
-    }
-
-    public DateTime GetStartOfTimeSpan(DateTime dateTime, TimeSpan timeSpan)
+    public static DateTime GetStartOfTimeSpan(DateTime dateTime, TimeSpan timeSpan)
     {
         long ticksSinceMidnight = dateTime.TimeOfDay.Ticks / timeSpan.Ticks;
         TimeSpan startOfTimeSpan = TimeSpan.FromTicks(ticksSinceMidnight * timeSpan.Ticks);
         return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day).Add(startOfTimeSpan);
     }
 
-    public TimeSpan GetTimeSpanByBreakoutPeriod(BreakoutPeriodEnum breakoutPeriod)
+    public static TimeSpan GetTimeSpanByBreakoutPeriod(BreakoutPeriodEnum breakoutPeriod)
     {
         return breakoutPeriod switch
         {
@@ -28,7 +20,7 @@ public class StrategyOperations : IStrategyOperations
         };
     }
 
-    public void UpdateOrCloseOpenPosition(ref PositionModel openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent)
+    public static void UpdateOrCloseOpenPosition(ref PositionModel openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent)
     {
         if (openPosition.Side == SideEnum.Buy)
         {
@@ -75,7 +67,7 @@ public class StrategyOperations : IStrategyOperations
         }
     }
 
-    OrderMessage IStrategyOperations.CreateOrderMessage(Guid strategyId, Guid userId, PositionModel position)
+    public static OrderMessage CreateOrderMessage(Guid strategyId, Guid userId, PositionModel position)
     {
         return new OrderMessage
         {

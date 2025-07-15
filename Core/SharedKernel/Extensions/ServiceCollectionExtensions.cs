@@ -74,7 +74,7 @@ namespace BN.PROJECT.Core
         {
             foreach (TypeInfo item in assembly.DefinedTypes.Where(Filter<T>))
             {
-                services.AddSingleton(typeof(T), item);
+                services.AddScoped(typeof(T), item);
             }
         }
 

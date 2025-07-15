@@ -6,14 +6,7 @@ namespace BN.PROJECT.StrategyService.Tests;
 
 public class StrategyOperationsTests
 {
-    private readonly StrategyOperations _strategyOperations;
-    private readonly Mock<ILogger<StrategyOperations>> _mockLogger;
 
-    public StrategyOperationsTests()
-    {
-        _mockLogger = new Mock<ILogger<StrategyOperations>>();
-        _strategyOperations = new StrategyOperations(_mockLogger.Object);
-    }
 
     [Fact]
     public void GetStartOfTimeSpan_ShouldReturnCorrectStartOfTimeSpan()
@@ -23,7 +16,7 @@ public class StrategyOperationsTests
         var timeSpan = TimeSpan.FromHours(1);
 
         // Act
-        var result = _strategyOperations.GetStartOfTimeSpan(dateTime, timeSpan);
+        var result = StrategyOperations.GetStartOfTimeSpan(dateTime, timeSpan);
 
         // Assert
         Assert.Equal(new DateTime(2023, 10, 10, 15, 0, 0), result);
@@ -35,7 +28,7 @@ public class StrategyOperationsTests
     public void GetTimeSpanByBreakoutPeriod_ShouldReturnCorrectTimeSpan(BreakoutPeriodEnum breakoutPeriod, int expectedMinutes)
     {
         // Act
-        var result = _strategyOperations.GetTimeSpanByBreakoutPeriod(breakoutPeriod);
+        var result = StrategyOperations.GetTimeSpanByBreakoutPeriod(breakoutPeriod);
 
         // Assert
         Assert.Equal(TimeSpan.FromMinutes(expectedMinutes), result);
@@ -51,7 +44,7 @@ public class StrategyOperationsTests
         decimal takeProfitPercent = 10;
 
         // Act
-        _strategyOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, trailingStop, takeProfitPercent);
+        StrategyOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, trailingStop, takeProfitPercent);
 
         // Assert
         Assert.Equal(121, openPosition.TakeProfit);

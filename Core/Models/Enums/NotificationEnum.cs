@@ -6,7 +6,7 @@ public enum NotificationEnum
     None,
     StrategyStart,
     StrategyStop,
-    OtimizeStart,
+    OptimizeStart,
     OptimizeStop,
     AlpacaRateFeed, 
     AccountLoaded,

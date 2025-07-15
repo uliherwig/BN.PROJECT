@@ -1,12 +1,19 @@
 # BN.PROJECT 
 
+
+
 ## source code
 
 https://github.com/uliherwig/BN.PROJECT
 
 ## Description
 
-BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
+The BN Project is a platform which combines brokerage operations with algorithmic trading, encompassing both traditional methodologies and AI-driven approaches. 
+Users have the flexibility to create and fine-tune their own strategies to suit their trading preferences.
+
+Currently, the platform is under development, with new features planned for regular release post-launch.
+During this phase, Alpaca paper accounts are utilized for strategy testing, ensuring a robust and reliable trading experience.
+
 The platform is designed to be modular and scalable. It is based on microservices and uses DDD principles.
 The UI is implemented with Next.js. (https://github.com/uliherwig/BN.NEXT.CLIENT)
 
@@ -40,6 +47,11 @@ StrategyService - contains and applies the trading strategies
 ### NotificationService
 
 NotificationService - provides notifications to React FE per signalR/Redis
+
+### FinAIService / python
+
+FinAIService - provides AI based trading strategies 
+and analysis - implemented in Python- pending
 
 ## CI/CD
 

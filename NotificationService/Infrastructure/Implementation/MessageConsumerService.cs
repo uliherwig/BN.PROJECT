@@ -37,7 +37,8 @@ public class MessageConsumerService : IHostedService
                 var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
 
                 kafkaConsumer.Start(_notificationTopic);
-                kafkaConsumer.MessageReceived += ConsumeMessage;
+                kafkaConsumer.MessageReceived += ConsumeMessage
+                    ;
 
             }
         }
@@ -66,10 +67,10 @@ public class MessageConsumerService : IHostedService
 
         switch (message.MessageType)
         {
-            case MessageTypeEnum.StartTest:
+            case MessageTypeEnum.Start:
                 messageType = NotificationEnum.StrategyStart;
                 break;
-            case MessageTypeEnum.StopTest:
+            case MessageTypeEnum.Stop:
                 messageType = NotificationEnum.StrategyStop;
                 break;
         }

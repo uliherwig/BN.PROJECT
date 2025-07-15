@@ -102,7 +102,6 @@ public class AlpacaTradingController : ControllerBase
         return Ok();
     }
 
-
     [HttpGet("assets")]
     public async Task<IActionResult> GetAssets()
     {
@@ -209,5 +208,13 @@ public class AlpacaTradingController : ControllerBase
 
         var result = await _alpacaTradingService.ClosePositionOrder(userSettings, symbol);
         return Ok(result);
+    }
+
+    [HttpDelete("delete-executions")]
+    public async Task<IActionResult> DeleteExecutionsByUserId()
+    {
+        var userId = HttpContext.Items["UserId"]?.ToString();
+        await _alpacaRepository.DeleteAlpacaExecutionsAsync(new Guid(userId!));
+        return Ok();
     }
 }

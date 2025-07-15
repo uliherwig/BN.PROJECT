@@ -27,8 +27,15 @@ public class InternalStrategyController : ControllerBase
         return Ok(test);
     }
 
-    [HttpPost]
+    [HttpPost("test")]
     public async Task<IActionResult> AddStrategy([FromBody] StrategySettingsModel testSettings)
+    {
+        await _strategyRepository.AddStrategyAsync(testSettings);
+        return Ok(true);
+    }
+
+    [HttpPost("optimize")]
+    public async Task<IActionResult> OptimizeStrategy([FromBody] StrategySettingsModel testSettings)
     {
         await _strategyRepository.AddStrategyAsync(testSettings);
         return Ok(true);

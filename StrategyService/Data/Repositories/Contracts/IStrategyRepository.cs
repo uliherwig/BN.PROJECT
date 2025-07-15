@@ -4,6 +4,8 @@ public interface IStrategyRepository
 {
     Task<List<StrategySettingsModel>> GetStrategiesByUserIdAsync(Guid userId, bool bookmarked);
 
+    Task<List<StrategySettingsModel>> GetStartedStrategies();
+
     Task<StrategySettingsModel?> GetStrategyByIdAsync(Guid testId);
 
     Task AddStrategyAsync(StrategySettingsModel strategySettings);

@@ -10,3 +10,4 @@ global using Serilog;
 global using System.Collections.Concurrent;
 global using System.Net.Http.Headers;
 global using System.Text;
+global using NuGet.Protocol;

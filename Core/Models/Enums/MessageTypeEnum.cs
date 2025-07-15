@@ -2,9 +2,10 @@
 
 public enum MessageTypeEnum
 {
-    StartTest,
+    Init,
+    Start,
     Quotes,
-    StopTest,
+    Stop,
     Success,
     Order
 }
