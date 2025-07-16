@@ -63,7 +63,7 @@ public class AlpacaTestController : ControllerBase
         if (settings == null)
         {
             return BadRequest("StrategySettingsModel cannot be null");
-        }
+        } 
         var userId = HttpContext.Items["UserId"]?.ToString();
         settings.UserId = new Guid(userId!);
         settings.Id = Guid.NewGuid();

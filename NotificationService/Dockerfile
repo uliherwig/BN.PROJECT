@@ -1,30 +1,30 @@
-# Unter https://aka.ms/customizecontainer erfahren Sie, wie Sie Ihren Debugcontainer anpassen und wie Visual Studio dieses Dockerfile verwendet, um Ihre Images für ein schnelleres Debuggen zu erstellen.
-
-# Diese Stufe wird verwendet, wenn sie von VS im Schnellmodus ausgeführt wird (Standardeinstellung für Debugkonfiguration).
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 80
+EXPOSE 5254
+EXPOSE 7220
 
-
-# Diese Stufe wird zum Erstellen des Dienstprojekts verwendet.
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
+
+# Kopieren Sie die Projektdateien und Wiederherstellen der Abhängigkeiten
 COPY ["NotificationService/NotificationService.csproj", "NotificationService/"]
-RUN dotnet restore "./NotificationService/NotificationService.csproj"
+COPY ["Core/CORE.csproj", "Core/"]
+RUN dotnet restore "NotificationService/NotificationService.csproj"
+
+# Kopieren Sie den Rest des Codes und bauen Sie das Projekt
 COPY . .
 WORKDIR "/src/NotificationService"
-RUN dotnet build "./NotificationService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "NotificationService.csproj" -c Release -o /app/build
 
-# Diese Stufe wird verwendet, um das Dienstprojekt zu veröffentlichen, das in die letzte Phase kopiert werden soll.
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./NotificationService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "NotificationService.csproj" -c Release -o /app/publish
 
-# Diese Stufe wird in der Produktion oder bei Ausführung von VS im regulären Modus verwendet (Standard, wenn die Debugkonfiguration nicht verwendet wird).
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Definieren Sie Umgebungsvariablen
+ENV ASPNETCORE_URLS=http://+:5254
+
 ENTRYPOINT ["dotnet", "NotificationService.dll"]

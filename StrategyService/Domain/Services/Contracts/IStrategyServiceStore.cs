@@ -2,9 +2,9 @@
 
 public interface IStrategyServiceStore
 {
-    IOptimizerService GetOrCreateOptimizer(Guid strategyId);
-    void RemoveOptimizer(Guid strategyId);
-    IStrategyService GetOrCreateBacktester(Guid strategyId, StrategyEnum strategyEnum);
-    void RemoveBacktester(Guid strategyId);
+    IKafkaProducerService GetOrCreateKafkaProducer(Guid strategyId);
+    void RemoveKafkaProducer(Guid strategyId);
+    IStrategyService GetOrCreateStrategyService(Guid strategyId, StrategyEnum strategyEnum);
+    void RemoveStrategyService(Guid strategyId);
     void Clear();
 }

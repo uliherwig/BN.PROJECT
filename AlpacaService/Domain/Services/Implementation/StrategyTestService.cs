@@ -32,6 +32,7 @@ public class StrategyTestService : IStrategyTestService
     public async Task RunBacktest(StrategySettingsModel testSettings)
     {
         var strategyTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Strategy);
+        var notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
         await StoreQuotesToRedis(testSettings);
 
         var message = new StrategyMessage
@@ -70,6 +71,7 @@ public class StrategyTestService : IStrategyTestService
         {
             IsBacktest = false,
             UserId = userId,
+            StrategyTask = StrategyTaskEnum.PaperTrade,
             StrategyId = testSettings.Id,
             Strategy = testSettings.StrategyType,
             MessageType = MessageTypeEnum.Start,
@@ -77,8 +79,6 @@ public class StrategyTestService : IStrategyTestService
         };
 
         await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-
-
     }
     public async Task StopExecution(Guid userId, Guid strategyId)
     {
@@ -117,7 +117,6 @@ public class StrategyTestService : IStrategyTestService
         await _alpacaTradingService.CreateOrderAsync(userSettings, symbol, qty, side, orderType, timeInForce);
 
     }
-
     private async Task StoreQuotesToRedis(StrategySettingsModel testSettings)
     {
         var symbol = testSettings.Asset;

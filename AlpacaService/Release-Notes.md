@@ -2,6 +2,11 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2025.07.2
+
+- Refactoring of strategy tasks - done by quartz jobs
+- CI/CD NOtification service added
+
 ## Version 2025.07.1
 
 - Optimization of strategy parameters feature added to strategy service

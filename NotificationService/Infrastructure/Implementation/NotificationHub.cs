@@ -11,8 +11,7 @@ public class NotificationHub : Hub, INotificationHub
     }
 
     public async Task RegisterNotificationFeed(string userId)
-    {
-        var senderId = Context.ConnectionId;
+    {       
         await _redisDatabase.StringSetAsync(userId, Context.ConnectionId);
     }
 

@@ -65,7 +65,7 @@ public class SendQuoteJob : IJob
                 UserId = exec.UserId,
                 StrategyId = exec.StrategyId,
                 Strategy = exec.StrategyType,
-                MessageType = MessageTypeEnum.Quotes,
+                //MessageType = MessageTypeEnum.Quotes,
                 Quotes = [q]
             };
 

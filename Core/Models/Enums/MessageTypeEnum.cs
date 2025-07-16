@@ -1,10 +1,8 @@
 ﻿namespace BN.PROJECT.Core;
 
 public enum MessageTypeEnum
-{
-    Init,
-    Start,
-    Quotes,
+{    
+    Start,  
     Stop,
     Success,
     Order

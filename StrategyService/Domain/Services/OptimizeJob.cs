@@ -41,6 +41,16 @@ public class OptimizeJob : IJob
             return;
         }
 
+        // Initialize Kafka producer for notifications
+        var notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
+        var notificationProducer = _serviceStore.GetOrCreateKafkaProducer(strategyId);
+
+        var notificationMessage = NotificationMessageFactory.CreateNotificationMessage(
+            strategySettings.UserId,
+            NotificationEnum.OptimizeStart
+        );
+        await notificationProducer.SendMessageAsync(notificationTopic, notificationMessage.ToJson());
+
 
         // create quotes
         var quotes = new List<Quote>();
@@ -109,7 +119,7 @@ public class OptimizeJob : IJob
 
                 foreach (var combo in combinations)
                 {
-                    var strategyService = _serviceStore.GetOrCreateBacktester(strategyId, strategySettings.StrategyType);
+                    var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.StrategyType);
 
                     switch (strategyParams.StopLossType)
                     {
@@ -171,7 +181,7 @@ public class OptimizeJob : IJob
                             Result = testResult
                         };
                     }
-                  _serviceStore.RemoveBacktester(strategyId);
+                  _serviceStore.RemoveStrategyService(strategyId);
                 }
                 break;
 
@@ -222,7 +232,7 @@ public class OptimizeJob : IJob
 
                 foreach (var combo in combinations)
                 {
-                    var strategyService = _serviceStore.GetOrCreateBacktester(strategyId, strategySettings.StrategyType);
+                    var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.StrategyType);
 
                     switch (smaSettings.StopLossType)
                     {
@@ -283,7 +293,7 @@ public class OptimizeJob : IJob
                             Result = testResult
                         };
                     }
-                    _serviceStore.RemoveBacktester(strategyId);
+                    _serviceStore.RemoveStrategyService(strategyId);
                 }
                 break;
 
@@ -292,9 +302,17 @@ public class OptimizeJob : IJob
                 return;
         }
 
-
+        // Store results
         optimizationResult.Settings.StampEnd = DateTime.UtcNow.ToUniversalTime();
         await _strategyRepository.UpdateStrategyAsync(optimizationResult.Settings);
         await _strategyRepository.AddPositionsAsync(optimizationResult.Positions);
+
+        // Notify user
+        notificationMessage.NotificationType = NotificationEnum.OptimizeStop;
+        await notificationProducer.SendMessageAsync(notificationTopic, notificationMessage.ToJson());
+
+        // Clean up the service store
+        _serviceStore.RemoveStrategyService(strategyId);
+        _serviceStore.RemoveKafkaProducer(strategyId);
     }
 }

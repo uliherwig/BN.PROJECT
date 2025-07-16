@@ -4,8 +4,8 @@ namespace BN.PROJECT.Core;
 public enum NotificationEnum
 {
     None,
-    StrategyStart,
-    StrategyStop,
+    BacktestStart,
+    BacktestStop,
     OptimizeStart,
     OptimizeStop,
     AlpacaRateFeed, 

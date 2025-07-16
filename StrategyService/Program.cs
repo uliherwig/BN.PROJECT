@@ -106,7 +106,6 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddSingleton<IStrategyServiceStore, StrategyServiceStore>();
 
     services.AddScoped<IStrategyRepository, StrategyRepository>();
-    services.AddScoped<IOptimizerService, OptimizerService>();
 
     services.AddWithAllDerivedTypes<IStrategyService>();  // adds all classes that implement IStrategyService as Singleton
 }

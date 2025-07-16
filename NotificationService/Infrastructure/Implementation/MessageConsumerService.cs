@@ -1,4 +1,5 @@
 ﻿using BN.PROJECT.Core;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BN.PROJECT.NotificationService;
 
@@ -37,8 +38,7 @@ public class MessageConsumerService : IHostedService
                 var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
 
                 kafkaConsumer.Start(_notificationTopic);
-                kafkaConsumer.MessageReceived += ConsumeMessage
-                    ;
+                kafkaConsumer.MessageReceived += ConsumeMessage;
 
             }
         }
@@ -55,34 +55,14 @@ public class MessageConsumerService : IHostedService
 
     public async void ConsumeMessage(string messageJson)
     {
-        var message = JsonConvert.DeserializeObject<StrategyMessage>(messageJson);
-        if (message == null)
+        var notificationMessage = JsonConvert.DeserializeObject<NotificationMessage>(messageJson);
+        if (notificationMessage == null)
         {
             return;
         }
 
-        _logger.LogInformation("Received message: {Message}", message.ToJson());
+        var connectionId = await _redisDatabase.StringGetAsync(notificationMessage.UserId.ToString());
 
-        var messageType = NotificationEnum.None;
-
-        switch (message.MessageType)
-        {
-            case MessageTypeEnum.Start:
-                messageType = NotificationEnum.StrategyStart;
-                break;
-            case MessageTypeEnum.Stop:
-                messageType = NotificationEnum.StrategyStop;
-                break;
-        }
-
-
-        var notificationMessage = new NotificationMessage
-        {
-            UserId = message.UserId,
-            NotificationType = messageType,
-        };
-
-        var connectionId = await _redisDatabase.StringGetAsync(message.UserId.ToString());
         if (!string.IsNullOrEmpty(connectionId.ToString()))
         {
             await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", notificationMessage.ToJson());

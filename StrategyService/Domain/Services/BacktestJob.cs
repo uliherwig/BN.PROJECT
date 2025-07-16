@@ -9,6 +9,8 @@ public class BacktestJob : IJob
     private readonly ILogger<BacktestJob> _logger;
     private readonly IConfiguration _configuration;
     private readonly IStrategyRepository _strategyRepository;
+    private readonly IServiceProvider _serviceProvider;
+
     private readonly IStrategyServiceStore _serviceStore;
     private readonly IDatabase _redisDatabase;
 
@@ -18,13 +20,15 @@ public class BacktestJob : IJob
         ILogger<BacktestJob> logger,
         IConfiguration configuration,
         IStrategyRepository strategyRepository,
-        IStrategyServiceStore strategyServiceStore, 
+        IServiceProvider serviceProvider,
+        IStrategyServiceStore strategyServiceStore,
         IConnectionMultiplexer redis
         )
     {
         _logger = logger;
         _configuration = configuration;
         _strategyRepository = strategyRepository;
+        _serviceProvider = serviceProvider;
         _serviceStore = strategyServiceStore;
         _redisDatabase = redis.GetDatabase();
 
@@ -32,7 +36,6 @@ public class BacktestJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-
         // get strategy settings
         // get quotes
         // create a strategy message
@@ -41,13 +44,11 @@ public class BacktestJob : IJob
         // evaluate quotes
         // get positions
         // get test result
-        // todb: update strategy settings with end time
-        // todb: save positions
-
-
+        // to db: update strategy settings with end time
+        // to db: save positions
 
         var dataMap = context.JobDetail.JobDataMap;
-        var strategyId = (Guid)dataMap.WrappedMap["strategyId"]; 
+        var strategyId = (Guid)dataMap.WrappedMap["strategyId"];
 
         var strategySettings = await _strategyRepository.GetStrategyByIdAsync(strategyId);
         if (strategySettings == null)
@@ -55,7 +56,17 @@ public class BacktestJob : IJob
             _logger.LogError($"Strategy with ID {strategyId} not found.");
             return;
         }
-     
+
+        // Initialize Kafka producer for notifications
+        var notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
+        var notificationProducer = _serviceStore.GetOrCreateKafkaProducer(strategyId);
+
+        var notificationMessage = NotificationMessageFactory.CreateNotificationMessage(
+            strategySettings.UserId,
+            NotificationEnum.BacktestStart
+        );
+        await notificationProducer.SendMessageAsync(notificationTopic, notificationMessage.ToJson());
+
         var quotes = new List<Quote>();
         var symbol = strategySettings.Asset;
         var startDate = strategySettings.StartDate.ToUniversalTime();
@@ -85,7 +96,7 @@ public class BacktestJob : IJob
             MessageType = MessageTypeEnum.Start
         };
 
-        var strategyService = _serviceStore.GetOrCreateBacktester(strategyId, strategySettings.StrategyType);
+        var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.StrategyType);
 
         await strategyService.StartTest(message);
 
@@ -94,17 +105,19 @@ public class BacktestJob : IJob
             await strategyService.EvaluateQuote(strategySettings.Id, message.UserId, q);
         }
 
+        // Store results
         var positions = strategyService.GetPositions();
 
         strategySettings.StampEnd = DateTime.UtcNow.ToUniversalTime();
         await _strategyRepository.UpdateStrategyAsync(strategySettings);
         await _strategyRepository.AddPositionsAsync(positions);
 
-        var results = await strategyService.GetTestResult();
+        // Notify user
+        notificationMessage.NotificationType = NotificationEnum.BacktestStop;
+        await notificationProducer.SendMessageAsync(notificationTopic, notificationMessage.ToJson());
 
-        _logger.LogInformation($"Backtest for strategy {strategyId} completed successfully.");
-
-        // Clean up the backtester from the service store
-        _serviceStore.RemoveBacktester(strategyId);
+        // Clean up the service store
+        _serviceStore.RemoveStrategyService(strategyId);
+        _serviceStore.RemoveKafkaProducer(strategyId);
     }
 }

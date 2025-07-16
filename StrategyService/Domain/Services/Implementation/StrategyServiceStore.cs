@@ -3,28 +3,28 @@
 public class StrategyServiceStore : IStrategyServiceStore
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ConcurrentDictionary<Guid, IOptimizerService> _optimizers = new();
-    private readonly ConcurrentDictionary<Guid, IStrategyService> _backtesters = new();
+    private readonly ConcurrentDictionary<Guid, IKafkaProducerService> _kafkaProducers = new();
+    private readonly ConcurrentDictionary<Guid, IStrategyService> _strategyServices = new();
 
     public StrategyServiceStore(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
 
-    public IOptimizerService GetOrCreateOptimizer(Guid strategyId)
+    public IKafkaProducerService GetOrCreateKafkaProducer(Guid strategyId)
     {
-        return _optimizers.GetOrAdd(strategyId, _ =>
+        return _kafkaProducers.GetOrAdd(strategyId, _ =>
         {
             var scope = _serviceProvider.CreateScope();
-            var optimizer = scope.ServiceProvider.GetService<IOptimizerService>();
+            var producer = scope.ServiceProvider.GetService<IKafkaProducerService>();
 
-            return optimizer;
+            return producer == null ? throw new InvalidOperationException("IKafkaProducerService not found.") : producer;
         });
     }
 
-    public void RemoveOptimizer(Guid strategyId)
+    public void RemoveKafkaProducer(Guid strategyId)
     {
-        if (_optimizers.TryRemove(strategyId, out var optimizer))
+        if (_kafkaProducers.TryRemove(strategyId, out var optimizer))
         {
             // Dispose the optimizer if it implements IDisposable
             if (optimizer is IDisposable disposable)
@@ -34,9 +34,9 @@ public class StrategyServiceStore : IStrategyServiceStore
         }
     }
 
-    public IStrategyService GetOrCreateBacktester(Guid strategyId, StrategyEnum strategyEnum)
+    public IStrategyService GetOrCreateStrategyService(Guid strategyId, StrategyEnum strategyEnum)
     {
-        return _backtesters.GetOrAdd(strategyId, _ =>
+        return _strategyServices.GetOrAdd(strategyId, _ =>
         {
             var scope = _serviceProvider.CreateScope();
             var services = scope.ServiceProvider.GetServices<IStrategyService>();
@@ -46,9 +46,9 @@ public class StrategyServiceStore : IStrategyServiceStore
         });
     }
 
-    public void RemoveBacktester(Guid strategyId)
+    public void RemoveStrategyService(Guid strategyId)
     {
-        if (_backtesters.TryRemove(strategyId, out var backtester))
+        if (_strategyServices.TryRemove(strategyId, out var backtester))
         {      
             if (backtester is IDisposable disposable)
             {
@@ -59,6 +59,6 @@ public class StrategyServiceStore : IStrategyServiceStore
 
     public void Clear()
     {
-        _backtesters.Clear();
+        _strategyServices.Clear();
     }
 }

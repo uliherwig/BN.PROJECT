@@ -53,4 +53,8 @@
 		<ProjectReference Include="..\Core\CORE.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Domain\" />
+	</ItemGroup>
+
 </Project>

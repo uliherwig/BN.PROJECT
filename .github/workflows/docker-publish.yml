@@ -64,10 +64,10 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/strategyservice:latest
 
-    - name: Build and push TestService image
+    - name: Build and push NotificationService image
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: TestService/Dockerfile
+        file: NotificationService/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/testservice:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/NotificationService:latest
