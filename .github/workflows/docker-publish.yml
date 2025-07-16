@@ -70,4 +70,4 @@ jobs:
         context: .
         file: NotificationService/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/notificationService:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/notificationservice:latest
