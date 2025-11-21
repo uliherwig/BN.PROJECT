@@ -31,7 +31,9 @@ namespace BN.PROJECT.AlpacaService
         public async Task<List<AlpacaAsset>> GetAssetsAsync()
         {
             var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var assets = await tradingClient.ListAssetsAsync(new AssetsRequest());
+            var req = new AssetsRequest();
+            req.AssetClass = AssetClass.UsEquity;
+            var assets = await tradingClient.ListAssetsAsync(req);
             return assets.Select(a => a.ToAlpacaAsset()).ToList();
         }
 

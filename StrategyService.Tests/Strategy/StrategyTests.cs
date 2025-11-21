@@ -41,7 +41,7 @@ public class StrategyTests
                            .Returns(Task.CompletedTask);
 
         _smaStrategy = new SmaStrategy(_testLoggerSma, _serviceProviderMock.Object, _mockKafkaProducer.Object);
-        _breakoutStrategy = new BreakoutStrategy(_testLoggerBreakout, _serviceProviderMock.Object,  _mockKafkaProducer.Object);
+        _breakoutStrategy = new BreakoutStrategy(_testLoggerBreakout,  _mockKafkaProducer.Object);
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class StrategyTests
             StartDate = DateTime.Parse("2024-11-27T14:30:00.000Z").ToUniversalTime(),
             EndDate = DateTime.Parse("2024-11-27T21:08:00.000Z").ToUniversalTime(),
             TrailingStop = 0.0m,
-            AllowOvernight = true,
+            ClosePositionEod = true,
             Bookmarked = false,         
             StrategyParams = smaParams
         };
@@ -120,7 +120,7 @@ public class StrategyTests
             StartDate = DateTime.Parse("2024-11-27T14:30:00.000Z").ToUniversalTime(),
             EndDate = DateTime.Parse("2024-11-27T21:08:00.000Z").ToUniversalTime(),
             TrailingStop = 0.0m,
-            AllowOvernight = true,
+            ClosePositionEod = true,
             Bookmarked = false,
             StrategyParams = smaParams
         };
@@ -150,7 +150,7 @@ public class StrategyTests
         var testparams = JsonConvert.SerializeObject(new
         {
             StopLossType = StopLossTypeEnum.Breakout,
-            BreakoutPeriod = BreakoutPeriodEnum.Hour
+            BreakoutPeriod = TimeFrameEnum.Hour
         });
 
         var strategySettings = new StrategySettingsModel
@@ -166,7 +166,7 @@ public class StrategyTests
             StartDate = DateTime.Parse("2024-11-27T14:30:00.000Z").ToUniversalTime(),
             EndDate = DateTime.Parse("2024-11-27T21:08:00.000Z").ToUniversalTime(),
             TrailingStop = 0.0m,
-            AllowOvernight = true,
+            ClosePositionEod = true,
             Bookmarked = false,
             StrategyParams = testparams
         };
@@ -212,7 +212,7 @@ public class StrategyTests
             StartDate = DateTime.Parse("2024-11-27T14:30:00.000Z").ToUniversalTime(),
             EndDate = DateTime.Parse("2024-11-27T21:08:00.000Z").ToUniversalTime(),
             TrailingStop = 0.0m,
-            AllowOvernight = true,
+            ClosePositionEod = true,
             Bookmarked = false,
             StrategyParams = smaParams1
         };
@@ -238,7 +238,7 @@ public class StrategyTests
             StartDate = DateTime.Parse("2024-11-27T14:30:00.000Z").ToUniversalTime(),
             EndDate = DateTime.Parse("2024-11-27T21:08:00.000Z").ToUniversalTime(),
             TrailingStop = 0.0m,
-            AllowOvernight = true,
+            ClosePositionEod = true,
             Bookmarked = false,
             StrategyParams = smaParams2
         };

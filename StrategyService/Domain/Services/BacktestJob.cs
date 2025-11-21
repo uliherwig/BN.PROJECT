@@ -14,8 +14,6 @@ public class BacktestJob : IJob
     private readonly IStrategyServiceStore _serviceStore;
     private readonly IDatabase _redisDatabase;
 
-
-
     public BacktestJob(
         ILogger<BacktestJob> logger,
         IConfiguration configuration,
@@ -89,7 +87,7 @@ public class BacktestJob : IJob
         var message = new StrategyMessage
         {
             StrategyId = strategySettings.Id,
-            IsBacktest = true,
+            StrategyTask = StrategyTaskEnum.Backtest,
             UserId = strategySettings.UserId,
             Settings = strategySettings,
             Strategy = strategySettings.StrategyType,
@@ -98,7 +96,7 @@ public class BacktestJob : IJob
 
         var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.StrategyType);
 
-        await strategyService.StartTest(message);
+        await strategyService.Initialize(StrategyTaskEnum.Backtest,strategySettings);
 
         foreach (var q in quotes)
         {

@@ -1,25 +1,7 @@
 ﻿namespace BN.PROJECT.StrategyService;
-public static class StrategyOperations
+
+public static class TradingOperations
 {
-    public static DateTime GetStartOfTimeSpan(DateTime dateTime, TimeSpan timeSpan)
-    {
-        long ticksSinceMidnight = dateTime.TimeOfDay.Ticks / timeSpan.Ticks;
-        TimeSpan startOfTimeSpan = TimeSpan.FromTicks(ticksSinceMidnight * timeSpan.Ticks);
-        return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day).Add(startOfTimeSpan);
-    }
-
-    public static TimeSpan GetTimeSpanByBreakoutPeriod(BreakoutPeriodEnum breakoutPeriod)
-    {
-        return breakoutPeriod switch
-        {
-            BreakoutPeriodEnum.Day => TimeSpan.FromDays(1),
-            BreakoutPeriodEnum.Hour => TimeSpan.FromHours(1),
-            BreakoutPeriodEnum.Minute => TimeSpan.FromMinutes(1),
-            BreakoutPeriodEnum.TenMinutes => TimeSpan.FromMinutes(10),
-            _ => TimeSpan.FromDays(1)
-        };
-    }
-
     public static void UpdateOrCloseOpenPosition(ref PositionModel openPosition, Quote quote, decimal trailingStop, decimal takeProfitPercent)
     {
         if (openPosition.Side == SideEnum.Buy)
@@ -46,11 +28,11 @@ public static class StrategyOperations
 
         if (openPosition.Side == SideEnum.Sell)
         {
-            if (quote.BidPrice < openPosition.TakeProfit)
+            if (quote.AskPrice < openPosition.TakeProfit)
             {
                 if (trailingStop > 0m)
                 {
-                    var tp = quote.BidPrice - (quote.BidPrice * takeProfitPercent / 100);
+                    var tp = quote.AskPrice - (quote.AskPrice * takeProfitPercent / 100);
                     var sl = quote.AskPrice + (quote.AskPrice * trailingStop / 100);
                     openPosition.UpdateTakeProfitAndStopLoss(tp, sl);
                 }
@@ -77,4 +59,5 @@ public static class StrategyOperations
             Position = position
         };
     }
+
 }

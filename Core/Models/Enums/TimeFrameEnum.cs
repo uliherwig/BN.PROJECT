@@ -1,9 +1,10 @@
 ﻿namespace BN.PROJECT.Core;
 
-public enum BreakoutPeriodEnum
+public enum TimeFrameEnum
 {
     Minute,
     TenMinutes,
+    ThirtyMinutes,
     Hour,
     Day,
 }

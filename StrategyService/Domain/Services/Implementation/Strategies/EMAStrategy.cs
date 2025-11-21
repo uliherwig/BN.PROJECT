@@ -1,10 +1,9 @@
 ﻿
-
 namespace BN.PROJECT.StrategyService;
 
-public class SmaStrategy : IStrategyService
+public class EmaStrategy : IStrategyService
 {
-    private readonly ILogger<SmaStrategy> _logger;
+    private readonly ILogger<EmaStrategy> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IKafkaProducerService _kafkaProducer;
 
@@ -16,8 +15,9 @@ public class SmaStrategy : IStrategyService
     private readonly string _notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
     private readonly string _orderTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Order);
 
-    public SmaStrategy(
-        ILogger<SmaStrategy> logger,
+    public EmaStrategy(
+
+        ILogger<EmaStrategy> logger,
         IServiceProvider serviceProvider,
         IKafkaProducerService kafkaProducer)
     {
@@ -98,14 +98,27 @@ public class SmaStrategy : IStrategyService
         }
         _strategy.LastQuotes.RemoveAt(0);
 
-        var shortPeriodQuotes = _strategy.LastQuotes.Skip(_strategy.LongPeriod - _strategy.ShortPeriod).Take(_strategy.ShortPeriod);
+
+        var shortPeriodQuotes = _strategy.LastQuotes.Skip(_strategy.LongPeriod - _strategy.ShortPeriod).Take(_strategy.ShortPeriod).ToList();
         var longPeriodQuotes = _strategy.LastQuotes;
 
-        var longSma = longPeriodQuotes.Average(q => q.AskPrice);
+        var longEma = longPeriodQuotes.Average(q => q.AskPrice);
+        decimal alpha = (decimal)(2.0 / (_strategy.LongPeriod + 1));
+        for (int i = 0; i < longPeriodQuotes.Count; i++)
+        {
+            longEma = alpha * longPeriodQuotes[i].AskPrice + (1 - alpha) * longEma;
+        }
+        
         var shortSma = shortPeriodQuotes.Average(q => q.AskPrice);
+        alpha = (decimal)(2.0 / (_strategy.ShortPeriod + 1));
+        for (int i = 0; i < shortPeriodQuotes.Count; i++)
+        {
+            shortSma = alpha * shortPeriodQuotes[i].AskPrice + (1 - alpha) * shortSma;
+        }
+
         var order = false;
 
-        var signal = shortSma > longSma ? SideEnum.Buy : SideEnum.Sell;
+        var signal = shortSma > longEma ? SideEnum.Buy : SideEnum.Sell;
         _signals.Add(signal);
         if (_signals.Count == 2)
         {
@@ -121,7 +134,7 @@ public class SmaStrategy : IStrategyService
 
 
         currentSmaTick.ShortSma = shortSma;
-        currentSmaTick.LongSma = longSma;
+        currentSmaTick.LongSma = longEma;
         _ticks.Add(currentSmaTick);
 
         _strategy.LastSmas.Add(currentSmaTick);
@@ -200,8 +213,7 @@ public class SmaStrategy : IStrategyService
     }
 
     public List<PositionModel> GetPositions()
-    {
-      
+    {      
         return _positions;
     }
 

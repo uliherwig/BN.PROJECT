@@ -3,5 +3,5 @@
 public class BreakoutModel
 {
     public StopLossTypeEnum StopLossType { get; set; } = StopLossTypeEnum.Breakout;
-    public BreakoutPeriodEnum BreakoutPeriod { get; set; } = BreakoutPeriodEnum.Day;
+    public TimeFrameEnum BreakoutPeriod { get; set; } = TimeFrameEnum.Day;
 }

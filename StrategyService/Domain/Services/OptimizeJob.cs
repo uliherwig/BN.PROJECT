@@ -103,9 +103,9 @@ public class OptimizeJob : IJob
 
                     case StopLossTypeEnum.Breakout:
 
-                        var paramGrid = new Dictionary<string, IEnumerable<BreakoutPeriodEnum>>
+                        var paramGrid = new Dictionary<string, IEnumerable<TimeFrameEnum>>
                             {
-                                { "period", Enum.GetValues(typeof(BreakoutPeriodEnum)).Cast<BreakoutPeriodEnum>() }
+                                { "period", Enum.GetValues(typeof(TimeFrameEnum)).Cast<TimeFrameEnum>() }
                             };
 
                         combinations =

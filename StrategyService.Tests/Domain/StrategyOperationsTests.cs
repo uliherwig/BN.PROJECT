@@ -1,6 +1,4 @@
 using BN.PROJECT.Core;
-using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace BN.PROJECT.StrategyService.Tests;
 
@@ -23,9 +21,9 @@ public class StrategyOperationsTests
     }
 
     [Theory]  
-    [InlineData(BreakoutPeriodEnum.Minute, 1)]
-    [InlineData(BreakoutPeriodEnum.TenMinutes, 10)]
-    public void GetTimeSpanByBreakoutPeriod_ShouldReturnCorrectTimeSpan(BreakoutPeriodEnum breakoutPeriod, int expectedMinutes)
+    [InlineData(TimeFrameEnum.Minute, 1)]
+    [InlineData(TimeFrameEnum.TenMinutes, 10)]
+    public void GetTimeSpanByBreakoutPeriod_ShouldReturnCorrectTimeSpan(TimeFrameEnum breakoutPeriod, int expectedMinutes)
     {
         // Act
         var result = StrategyOperations.GetTimeSpanByBreakoutPeriod(breakoutPeriod);
@@ -44,7 +42,7 @@ public class StrategyOperationsTests
         decimal takeProfitPercent = 10;
 
         // Act
-        StrategyOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, trailingStop, takeProfitPercent);
+        TradingOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, trailingStop, takeProfitPercent);
 
         // Assert
         Assert.Equal(121, openPosition.TakeProfit);

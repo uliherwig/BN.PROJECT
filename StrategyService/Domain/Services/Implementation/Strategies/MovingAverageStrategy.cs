@@ -1,75 +1,28 @@
-﻿using System.Diagnostics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿namespace BN.PROJECT.StrategyService;
 
-namespace BN.PROJECT.StrategyService;
+public class MovingAverageStrategy(
 
-public class BreakoutStrategy : IStrategyService
+    ILogger<MovingAverageStrategy> logger,
+    IKafkaProducerService kafkaProducer) : IStrategyService
 {
-    private readonly ILogger<BreakoutStrategy> _logger;
-    private readonly IKafkaProducerService _kafkaProducer;
+    private readonly ILogger<MovingAverageStrategy> _logger = logger;
+    private readonly IKafkaProducerService _kafkaProducer = kafkaProducer;
 
     private StrategyTaskEnum _strategyTask;
     private StrategySettingsModel? _strategy;
-    private BreakoutModel? _breakoutSettings;
+    private SmaModel? _smaSettings;
 
-
-    private List<Quote> _quotes = [];
-    private decimal _prevHigh = 0.0m;
-    private decimal _prevLow = 0.0m;
 
 
     public List<PositionModel> _positions = [];
     private readonly TimeSpan _marketCloseTime = new TimeSpan(19, 55, 0);
+    private List<decimal> _prices = [];
+    private List<decimal> _longSmas = [];
+    private List<decimal> _shortSmas = [];
+
 
     private readonly string _notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
     private readonly string _orderTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Order);
-
-
-    public BreakoutStrategy(
-
-        ILogger<BreakoutStrategy> logger,
-        IKafkaProducerService kafkaProducer)
-    {
-        _logger = logger;
-        _kafkaProducer = kafkaProducer;
-    }
-
-    //public Task StartTest(StrategyMessage message)
-    //{
-    //    if (message == null || message.Settings == null)
-    //    {
-    //        return Task.CompletedTask;
-    //    }
-    //    var strategySettings = message.Settings;
-    //    var breakOutSettings = JsonConvert.DeserializeObject<BreakoutModel>(strategySettings.StrategyParams);
-
-    //     _strategy = new BreakoutProcessModel
-    //    {
-    //        IsBacktest = message.IsBacktest,
-    //        StartDate = DateTime.MinValue,
-    //        BreakoutTimeSpan = StrategyOperations.GetTimeSpanByBreakoutPeriod(breakOutSettings.BreakoutPeriod),
-    //        CurrentHigh = 10000.0m,
-    //        CurrentLow = 0.0m,
-    //        PrevHigh = 10000.0m,
-    //        PrevLow = 0.0m,
-    //        LastTimeFrameVolume = 0,  // in use but senseless
-    //        TimeFrameStart = DateTime.MinValue,
-    //        PrevTimeFrameStart = DateTime.MinValue,
-    //        TakeProfitPlus = 0.0m, // currently obsolete
-    //        MarketCloseTime = new TimeSpan(19, 55, 0), // todo replace with method to get market close time get it from asset
-    //        AllowOvernight = strategySettings.AllowOvernight,
-    //        Asset = strategySettings.Asset,
-    //        Quantity = strategySettings.Quantity,
-    //        StrategyId = message.StrategyId,
-    //        TakeProfitPercent = strategySettings.TakeProfitPercent,
-    //        StopLossPercent = strategySettings.StopLossPercent,
-    //        TrailingStop = strategySettings.TrailingStop,
-    //        StopLossType = breakOutSettings.StopLossType,
-    //    };
-
-
-    //    return Task.CompletedTask;
-    //}
 
     public Task Initialize(StrategyTaskEnum strategyTask, StrategySettingsModel strategySettings)
     {
@@ -81,15 +34,17 @@ public class BreakoutStrategy : IStrategyService
         _strategy = strategySettings;
         _strategyTask = strategyTask;
 
-        _breakoutSettings = JsonConvert.DeserializeObject<BreakoutModel>(strategySettings.StrategyParams)
+        _smaSettings = JsonConvert.DeserializeObject<SmaModel>(strategySettings.StrategyParams)
                        ?? throw new InvalidOperationException("StrategyParams deserialization returned null.");
 
-
+        _smaSettings.SlopeWindow = 5;
+        _smaSettings.MinSlopeThreshold = 0.05m;
 
         _logger.LogInformation($"Strategy {strategySettings.Id} initialized with settings: {strategySettings.ToJson()}");
 
         // Reset state       
         _positions.Clear();
+        _prices.Clear();
 
         // Send notification about strategy initialization
         _kafkaProducer.SendMessageAsync(_notificationTopic, strategySettings.ToJson());
@@ -99,71 +54,61 @@ public class BreakoutStrategy : IStrategyService
 
     public Task EvaluateQuote(Guid strategyId, Guid userId, Quote quote)
     {
-        var stopwatch = Stopwatch.StartNew();
-
-        if (_strategy == null || _breakoutSettings == null)
+        if(_strategy == null || _smaSettings == null)
         {
             return Task.CompletedTask;
         }
 
-        if (quote == null || quote.AskPrice == 0 || quote.BidPrice == 0)
+        _prices.Add(quote.AskPrice);
+        if (_prices.Count <= _smaSettings.LongPeriod)
+        {
+            return Task.CompletedTask;
+        }
+        _prices.RemoveAt(0);
+
+        var quoteStamp = quote.TimestampUtc;
+        var shortSMA = StrategyOperations.CalculateSMA(_prices, _smaSettings.ShortPeriod);
+        var longSMA = StrategyOperations.CalculateSMA(_prices, _smaSettings.LongPeriod);
+
+        _longSmas.Add(longSMA);
+        _shortSmas.Add(shortSMA);
+
+        if (_shortSmas.Count <= _smaSettings.SlopeWindow)
         {
             return Task.CompletedTask;
         }
 
-        _quotes.Add(quote);
-
-        var timeSpan = StrategyOperations.GetTimeSpanByBreakoutPeriod(_breakoutSettings.BreakoutPeriod);
-
-        var minutes = timeSpan.TotalMinutes;
-
-        var startOfTimeSpan = StrategyOperations.GetStartOfTimeSpan(quote.TimestampUtc, timeSpan);
-        var prevStartOfTimeSpan = startOfTimeSpan.Add(-timeSpan);
-        if (_quotes.Count <= timeSpan.TotalMinutes * 2)
+        if (_longSmas.Count > _smaSettings.LongPeriod)
         {
-            return Task.CompletedTask;
+            _longSmas.RemoveAt(0);
+            _shortSmas.RemoveAt(0);
         }
 
-
-        var quotesPrevPeriod = _quotes
-            .Where(q => q.TimestampUtc >= prevStartOfTimeSpan && q.TimestampUtc < startOfTimeSpan)
-            .ToList();
-
-        if (quotesPrevPeriod.Count < 10)
-        {
-            _logger.LogWarning($"No quotes found for the time span starting at {startOfTimeSpan}.");
-            return Task.CompletedTask;
-        }
-
-        var maxAskQuote = quotesPrevPeriod
-            .OrderByDescending(q => q.AskPrice)
-            .First();
-        var minBidQuote = quotesPrevPeriod
-            .OrderBy(q => q.BidPrice)
-            .First();
-
+        var prevCrossDown = _shortSmas[_shortSmas.Count - 2] < _longSmas[_longSmas.Count - 2];
+        var currCrossDown = _shortSmas[_shortSmas.Count - 1] < _longSmas[_longSmas.Count - 1];
+        var prevCrossUp = _shortSmas[_shortSmas.Count - 2] > _longSmas[_longSmas.Count - 2];
+        var currCrossUp = _shortSmas[_shortSmas.Count - 1] > _longSmas[_longSmas.Count - 1];
 
         var tradeSignal = TradeSignal.Hold;
 
-        // ask > prev high
-        if (quote.AskPrice > maxAskQuote.AskPrice)
+        decimal slope = StrategyOperations.CalculateSlope(_shortSmas, _smaSettings.SlopeWindow);
+
+        if (prevCrossDown && currCrossUp && slope > _smaSettings.MinSlopeThreshold)
         {
             tradeSignal = TradeSignal.Buy;
         }
-        // bid < prev low
-        if (quote.BidPrice < minBidQuote.BidPrice)
+        if (prevCrossUp && currCrossDown && slope < -_smaSettings.MinSlopeThreshold)
         {
             tradeSignal = TradeSignal.Sell;
         }
-
-        var breakoutParams = JsonConvert.SerializeObject(new
-        {
-            PrevLow = minBidQuote.BidPrice,
-            PrevHigh = maxAskQuote.AskPrice,
-            PrevLowStamp = minBidQuote.TimestampUtc,
-            PrevHighStamp = maxAskQuote.TimestampUtc
-
-        });
+        //if (prevCrossDown && currCrossUp)
+        //{
+        //    tradeSignal = TradeSignal.Buy;
+        //}
+        //if (prevCrossUp && currCrossDown)
+        //{
+        //    tradeSignal = TradeSignal.Sell;
+        //}
 
         var openPosition = _positions.Where(p => p.PriceClose == 0).FirstOrDefault();
 
@@ -172,17 +117,17 @@ public class BreakoutStrategy : IStrategyService
         if (openPosition != null)
         {
             // check if we need to close position at EoD
-            if (_strategy.ClosePositionEod == false && quote.TimestampUtc.TimeOfDay > _marketCloseTime)
+            if (_strategy.ClosePositionEod == false && quoteStamp.TimeOfDay > _marketCloseTime)
             {
                 var closePrice = openPosition.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
                 openPosition.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close");
             }
 
             // handle normal SL / TP operation
-            else if (_breakoutSettings.StopLossType == StopLossTypeEnum.None)
+            else if (_smaSettings.StopLossType == StopLossTypeEnum.None)
             {
                 TradingOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, _strategy.TrailingStop, _strategy.TakeProfitPercent);
-
+            
             }
 
             if (openPosition.PriceClose > 0 && _strategyTask == StrategyTaskEnum.PaperTrade)
@@ -218,7 +163,7 @@ public class BreakoutStrategy : IStrategyService
                         tp,
                         quote.TimestampUtc,
                         _strategy.StrategyType,
-                        JsonConvert.SerializeObject(_breakoutSettings));
+                        JsonConvert.SerializeObject(_smaSettings));
 
             _positions.Add(position);
 
@@ -231,21 +176,23 @@ public class BreakoutStrategy : IStrategyService
         return Task.CompletedTask;
     }
 
-    public async Task StopTest(StrategyMessage message)
-    {
-
-
-    }
 
     public List<PositionModel> GetPositions()
     {
+
         return _positions;
     }
+
     public async Task<TestResult> GetTestResult()
     {
         var testResult = new TestResult();
+
+
+        testResult.Id = _strategy.Id;
+        testResult.Asset = _strategy.Asset;
+        testResult.StartDate = _strategy.StartDate;
         testResult.EndDate = DateTime.UtcNow;
-        testResult.NumberOfPositions = _positions.Count();
+        testResult.NumberOfPositions = _positions.Count;
         testResult.NumberOfBuyPositions = _positions.Count(p => p.Side == SideEnum.Buy);
         testResult.NumberOfSellPositions = _positions.Count(p => p.Side == SideEnum.Sell);
         testResult.TotalProfitLoss = _positions.Sum(p => p.ProfitLoss);
@@ -254,11 +201,16 @@ public class BreakoutStrategy : IStrategyService
         return testResult;
     }
 
-    public bool CanHandle(StrategyEnum strategy) =>
-     strategy == StrategyEnum.Breakout;
-
+    public bool CanHandle(StrategyEnum strategy)
+    {
+        return strategy == StrategyEnum.SMA || strategy == StrategyEnum.WMA || strategy == StrategyEnum.EMA;
+    }
 
     public Task StartTest(StrategyMessage message)
+    {
+        throw new NotImplementedException();
+    }
+    public async Task StopTest(StrategyMessage message)
     {
         throw new NotImplementedException();
     }

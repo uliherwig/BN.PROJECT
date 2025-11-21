@@ -9,6 +9,9 @@ public enum StrategyEnum
     Reversal,
     TrendFollowing,
     SMA,
+    EMA,
+    WMA,
+    TEMA
     //ValueInvesting,
     //GrowthInvesting,
     //DividendInvesting,

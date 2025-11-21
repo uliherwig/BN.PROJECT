@@ -15,11 +15,12 @@ public class StrategySettingsModel
     public int Quantity { get; set; }
     public decimal TakeProfitPercent { get; set; }
     public decimal StopLossPercent { get; set; }
-    public DateTime StartDate { get; set; } 
+    public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public decimal TrailingStop { get; set; } = 0m;
-    public bool AllowOvernight { get; set; } = true;
+    public bool ClosePositionEod { get; set; } = true;
     public bool Bookmarked { get; set; } = false;
+    // TODO check if Optimized is needed
     public bool Optimized { get; set; } = false;
     public string StrategyParams { get; set; } = string.Empty;
 }

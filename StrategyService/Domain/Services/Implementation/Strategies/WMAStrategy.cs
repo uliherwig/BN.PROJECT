@@ -1,10 +1,8 @@
-﻿
+﻿namespace BN.PROJECT.StrategyService;
 
-namespace BN.PROJECT.StrategyService;
-
-public class SmaStrategy : IStrategyService
+public class WmaStrategy : IStrategyService
 {
-    private readonly ILogger<SmaStrategy> _logger;
+    private readonly ILogger<WmaStrategy> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IKafkaProducerService _kafkaProducer;
 
@@ -16,8 +14,9 @@ public class SmaStrategy : IStrategyService
     private readonly string _notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
     private readonly string _orderTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Order);
 
-    public SmaStrategy(
-        ILogger<SmaStrategy> logger,
+    public WmaStrategy(
+
+        ILogger<WmaStrategy> logger,
         IServiceProvider serviceProvider,
         IKafkaProducerService kafkaProducer)
     {
@@ -98,14 +97,33 @@ public class SmaStrategy : IStrategyService
         }
         _strategy.LastQuotes.RemoveAt(0);
 
-        var shortPeriodQuotes = _strategy.LastQuotes.Skip(_strategy.LongPeriod - _strategy.ShortPeriod).Take(_strategy.ShortPeriod);
+
+        var shortPeriodQuotes = _strategy.LastQuotes.Skip(_strategy.LongPeriod - _strategy.ShortPeriod).Take(_strategy.ShortPeriod).ToList();
         var longPeriodQuotes = _strategy.LastQuotes;
 
-        var longSma = longPeriodQuotes.Average(q => q.AskPrice);
-        var shortSma = shortPeriodQuotes.Average(q => q.AskPrice);
+        // Calculate WMA for long period
+        decimal longWma = 0;
+        int longN = longPeriodQuotes.Count;
+        int longWeightSum = longN * (longN + 1) / 2;
+        for (int i = 0; i < longN; i++)
+        {
+            longWma += longPeriodQuotes[i].AskPrice * (i + 1);
+        }
+        longWma /= longWeightSum;
+
+        // Calculate WMA for short period
+        decimal shortWma = 0;
+        int shortN = shortPeriodQuotes.Count;
+        int shortWeightSum = shortN * (shortN + 1) / 2;
+        for (int i = 0; i < shortN; i++)
+        {
+            shortWma += shortPeriodQuotes[i].AskPrice * (i + 1);
+        }
+        shortWma /= shortWeightSum;
+
         var order = false;
 
-        var signal = shortSma > longSma ? SideEnum.Buy : SideEnum.Sell;
+        var signal = shortWma > longWma ? SideEnum.Buy : SideEnum.Sell;
         _signals.Add(signal);
         if (_signals.Count == 2)
         {
@@ -120,8 +138,8 @@ public class SmaStrategy : IStrategyService
         // _logger.LogInformation($"SMA Intersection detected for strategy {strategyId} at {quoteStamp}; signal = {_signals.ElementAt(0)}");
 
 
-        currentSmaTick.ShortSma = shortSma;
-        currentSmaTick.LongSma = longSma;
+        currentSmaTick.ShortSma = shortWma;
+        currentSmaTick.LongSma = longWma;
         _ticks.Add(currentSmaTick);
 
         _strategy.LastSmas.Add(currentSmaTick);
@@ -200,8 +218,7 @@ public class SmaStrategy : IStrategyService
     }
 
     public List<PositionModel> GetPositions()
-    {
-      
+    {      
         return _positions;
     }
 

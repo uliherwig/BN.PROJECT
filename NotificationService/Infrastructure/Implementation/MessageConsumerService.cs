@@ -1,7 +1,4 @@
-﻿using BN.PROJECT.Core;
-using Microsoft.AspNetCore.SignalR;
-
-namespace BN.PROJECT.NotificationService;
+﻿namespace BN.PROJECT.NotificationService;
 
 public class MessageConsumerService : IHostedService
 {

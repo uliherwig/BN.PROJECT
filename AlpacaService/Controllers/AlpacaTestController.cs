@@ -100,8 +100,7 @@ public class AlpacaTestController : ControllerBase
         settings.StartDate = settings.StartDate.ToUniversalTime();
         settings.EndDate = settings.EndDate.ToUniversalTime();
         settings.StampStart = DateTime.UtcNow.ToUniversalTime();
-        settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
-        settings.Optimized = true;
+        settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();      
         var result = await _strategyServiceClient.StartStrategyAsync(settings);
         if (result == "true")
         {

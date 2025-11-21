@@ -131,8 +131,9 @@ public class StrategyTestService : IStrategyTestService
 
         while (stamp < endDate)
         {
-            var key = $"quotes:{symbol}:{stamp:yyyy-MM-dd}";
-            if (!_redisDatabase.KeyExists(key))
+            var quoteskey = $"quotes:{symbol}:{stamp:yyyy-MM-dd}";
+            var barskey = $"bars:{symbol}:{stamp:yyyy-MM-dd}";
+            if (!_redisDatabase.KeyExists(quoteskey) || !_redisDatabase.KeyExists(barskey))
             {
                 var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
                 if (bars.Count == 0)
@@ -141,6 +142,7 @@ public class StrategyTestService : IStrategyTestService
                     continue;
                 }
                 var quotesDay = new List<Quote>();
+                var barsDay = new List<AlpacaBar>();
                 foreach (var bar in bars.Where(b => b.T > stamp && b.T < stampEnd))
                 {
                     var q = new Quote
@@ -151,9 +153,11 @@ public class StrategyTestService : IStrategyTestService
                         TimestampUtc = bar.T.ToUniversalTime()
                     };
                     quotesDay.Add(q);
+                    barsDay.Add(bar);
                 }
 
-                _redisDatabase.StringSet($"quotes:{symbol}:{stamp:yyyy-MM-dd}", quotesDay.ToJson(), TimeSpan.FromDays(1));
+                _redisDatabase.StringSet($"quotes:{symbol}:{stamp:yyyy-MM-dd}", quotesDay.ToJson(), TimeSpan.FromDays(100));
+                _redisDatabase.StringSet($"bars:{symbol}:{stamp:yyyy-MM-dd}", barsDay.ToJson(), TimeSpan.FromDays(100));
             }
 
             stamp = stamp.Add(timeFrame).ToUniversalTime();
