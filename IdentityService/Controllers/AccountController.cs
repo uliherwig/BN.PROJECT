@@ -44,31 +44,52 @@ public class AccountController : ControllerBase
     [HttpPost("sign-in")]
     public async Task<IActionResult> SignIn([FromBody] SignInRequest signInRequest)
     {
-        var user = await _identityRepository.GetUserByNameAsync(signInRequest.Username);  
-        var response = await _keycloakServiceClient.SignIn(signInRequest);
+        var user = await _identityRepository.GetUserByEmailAsync(signInRequest.Username.ToLower());
+        if (user == null)
+        {
+            return Ok(new SignInResponse
+            {
+                Success = false,
+                ErrorCode = AuthErrorCode.UserNotFound,
+                JwtToken = null
+            });
+        }
+
 
         if (user != null && user.IsEmailVerified == false)
         {
-            response.Success = false;
-            response.Errors = "Email not verified";
-            response.JwtToken = null;
+            return Ok(new SignInResponse
+            {
+                Success = false,
+                ErrorCode = AuthErrorCode.EmailNotVerified,
+                JwtToken = null
+            });
+        }
+
+        var response = await _keycloakServiceClient.SignIn(signInRequest);
+        if (!(bool)response.Success)
+        {
+            response = new SignInResponse
+            {
+                Success = false,
+                ErrorCode = response.ErrorCode,
+                JwtToken = null
+            };
         }
 
         if ((bool)response.Success)
         {
-            if (user != null)
+            var session = new Session
             {
-                var session = new Session
-                {
-                    SessionId = Guid.NewGuid(),
-                    UserId = user.UserId,
-                    CreatedAt = DateTime.UtcNow,
-                    LastActive = DateTime.UtcNow,
-                    ExpiresAt = DateTime.UtcNow.AddMinutes(5),
-                    SignedOutAt = DateTime.MinValue
-                };
-                await _identityRepository.AddSessionAsync(session);
-            }
+                SessionId = Guid.NewGuid(),
+                UserId = user.UserId,
+                CreatedAt = DateTime.UtcNow,
+                LastActive = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                SignedOutAt = DateTime.MinValue
+            };
+            await _identityRepository.AddSessionAsync(session);
+
         }
         return Ok(response);
     }
@@ -95,7 +116,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
- 
+
 
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
@@ -123,10 +144,20 @@ public class AccountController : ControllerBase
     [HttpPost("sign-up")]
     public async Task<IActionResult> SignUp([FromBody] SignUpRequest signUpRequest)
     {
+        var user = await _identityRepository.GetUserByEmailAsync(signUpRequest.Username.ToLower());
+        if (user != null)
+        {
+            return Ok(new SignUpResponse
+            {
+                Success = false,
+                ErrorCode = AuthErrorCode.EmailAlreadyExists
+            });
+        }
+
         var response = await _keycloakServiceClient.SignUp(signUpRequest);
         if (response != null && response.Success == true)
         {
-            var user = new User
+            user = new User
             {
                 UserId = new Guid(response.UserId),
                 Username = signUpRequest.Username,
@@ -140,6 +171,27 @@ public class AccountController : ControllerBase
             };
             await _identityRepository.AddUserAsync(user);
 
+            var role = await _identityRepository.GetRoleByNameAsync("user");
+
+            var userRole = new UserRole
+            {
+                UserRoleId = Guid.NewGuid(),
+                UserId = user.UserId,
+                RoleId = role.Id,
+                AssignedAt = DateTime.UtcNow
+            };
+            await _identityRepository.AddUserRoleAsync(userRole);
+            if (_configuration["SERVICE_LOCATION"] == "local")
+            {
+                return Ok(new SignUpResponse
+                {
+                    Success = true,
+                    ErrorCode = AuthErrorCode.None,
+                    UserId = response.UserId
+                });
+            }
+
+
             // E-Mail senden
             var subject = "Willkommen bei BN Project!";
             var body = $"Hallo {signUpRequest.FirstName},<br/><br/>" +
@@ -147,23 +199,39 @@ public class AccountController : ControllerBase
                        "Bitte klicken Sie auf den folgenden Link, um Ihre E-Mail-Adresse zu bestätigen:<br/>" +
                          $"<a href='{_configuration["UI"]}/auth/confirm?token={user.UserId}'>E-Mail-Adresse bestätigen</a><br/><br/>" +
                        "Mit freundlichen Grüßen,<br/>Das BN Project Team";
-            var success = await _emailService.SendEmailAsync(signUpRequest.Email, subject, body);
-            if (success)
+            var isEmailValid = await _emailService.SendEmailAsync(signUpRequest.Email, subject, body);
+            if (isEmailValid)
             {
-
-                return Ok(response);
+                return Ok(new SignUpResponse
+                {
+                    Success = true,
+                    ErrorCode = AuthErrorCode.None,
+                    UserId = response.UserId
+                });
             }
-            return BadRequest(new { Error = "Email not valid" });
+            else
+            {
+                // todo delete account in case
+                return Ok(new SignUpResponse
+                {
+                    Success = false,
+                    ErrorCode = AuthErrorCode.EmailSendError
+                });
+            }
         }
 
-        return BadRequest(new { response.Errors });
+        return Ok(new SignUpResponse
+        {
+            Success = false,
+            ErrorCode = AuthErrorCode.UnKnown
+        });
     }
 
     [HttpPut("confirm")]
     public async Task<IActionResult> ConfirmSignUp([FromBody] ConfirmSignUpRequest confirmSignUp)
     {
         var userId = new Guid(confirmSignUp.Token!);
-        var user = await _identityRepository.GetUserByIdAsync(userId);      
+        var user = await _identityRepository.GetUserByIdAsync(userId);
 
         if (user != null)
         {
@@ -175,7 +243,7 @@ public class AccountController : ControllerBase
             user.UpdatedAt = DateTime.UtcNow;
             await _identityRepository.UpdateUserAsync(user);
             await _keycloakServiceClient.VerifyEmail(user);
-            return Ok(new { Success = true, Data = user});
+            return Ok(new { Success = true, Data = user });
         }
         return BadRequest(new { Success = false, Message = BnErrorCode.NotFound });
     }

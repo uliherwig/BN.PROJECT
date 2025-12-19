@@ -1,5 +1,3 @@
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-
 namespace BN.PROJECT.IdentityService;
 
 public class KeycloakServiceClient : IKeycloakServiceClient
@@ -39,17 +37,16 @@ public class KeycloakServiceClient : IKeycloakServiceClient
     }
 
     public async Task<SignInResponse> SignIn(SignInRequest signInRequest)
-    {
-        var signInResponse = new SignInResponse
-        {
-            Success = false,
-            Errors = "Invalid username or password.",
-            JwtToken = null
-        };
+    {      
 
         if (signInRequest == null || string.IsNullOrEmpty(signInRequest.Username) || string.IsNullOrEmpty(signInRequest.Password))
         {
-            return signInResponse;
+            return new SignInResponse
+            {
+                Success = false,
+                ErrorCode = AuthErrorCode.InvalidCredentials,
+                JwtToken = null
+            };
         }
 
         var endpoint = $"{_authority}/protocol/openid-connect/token";
@@ -76,7 +73,7 @@ public class KeycloakServiceClient : IKeycloakServiceClient
             return new SignInResponse
             {
                 Success = true,
-                Errors = string.Empty,
+                ErrorCode = AuthErrorCode.None,
                 JwtToken = tokenResponse
             };
         }
@@ -85,12 +82,17 @@ public class KeycloakServiceClient : IKeycloakServiceClient
             var errorContent = await response.Content.ReadAsStringAsync();
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                return signInResponse;
+                return new SignInResponse
+                {
+                    Success = false,
+                    ErrorCode = AuthErrorCode.Unauthorized,
+                    JwtToken = null
+                };
             }
             return new SignInResponse
             {
                 Success = false,
-                Errors = errorContent,
+                ErrorCode = AuthErrorCode.InternalServerError,
                 JwtToken = null
             };
         }
@@ -105,8 +107,6 @@ public class KeycloakServiceClient : IKeycloakServiceClient
         };
 
         var endpoint = $"{_authority}/protocol/openid-connect/logout";
-        // var endpoint = $"{_authority}/admin/realms/{_realm}/users/{signOutRequest.UserId}/logout";
-
 
         var parameters = new Dictionary<string, string>
             {
@@ -141,7 +141,7 @@ public class KeycloakServiceClient : IKeycloakServiceClient
 
         var user = new
         {
-            username = registerRequest.Username,
+            username = registerRequest.Email,
             email = registerRequest.Email,
             firstName = registerRequest.FirstName,
             lastName = registerRequest.LastName,
@@ -170,8 +170,21 @@ public class KeycloakServiceClient : IKeycloakServiceClient
         if (!response.IsSuccessStatusCode)
         {
             var errorContent = await response.Content.ReadAsStringAsync();
-            signUpResponse.Errors = errorContent;
-            _logger.LogError(errorContent);
+
+            switch (response.StatusCode)
+            {  
+                case HttpStatusCode.Conflict:
+                    // Common when user/email already exists
+                    signUpResponse.ErrorCode = AuthErrorCode.EmailAlreadyExists;
+                    _logger.LogError("User/email already exists: {Error}", errorContent);
+                    break;        
+
+                default:
+                    signUpResponse.ErrorCode = AuthErrorCode.InternalServerError;
+                    _logger.LogError("Unexpected error creating user (Status: {Status}): {Error}", response.StatusCode, errorContent);
+                    break;
+            }
+
             return signUpResponse;
         }
 

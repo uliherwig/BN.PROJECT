@@ -16,14 +16,14 @@ public class SeedDatabaseService : IHostedService
             var keycloakServiceClient = scope.ServiceProvider.GetRequiredService<IKeycloakServiceClient>();
             var identityRepository = scope.ServiceProvider.GetRequiredService<IIdentityRepository>();
 
-            var defaultUsersCreated = await identityRepository.GetUserByNameAsync("bn-admin") != null;
+            var defaultUsersCreated = await identityRepository.GetUserByNameAsync("bn_admin@test.de") != null;
             if (defaultUsersCreated)
             {
                 return;
             }
 
-            var user1 = await keycloakServiceClient.GetUserByName("bn-admin");
-            var user2 = await keycloakServiceClient.GetUserByName("bn-user");
+            var user1 = await keycloakServiceClient.GetUserByName("bn_admin@test.de");
+            var user2 = await keycloakServiceClient.GetUserByName("bn-user@test.de");
 
             await identityRepository.AddUserAsync(user1);
             await identityRepository.AddUserAsync(user2);

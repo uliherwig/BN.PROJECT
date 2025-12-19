@@ -48,7 +48,7 @@ public class AlpacaServiceClient : IAlpacaServiceClient
 
     public async Task DeleteExecutions(string token)
     {
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"/alpacatest/delete-executions");
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"/alpacatrading/delete-executions");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();

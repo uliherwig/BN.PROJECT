@@ -40,7 +40,7 @@ public class IdentityRepository : IIdentityRepository
                 throw new Exception("Ein Benutzer mit dieser E-Mail-Adresse existiert bereits.");
             }
 
-            await _context.Users.AddAsync(user);
+            var test = await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
         catch (Exception ex)

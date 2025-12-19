@@ -21,7 +21,7 @@ Postgres
 
 ## Message Broker
 
-Kafka
+Redis
 
 ## Services
 
@@ -49,7 +49,7 @@ NotificationService - provides notifications to React FE per signalR/Redis
 ### FinAIService / python
 
 FinAIService - provides AI based trading strategies 
-and analysis - implemented in Python- pending
+and analysis - implemented in Python
 
 ## CI/CD
 
