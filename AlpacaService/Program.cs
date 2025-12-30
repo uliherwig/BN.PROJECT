@@ -68,12 +68,11 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         });
     });
 
-    services.AddKeyCloakAuthentication(configuration);
-    services.AddMessageBus(configuration);
+    services.AddKeyCloakAuthentication(configuration);   
 
     services.AddHttpClient();
     services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
-    services.AddHttpClient<IOptimizerServiceClient, OptimizerServiceClient>();
+    services.AddHttpClient<IFinAIServiceClient, FinAIServiceClient>();
 
     services.AddScoped<IAlpacaClient, AlpacaClient>();
     services.AddScoped<IAlpacaRepository, AlpacaRepository>();
@@ -84,7 +83,14 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     var redisConnection = configuration["RedisConnection"]; 
     var redis = ConnectionMultiplexer.Connect(redisConnection);
+
+    // Register both the interface and the concrete type so DI can resolve either.
     services.AddSingleton<IConnectionMultiplexer>(redis);
+    services.AddSingleton<ConnectionMultiplexer>(redis);
+
+    // Register your publisher/subscriber services
+    services.AddScoped<IRedisPublisher, RedisPublisher>();
+    services.AddScoped<IRedisSubscriber, RedisSubscriber>();
 
     services.AddSignalR()
     .AddStackExchangeRedis(redisConnection, options =>

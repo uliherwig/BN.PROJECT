@@ -12,7 +12,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         private readonly Mock<IAlpacaRepository> _mockAlpacaRepository;
         private readonly Mock<IStrategyTestService> _mockBacktestService;
         private readonly Mock<IStrategyServiceClient> _mockStrategyServiceClient;
-        private readonly Mock<IOptimizerServiceClient> _mockOptimizerServiceClient;
+        private readonly Mock<IFinAIServiceClient> _mockOptimizerServiceClient;
         private readonly Mock<ILogger<AlpacaTestController>> _mockLogger;
         private readonly AlpacaTestController _alpacaTestController;
 
@@ -22,7 +22,7 @@ namespace BN.PROJECT.AlpacaService.Tests
             _mockAlpacaRepository = new Mock<IAlpacaRepository>();
             _mockBacktestService = new Mock<IStrategyTestService>();
             _mockStrategyServiceClient = new Mock<IStrategyServiceClient>();
-            _mockOptimizerServiceClient = new Mock<IOptimizerServiceClient>();
+            _mockOptimizerServiceClient = new Mock<IFinAIServiceClient>();
             _mockLogger = new Mock<ILogger<AlpacaTestController>>();
             _alpacaTestController = new AlpacaTestController(_mockEnv.Object,
                                               _mockAlpacaRepository.Object,

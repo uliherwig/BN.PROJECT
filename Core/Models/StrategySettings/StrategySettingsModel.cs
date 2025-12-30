@@ -23,4 +23,8 @@ public class StrategySettingsModel
     // TODO check if Optimized is needed
     public bool Optimized { get; set; } = false;
     public string StrategyParams { get; set; } = string.Empty;
+
+    public decimal SpreadPerTrade { get; set; } = 0.005m;
+    public decimal OvernightFeeRate { get; set; } = 0.00005m;
+    public bool ReverseTrade { get; set; } = false;
 }

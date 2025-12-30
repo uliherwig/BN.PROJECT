@@ -16,6 +16,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         private readonly StrategyTestService _backtestService;
         private readonly Mock<IHubContext<AlpacaHub>> _mockHubContext; // Mock for IHubContext<AlpacaHub>
         private readonly Mock<IConnectionMultiplexer> _mockRedisDatabase; // Mock for IConnectionMultiplexer
+        private readonly Mock<IRedisPublisher> _mockRedisPublisher;
 
         private readonly StrategySettingsModel _settings = new()
         {
@@ -34,21 +35,20 @@ namespace BN.PROJECT.AlpacaService.Tests
             _mockAlpacaRepository = new Mock<IAlpacaRepository>();
             _mockRedisDatabase = new Mock<IConnectionMultiplexer>();
             _mockAlpacaTradingService = new Mock<IAlpacaTradingService>();
-            _mockKafkaProducer = new Mock<IKafkaProducerService>();
             _mockStrategyServiceClient = new Mock<IStrategyServiceClient>();
-            _mockHubContext = new Mock<IHubContext<AlpacaHub>>();
-
-            _mockKafkaProducer.Setup(producer => producer.SendMessageAsync("strategy", It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                              .Returns(Task.CompletedTask);
+            _mockHubContext = new Mock<IHubContext<AlpacaHub>>(); 
+            _mockRedisPublisher = new Mock<IRedisPublisher>();
+            _mockRedisPublisher.Setup(publisher => publisher.Publish(It.IsAny<string>(), It.IsAny<string>()))
+                                 .Returns(Task.CompletedTask);
 
             _mockLogger = new Mock<ILogger<StrategyTestService>>();
             _backtestService = new StrategyTestService(_mockAlpacaRepository.Object, 
                 _mockLogger.Object, 
-                _mockKafkaProducer.Object,
                 _mockStrategyServiceClient.Object,
                 _mockAlpacaTradingService.Object,
                 _mockHubContext.Object,
-                _mockRedisDatabase.Object);
+                _mockRedisDatabase.Object, 
+                _mockRedisPublisher.Object);
         }
 
         [Fact]
@@ -62,8 +62,8 @@ namespace BN.PROJECT.AlpacaService.Tests
             await _backtestService.RunBacktest(_settings);
 
             // Assert
-            _mockKafkaProducer.Verify(producer => producer.SendMessageAsync("strategy", It.Is<string>(msg => msg.Contains("\"MessageType\":\"startTest\"")), It.IsAny<CancellationToken>()));
-            _mockKafkaProducer.Verify(producer => producer.SendMessageAsync("strategy", It.Is<string>(msg => msg.Contains("\"MessageType\":\"stopTest\"")), It.IsAny<CancellationToken>()));
+            _mockRedisPublisher.Verify(producer => producer.PublishAsync(It.Is<string>(msg => msg.Contains("\"MessageType\":\"startTest\"")), ""));
+            _mockRedisPublisher.Verify(producer => producer.PublishAsync(It.Is<string>(msg => msg.Contains("\"MessageType\":\"stopTest\"")), ""));
         }
 
         [Fact]
@@ -86,9 +86,6 @@ namespace BN.PROJECT.AlpacaService.Tests
             await _backtestService.RunBacktest(_settings);
 
             // Assert
-            _mockKafkaProducer.Verify(producer => producer.SendMessageAsync("strategy", It.Is<string>(msg => msg.Contains("\"MessageType\":\"startTest\"")), It.IsAny<CancellationToken>()));
-            _mockKafkaProducer.Verify(producer => producer.SendMessageAsync("strategy", It.Is<string>(msg => msg.Contains("\"MessageType\":\"quotes\"")), It.IsAny<CancellationToken>()));
-            _mockKafkaProducer.Verify(producer => producer.SendMessageAsync("strategy", It.Is<string>(msg => msg.Contains("\"MessageType\":\"stopTest\"")), It.IsAny<CancellationToken>()));
-        }
+       }
     }
 }

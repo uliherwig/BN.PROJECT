@@ -14,6 +14,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Duende.IdentityModel" Version="8.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="9.0.3" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3" />
@@ -21,6 +22,7 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
 		<PackageReference Include="Moq" Version="4.20.72" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Parquet.Net" Version="5.4.0" />
 		<PackageReference Include="SQLite" Version="3.13.0" />
 		<PackageReference Include="StackExchange.Redis" Version="2.10.1" />
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />

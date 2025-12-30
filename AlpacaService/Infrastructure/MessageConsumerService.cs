@@ -8,8 +8,9 @@ public class MessageConsumerService : IHostedService
 
 
 
+
     //private readonly string[] topicNames = ["order", "strategy"];
-    private readonly string[] topicNames = Enum.GetNames(typeof(KafkaTopicEnum))
+    private readonly string[] topicNames = Enum.GetNames(typeof(RedisChannelEnum))
     .Select(x => x.ToLowerInvariant())
     .ToArray();
 
@@ -33,17 +34,18 @@ public class MessageConsumerService : IHostedService
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
+                var redisSubscriber = scope.ServiceProvider.GetRequiredService<IRedisSubscriber>();
 
-                var topicName = KafkaUtilities.GetTopicName(KafkaTopicEnum.Order);
+                var topicName = RedisUtilities.GetChannelName(RedisChannelEnum.Order);
                 if (string.IsNullOrEmpty(topicName))
                 {
-                    _logger.LogError("Kafka topic name is null or empty.");
                     return Task.CompletedTask;
                 }
 
-                kafkaConsumer.Start(topicName);
-                kafkaConsumer.MessageReceived += ConsumeMessage;
+                redisSubscriber.Subscribe(topicName, (channel, msg) =>
+                {                    
+                    ConsumeMessage(msg);
+                });
             }
         }
         catch (Exception e)

@@ -11,7 +11,7 @@ public class AlpacaTestController : ControllerBase
     private readonly IAlpacaRepository _alpacaRepository;
     private readonly IStrategyTestService _strategyTestService;
     private readonly IStrategyServiceClient _strategyServiceClient;
-    private readonly IOptimizerServiceClient _optimizerServiceClient;
+    private readonly IFinAIServiceClient _finAIServiceClient;
     private readonly ILogger<AlpacaTestController> _logger;
 
     public AlpacaTestController(
@@ -19,14 +19,14 @@ public class AlpacaTestController : ControllerBase
         IAlpacaRepository alpacaRepository,
         IStrategyTestService backtestService,
         IStrategyServiceClient strategyServiceClient,
-        IOptimizerServiceClient optimizerServiceClient,
+        IFinAIServiceClient finAIServiceClient,
         ILogger<AlpacaTestController> logger)
     {
         _env = env;
         _alpacaRepository = alpacaRepository;
         _strategyTestService = backtestService;
         _strategyServiceClient = strategyServiceClient;
-        _optimizerServiceClient = optimizerServiceClient;
+        _finAIServiceClient = finAIServiceClient;
         _logger = logger;
     }
 
@@ -72,18 +72,25 @@ public class AlpacaTestController : ControllerBase
         settings.StampStart = DateTime.UtcNow.ToUniversalTime();
         settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
 
-        var result = await _strategyServiceClient.StartStrategyAsync(settings);
-        if (result == "true")
+        var startResponse = await _strategyServiceClient.StartStrategyAsync(settings);
+        if (startResponse == "true")
         {
+            await _strategyTestService.StoreQuotesToRedis(settings);
+            var dfCreatedResponse = await _finAIServiceClient.CreateIndicatorDataframeAsync(settings);
+            if (dfCreatedResponse != "true")
+            {
+                _logger.LogError($"Failed to create indicator dataframe for strategy {settings.Id}");
+                return StatusCode(500, "Failed to create indicator dataframe");
+            }
             await _strategyTestService.RunBacktest(settings);
         }
-        return Ok(result);
+        return Ok(startResponse);
     }
 
     [HttpGet("test-optimization-service")]
     public async Task<IActionResult> TestOptimizationAsync()
     {
-        var test = await _optimizerServiceClient.TestOptimizationAsync();
+        var test = await _finAIServiceClient.TestOptimizationAsync();
         return Ok(test);
     }
 
@@ -107,6 +114,23 @@ public class AlpacaTestController : ControllerBase
             await _strategyTestService.OptimizeStrategy(settings);
         }
         return Ok(result);
+    }
+
+    [HttpPost("store-to-redis")]
+    public async Task<IActionResult> StoreToRedis([FromBody] StrategySettingsModel settings)
+    {
+        if (settings == null)
+        {
+            return BadRequest("StrategySettingsModel cannot be null");
+        }
+
+        settings.StartDate = settings.StartDate.ToUniversalTime();
+        settings.EndDate = settings.EndDate.ToUniversalTime();
+        settings.StampStart = DateTime.UtcNow.ToUniversalTime();
+        settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
+        await _strategyTestService.StoreQuotesToRedis(settings);
+      
+        return Ok();
     }
 
     [HttpGet("save-assets")]

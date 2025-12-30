@@ -2,14 +2,12 @@
 
 public class MessageConsumerService : IHostedService
 {
-
-    // TODO kafka setup service
     private readonly ILogger<MessageConsumerService> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
     private readonly IHubContext<NotificationHub> _hubContext;
     private readonly IDatabase _redisDatabase;
-    private readonly string _notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
+    private readonly string _notificationTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Notification);
 
     public MessageConsumerService(
         IConfiguration configuration,
@@ -31,11 +29,19 @@ public class MessageConsumerService : IHostedService
         try
         {
             using (var scope = _serviceProvider.CreateScope())
-            {
-                var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
+            {  
+                var redisSubscriber = scope.ServiceProvider.GetRequiredService<IRedisSubscriber>();
 
-                kafkaConsumer.Start(_notificationTopic);
-                kafkaConsumer.MessageReceived += ConsumeMessage;
+             
+                if (string.IsNullOrEmpty(_notificationTopic))
+                {
+                    return;
+                }
+
+                redisSubscriber.Subscribe(_notificationTopic, (channel, msg) =>
+                {
+                    ConsumeMessage(msg);
+                });
 
             }
         }

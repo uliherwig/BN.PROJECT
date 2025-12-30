@@ -3,35 +3,11 @@
 public class StrategyServiceStore : IStrategyServiceStore
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ConcurrentDictionary<Guid, IKafkaProducerService> _kafkaProducers = new();
     private readonly ConcurrentDictionary<Guid, IStrategyService> _strategyServices = new();
 
     public StrategyServiceStore(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-    }
-
-    public IKafkaProducerService GetOrCreateKafkaProducer(Guid strategyId)
-    {
-        return _kafkaProducers.GetOrAdd(strategyId, _ =>
-        {
-            var scope = _serviceProvider.CreateScope();
-            var producer = scope.ServiceProvider.GetService<IKafkaProducerService>();
-
-            return producer == null ? throw new InvalidOperationException("IKafkaProducerService not found.") : producer;
-        });
-    }
-
-    public void RemoveKafkaProducer(Guid strategyId)
-    {
-        if (_kafkaProducers.TryRemove(strategyId, out var optimizer))
-        {
-            // Dispose the optimizer if it implements IDisposable
-            if (optimizer is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
     }
 
     public IStrategyService GetOrCreateStrategyService(Guid strategyId, StrategyEnum strategyEnum)

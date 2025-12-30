@@ -7,7 +7,6 @@ public class RedisService
     //private readonly IConfiguration _configuration;
     //private readonly IAlpacaDataService _alpacaDataService;
     //private readonly IAlpacaRepository _alpacaRepository;
-    //private readonly IKafkaProducerService _kafkaProducer;
     //private readonly IHubContext<AlpacaHub> _hubContext;
     private readonly IDatabase _redisDatabase;
     private readonly IConnectionMultiplexer _redis;
@@ -24,7 +23,7 @@ public class RedisService
     }
     public async Task SetStringAsync(string key, string value, TimeSpan? expiry = null)
     {
-        await _redisDatabase.StringSetAsync(key, value, expiry);
+        await _redisDatabase.StringSetAsync(key, value);
     }
     public async Task<bool> KeyExistsAsync(string key)
     {

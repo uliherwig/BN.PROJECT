@@ -16,3 +16,4 @@ global using System.Security.Claims;
 global using Microsoft.AspNetCore.Http;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Converters;
+global using StackExchange.Redis;

@@ -29,8 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaintenanceApp", "Maintenan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "NotificationService\NotificationService.csproj", "{9A5AB0DD-AF45-4EAF-995F-7B1F5EACED8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KafkaSetupService", "KafkaSetupService\KafkaSetupService.csproj", "{63899D7A-D3A2-40DE-A9FE-A7016BAEDFCC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,10 +75,6 @@ Global
 		{9A5AB0DD-AF45-4EAF-995F-7B1F5EACED8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A5AB0DD-AF45-4EAF-995F-7B1F5EACED8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A5AB0DD-AF45-4EAF-995F-7B1F5EACED8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{63899D7A-D3A2-40DE-A9FE-A7016BAEDFCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63899D7A-D3A2-40DE-A9FE-A7016BAEDFCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63899D7A-D3A2-40DE-A9FE-A7016BAEDFCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63899D7A-D3A2-40DE-A9FE-A7016BAEDFCC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

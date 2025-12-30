@@ -10,6 +10,7 @@ public static class MessageBusExtension
         services.AddSingleton<IKafkaConsumerService>(provider =>
             new KafkaConsumerService(configuration));
 
+
         return services;
     }
 }

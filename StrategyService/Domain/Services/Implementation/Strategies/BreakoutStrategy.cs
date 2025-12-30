@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace BN.PROJECT.StrategyService;
 
 public class BreakoutStrategy : IStrategyService
 {
     private readonly ILogger<BreakoutStrategy> _logger;
-    private readonly IKafkaProducerService _kafkaProducer;
+    private readonly IRedisPublisher _publisher;
 
     private StrategyTaskEnum _strategyTask;
     private StrategySettingsModel? _strategy;
@@ -21,17 +21,17 @@ public class BreakoutStrategy : IStrategyService
     public List<PositionModel> _positions = [];
     private readonly TimeSpan _marketCloseTime = new TimeSpan(19, 55, 0);
 
-    private readonly string _notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
-    private readonly string _orderTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Order);
+    private readonly string _notificationTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Notification);
+    private readonly string _orderTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Order);
 
 
     public BreakoutStrategy(
 
         ILogger<BreakoutStrategy> logger,
-        IKafkaProducerService kafkaProducer)
+        IRedisPublisher publisher)
     {
         _logger = logger;
-        _kafkaProducer = kafkaProducer;
+        _publisher = publisher;
     }
 
     //public Task StartTest(StrategyMessage message)
@@ -92,7 +92,8 @@ public class BreakoutStrategy : IStrategyService
         _positions.Clear();
 
         // Send notification about strategy initialization
-        _kafkaProducer.SendMessageAsync(_notificationTopic, strategySettings.ToJson());
+        //_kafkaProducer.SendMessageAsync(_notificationTopic, strategySettings.ToJson());
+        _publisher.Publish(_notificationTopic, strategySettings.ToJson());
 
         return Task.CompletedTask;
     }
@@ -188,7 +189,9 @@ public class BreakoutStrategy : IStrategyService
             if (openPosition.PriceClose > 0 && _strategyTask == StrategyTaskEnum.PaperTrade)
             {
                 var message = TradingOperations.CreateOrderMessage(strategyId, userId, openPosition).ToJson();
-                _kafkaProducer.SendMessageAsync("order", message);
+                //_kafkaProducer.SendMessageAsync("order", message);
+                _publisher.Publish("order",message);
+
             }
         }
         else
@@ -225,7 +228,9 @@ public class BreakoutStrategy : IStrategyService
             if (_strategyTask == StrategyTaskEnum.PaperTrade)
             {
                 var message = TradingOperations.CreateOrderMessage(strategyId, userId, position).ToJson();
-                _kafkaProducer.SendMessageAsync("order", message);
+                //_kafkaProducer.SendMessageAsync("order", message);
+                _publisher.Publish("order",message);
+
             }
         }
         return Task.CompletedTask;

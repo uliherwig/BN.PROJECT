@@ -17,5 +17,4 @@ global using System.Text;
 global using System.Collections.Concurrent;
 global using Microsoft.AspNetCore.SignalR;
 global using StackExchange.Redis;
-global using Confluent.Kafka;
-global using Confluent.Kafka.Admin;
+

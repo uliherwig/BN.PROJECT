@@ -84,7 +84,6 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     });
 
     services.AddKeyCloakAuthentication(configuration);
-    services.AddMessageBus(configuration);
 
     services.AddHttpClient();
     services.AddHealthChecks();
@@ -92,6 +91,12 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     var redisConnection = configuration["RedisConnection"];
     var redis = ConnectionMultiplexer.Connect(redisConnection);
     services.AddSingleton<IConnectionMultiplexer>(redis);
+    services.AddSingleton<ConnectionMultiplexer>(redis);
+
+    // Register your publisher/subscriber services
+    services.AddScoped<IRedisPublisher, RedisPublisher>();
+    services.AddScoped<IRedisSubscriber, RedisSubscriber>();
+    services.AddScoped<IRedisParquetService, RedisParquetService>();
 
     // Quartz-Services
     services.AddQuartz();

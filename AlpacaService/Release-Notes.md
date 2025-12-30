@@ -2,6 +2,15 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2025.12.2
+
+- Replacement of Kafka with Redis for message brokering
+- Strategy service DB update - StrategySettingsModel changes
+
+## Version 2025.12.1
+
+- Refactoring of identity service - improved error handling
+
 ## Version 2025.07.2
 
 - Refactoring of strategy tasks - done by quartz jobs

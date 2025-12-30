@@ -8,7 +8,7 @@ var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false)
     .Build();
 
-var _topicNames = Enum.GetNames(typeof(KafkaTopicEnum))
+var _topicNames = Enum.GetNames(typeof(RedisChannelEnum))
 .Select(x => x.ToLowerInvariant())
 .ToArray();
 var numPartitions = configuration.GetValue<int>("Kafka:NumPartitions", 1);

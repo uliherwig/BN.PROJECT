@@ -8,7 +8,7 @@ public class SendQuoteJob : IJob
     private readonly IConfiguration _configuration;
     private readonly IAlpacaDataService _alpacaDataService;
     private readonly IAlpacaRepository _alpacaRepository;
-    private readonly IKafkaProducerService _kafkaProducer;
+    private readonly IRedisPublisher _publisher;
     private readonly IHubContext<AlpacaHub> _hubContext;
     private readonly IDatabase _redisDatabase;
 
@@ -17,18 +17,17 @@ public class SendQuoteJob : IJob
         IConfiguration configuration,
         IAlpacaDataService alpacaDataService,
         IAlpacaRepository alpacaRepository,
-        IKafkaProducerService kafkaProducer,
         IHubContext<AlpacaHub> hubContext,
-        IConnectionMultiplexer redis)
+        IConnectionMultiplexer redis,
+        IRedisPublisher publisher)
     {
         _logger = logger;
         _configuration = configuration;
         _alpacaDataService = alpacaDataService;
         _alpacaRepository = alpacaRepository;
-        _kafkaProducer = kafkaProducer;
         _hubContext = hubContext;
         _redisDatabase = redis.GetDatabase();
-
+        _publisher = publisher;
     }
 
     public async Task Execute(IJobExecutionContext context)
@@ -69,7 +68,7 @@ public class SendQuoteJob : IJob
                 Quotes = [q]
             };
 
-            await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
+            await _publisher.PublishAsync("strategy", message.ToJson());
 
             var quoteMessage = new QuoteMessage
             {

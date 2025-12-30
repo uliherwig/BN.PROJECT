@@ -19,9 +19,18 @@ public class MessageConsumerService : IHostedService
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var kafkaConsumer = scope.ServiceProvider.GetRequiredService<IKafkaConsumerService>();
-                kafkaConsumer.Start(KafkaUtilities.GetTopicName(KafkaTopicEnum.Strategy));
-                kafkaConsumer.MessageReceived += ConsumeMessage;
+                var redisSubscriber = scope.ServiceProvider.GetRequiredService<IRedisSubscriber>();
+
+                var channelName = RedisUtilities.GetChannelName(RedisChannelEnum.Strategy);
+                if (string.IsNullOrEmpty(channelName))
+                {
+                    return Task.CompletedTask;
+                }
+
+                redisSubscriber.Subscribe(channelName, (channel, msg) =>
+                {
+                    ConsumeMessage(msg);
+                });
             }
         }
         catch (Exception e)

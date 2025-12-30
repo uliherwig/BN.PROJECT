@@ -8,4 +8,5 @@ public interface IStrategyTestService
     Task StartExecution(Guid userId, Guid strategyId);
     Task StopExecution(Guid userId, Guid strategyId);
     Task CreateAlpacaOrder(OrderMessage orderMessage);
+    Task StoreQuotesToRedis(StrategySettingsModel testSettings);
 }

@@ -1,6 +1,6 @@
 ﻿namespace BN.PROJECT.Core;
 
-public enum KafkaTopicEnum
+public enum RedisChannelEnum
 {
     Strategy,
     Order,

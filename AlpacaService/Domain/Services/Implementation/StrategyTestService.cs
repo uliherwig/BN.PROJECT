@@ -5,35 +5,35 @@ namespace BN.PROJECT.AlpacaService;
 public class StrategyTestService : IStrategyTestService
 {
     private readonly IAlpacaRepository _alpacaRepository;
-    private readonly IKafkaProducerService _kafkaProducer;
     private readonly IAlpacaTradingService _alpacaTradingService;
     private readonly IStrategyServiceClient _strategyServiceClient;
     private readonly ILogger<StrategyTestService> _logger;
     private readonly IHubContext<AlpacaHub> _hubContext;
     private readonly IDatabase _redisDatabase;
+    private readonly IRedisPublisher _publisher;
 
     public StrategyTestService(IAlpacaRepository alpacaRepository,
         ILogger<StrategyTestService> logger,
-        IKafkaProducerService kafkaProducer,
         IStrategyServiceClient strategyServiceClient,
         IAlpacaTradingService alpacaTradingService,
         IHubContext<AlpacaHub> hubContext,
-        IConnectionMultiplexer redis)
+        IConnectionMultiplexer redis,
+        IRedisPublisher publisher)
     {
         _alpacaRepository = alpacaRepository;
         _logger = logger;
-        _kafkaProducer = kafkaProducer;
         _alpacaTradingService = alpacaTradingService;
         _strategyServiceClient = strategyServiceClient;
         _hubContext = hubContext;
         _redisDatabase = redis.GetDatabase();
+        _publisher = publisher;
     }
 
     public async Task RunBacktest(StrategySettingsModel testSettings)
     {
-        var strategyTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Strategy);
-        var notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
-        await StoreQuotesToRedis(testSettings);
+        var strategyTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Strategy);
+        var notificationTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Notification);
+        //await StoreQuotesToRedis(testSettings);
 
         var message = new StrategyMessage
         {
@@ -43,11 +43,12 @@ public class StrategyTestService : IStrategyTestService
             StrategyId = testSettings.Id
         }; 
 
-        await _kafkaProducer.SendMessageAsync(strategyTopic, message.ToJson());
+        await _publisher.PublishAsync(strategyTopic, message.ToJson());
+
     }
     public async Task OptimizeStrategy(StrategySettingsModel testSettings)
     {
-        var optimizeTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Strategy);
+        var optimizeTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Strategy);
         await StoreQuotesToRedis(testSettings);
 
         var message = new StrategyMessage
@@ -57,7 +58,7 @@ public class StrategyTestService : IStrategyTestService
             UserId = testSettings.UserId,
             StrategyId = testSettings.Id
         };       
-        await _kafkaProducer.SendMessageAsync(optimizeTopic, message.ToJson());
+        //await _kafkaProducer.SendMessageAsync(optimizeTopic, message.ToJson());
     }
     public async Task StartExecution(Guid userId, Guid strategyId)
     {
@@ -78,7 +79,9 @@ public class StrategyTestService : IStrategyTestService
             Settings = testSettings
         };
 
-        await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
+        //await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
+        await _publisher.PublishAsync("strategy", message.ToJson());
+
     }
     public async Task StopExecution(Guid userId, Guid strategyId)
     {
@@ -89,7 +92,9 @@ public class StrategyTestService : IStrategyTestService
             UserId = userId,
             StrategyId = strategyId
         };
-        await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
+        //await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
+        await _publisher.PublishAsync("strategy", message.ToJson());
+
     }
     public async Task CreateAlpacaOrder(OrderMessage orderMessage)
     {
@@ -117,7 +122,7 @@ public class StrategyTestService : IStrategyTestService
         await _alpacaTradingService.CreateOrderAsync(userSettings, symbol, qty, side, orderType, timeInForce);
 
     }
-    private async Task StoreQuotesToRedis(StrategySettingsModel testSettings)
+    public async Task StoreQuotesToRedis(StrategySettingsModel testSettings)
     {
         var symbol = testSettings.Asset;
         var startDate = testSettings.StartDate.ToUniversalTime();

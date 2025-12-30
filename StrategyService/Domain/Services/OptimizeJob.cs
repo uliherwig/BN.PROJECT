@@ -42,14 +42,12 @@ public class OptimizeJob : IJob
         }
 
         // Initialize Kafka producer for notifications
-        var notificationTopic = KafkaUtilities.GetTopicName(KafkaTopicEnum.Notification);
-        var notificationProducer = _serviceStore.GetOrCreateKafkaProducer(strategyId);
+        var notificationTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Notification);
 
         var notificationMessage = NotificationMessageFactory.CreateNotificationMessage(
             strategySettings.UserId,
             NotificationEnum.OptimizeStart
         );
-        await notificationProducer.SendMessageAsync(notificationTopic, notificationMessage.ToJson());
 
 
         // create quotes
@@ -309,10 +307,8 @@ public class OptimizeJob : IJob
 
         // Notify user
         notificationMessage.NotificationType = NotificationEnum.OptimizeStop;
-        await notificationProducer.SendMessageAsync(notificationTopic, notificationMessage.ToJson());
 
         // Clean up the service store
         _serviceStore.RemoveStrategyService(strategyId);
-        _serviceStore.RemoveKafkaProducer(strategyId);
     }
 }
