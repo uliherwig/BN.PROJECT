@@ -6,7 +6,6 @@ public class PositionModel
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid StrategyId { get; set; }
-    public StrategyEnum StrategyType { get; set; }
     public Guid ExecutionId { get; set; } = Guid.Empty;
     public string Symbol { get; set; }
     public decimal Quantity { get; set; }
@@ -16,6 +15,8 @@ public class PositionModel
     public decimal ProfitLoss { get; set; }
     public decimal TakeProfit { get; set; }
     public decimal StopLoss { get; set; }
+    public decimal SpreadPerTrade { get; set; }
+    public decimal OvernightFeeRate { get; set; }
     public DateTime StampOpened { get; set; }
     public DateTime StampClosed { get; set; }
     public string CloseSignal { get; set; } = string.Empty;  

@@ -1,3 +1,5 @@
+using static System.Net.Mime.MediaTypeNames;
+
 namespace BN.PROJECT.AlpacaService;
 
 public class FinAIServiceClient : IFinAIServiceClient
@@ -24,16 +26,26 @@ public class FinAIServiceClient : IFinAIServiceClient
         return result;
     }
 
-    public async Task<string?> CreateIndicatorDataframeAsync(StrategySettingsModel testSettings)
+    public async Task<string?> CreateDataframeAsync(StrategySettingsModel testSettings)
     {
         try
         {
             var json = JsonConvert.SerializeObject(testSettings);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"/api/v1/indicator-test", content);
+            
 
-            var result = await response.Content.ReadAsStringAsync();
-            return result;
+            if(testSettings.StrategyType == StrategyEnum.IndicatorBased)
+            {
+                var response = await _httpClient.PostAsync($"/api/v1/indicator-test", content);
+                return await response.Content.ReadAsStringAsync();
+            }
+            if (testSettings.StrategyType == StrategyEnum.MachineLearningBased)
+            {
+                var response = await _httpClient.PostAsync($"/api/v1/get-lgb-dataframe", content);
+                return await response.Content.ReadAsStringAsync();               
+            }
+
+            return null;
         }
         catch (Exception e)
         {
@@ -57,4 +69,5 @@ public class FinAIServiceClient : IFinAIServiceClient
             return e.Message;
         }
     }
+
 }

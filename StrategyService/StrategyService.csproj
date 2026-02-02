@@ -53,8 +53,4 @@
 		<ProjectReference Include="..\Core\CORE.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Infrastructure\Contracts\" />
-	</ItemGroup>
-
 </Project>

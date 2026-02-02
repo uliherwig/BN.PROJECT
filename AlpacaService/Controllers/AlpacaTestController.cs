@@ -63,7 +63,7 @@ public class AlpacaTestController : ControllerBase
         if (settings == null)
         {
             return BadRequest("StrategySettingsModel cannot be null");
-        } 
+        }
         var userId = HttpContext.Items["UserId"]?.ToString();
         settings.UserId = new Guid(userId!);
         settings.Id = Guid.NewGuid();
@@ -72,17 +72,13 @@ public class AlpacaTestController : ControllerBase
         settings.StampStart = DateTime.UtcNow.ToUniversalTime();
         settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
 
+
         var startResponse = await _strategyServiceClient.StartStrategyAsync(settings);
         if (startResponse == "true")
         {
             await _strategyTestService.StoreQuotesToRedis(settings);
-            var dfCreatedResponse = await _finAIServiceClient.CreateIndicatorDataframeAsync(settings);
-            if (dfCreatedResponse != "true")
-            {
-                _logger.LogError($"Failed to create indicator dataframe for strategy {settings.Id}");
-                return StatusCode(500, "Failed to create indicator dataframe");
-            }
-            await _strategyTestService.RunBacktest(settings);
+            await _finAIServiceClient.CreateDataframeAsync(settings);          
+
         }
         return Ok(startResponse);
     }
@@ -107,7 +103,7 @@ public class AlpacaTestController : ControllerBase
         settings.StartDate = settings.StartDate.ToUniversalTime();
         settings.EndDate = settings.EndDate.ToUniversalTime();
         settings.StampStart = DateTime.UtcNow.ToUniversalTime();
-        settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();      
+        settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
         var result = await _strategyServiceClient.StartStrategyAsync(settings);
         if (result == "true")
         {
@@ -129,7 +125,7 @@ public class AlpacaTestController : ControllerBase
         settings.StampStart = DateTime.UtcNow.ToUniversalTime();
         settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
         await _strategyTestService.StoreQuotesToRedis(settings);
-      
+
         return Ok();
     }
 

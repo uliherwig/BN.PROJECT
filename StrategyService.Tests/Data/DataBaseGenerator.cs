@@ -38,7 +38,8 @@ public static class DataBaseGenerator
             StartDate = new DateTime(2023, 1, 1),
             EndDate = new DateTime(2023, 1, 2),
             Asset = "AAPL",
-            StrategyType = StrategyEnum.Breakout,
+            StrategyType = StrategyEnum.IndicatorBased,
+            IndicatorType = IndicatorEnum.BREAKOUT,
             UserId = TestGuid,
             Id = TestGuid
         };
@@ -51,7 +52,8 @@ public static class DataBaseGenerator
             StartDate = new DateTime(2023, 1, 1),
             EndDate = new DateTime(2023, 1, 2),
             Asset = "AAPL",
-            StrategyType = StrategyEnum.Breakout,
+            StrategyType = StrategyEnum.IndicatorBased,
+            IndicatorType = IndicatorEnum.BREAKOUT,
             UserId = TestGuid,
             Id = Guid.NewGuid()
         };

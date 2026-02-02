@@ -47,37 +47,102 @@ public class MessageConsumerService : IHostedService
 
     public async void ConsumeMessage(string messageJson)
     {
-        var message = JsonConvert.DeserializeObject<StrategyMessage>(messageJson); 
+        var message = JsonConvert.DeserializeObject<Dictionary<string, string>>(messageJson);
 
-        if (message != null && message.StrategyTask == StrategyTaskEnum.Backtest || message.StrategyTask == StrategyTaskEnum.Optimize)
+        if (message != null)
         {
-            using (var scope = _serviceProvider.CreateScope())
+
+
+            if(message.TryGetValue("status", out var statusValue) &&
+               message.TryGetValue("strategy_id", out var strategyIdValue) &&
+               Guid.TryParse(strategyIdValue, out var strategyId))
             {
-                var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
-                var scheduler = await schedulerFactory.GetScheduler();
-                var jobKey = new JobKey($"{message.StrategyTask.ToString().ToLower()}Job_{message.StrategyId}", "strategyGroup");
-                Type jobType = message.StrategyTask switch
+        
+                if (statusValue == "NO_DATA")
                 {
-                    StrategyTaskEnum.Backtest => typeof(BacktestJob),
-                    StrategyTaskEnum.Optimize => typeof(OptimizeJob),
-                    _ => throw new ArgumentException("Unknown strategy task", nameof(message.StrategyTask))
-                };
-                var strategyJob = JobBuilder.Create(jobType)
-                    .WithIdentity(jobKey)
-                    .SetJobData(new JobDataMap
-                        {
+                    // TODO Notify user
+                    return;
+                }
+                if (statusValue == "DATA_ERROR")
+                {
+                    // TODO Notify user
+                    return;
+                }
+                if (statusValue == "DATA_READY")
+                {
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        Type jobType = typeof(BacktestJob);
+                        var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
+                        var scheduler = await schedulerFactory.GetScheduler();
+                        var jobKey = new JobKey($"Strategy_Test_Job_{strategyId}", "strategyGroup");
+                        //Type jobType = message.StrategyTask switch
+                        //{
+                        //    StrategyTaskEnum.Backtest => typeof(BacktestJob),
+                        //    StrategyTaskEnum.Optimize => typeof(OptimizeJob),
+                        //    _ => throw new ArgumentException("Unknown strategy task", nameof(message.StrategyTask))
+                        //};
+                        var strategyJob = JobBuilder.Create(jobType)
+                            .WithIdentity(jobKey)
+                            .SetJobData(new JobDataMap
+                                {
                             { "key", jobKey },
-                            { "strategyId", message.StrategyId }
-                        })
-                    .Build();
+                            { "strategyId", strategyId }
+                                })
+                            .Build();
 
-                var trigger = TriggerBuilder.Create()
-                   .StartNow()
-                   .Build();
+                        var trigger = TriggerBuilder.Create()
+                           .StartNow()
+                           .Build();
 
-                await scheduler.ScheduleJob(strategyJob, trigger);
+                        await scheduler.ScheduleJob(strategyJob, trigger);
+                    }
+                }
             }
+            else
+            {
+                _logger.LogError("Invalid message format: missing required fields.");
+                return;
+            }
+
+
+
         }
+
+
+
+
+
+
+        //if (message != null && message.StrategyTask == StrategyTaskEnum.Backtest || message.StrategyTask == StrategyTaskEnum.Optimize)
+        //{
+        //    using (var scope = _serviceProvider.CreateScope())
+        //    {
+        //        var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
+        //        var scheduler = await schedulerFactory.GetScheduler();
+        //        var jobKey = new JobKey($"{message.StrategyTask.ToString().ToLower()}Job_{message.StrategyId}", "strategyGroup");
+        //        Type jobType = message.StrategyTask switch
+        //        {
+        //            StrategyTaskEnum.Backtest => typeof(BacktestJob),
+        //            StrategyTaskEnum.Optimize => typeof(OptimizeJob),
+        //            _ => throw new ArgumentException("Unknown strategy task", nameof(message.StrategyTask))
+        //        };
+        //        var strategyJob = JobBuilder.Create(jobType)
+        //            .WithIdentity(jobKey)
+        //            .SetJobData(new JobDataMap
+        //                {
+        //                    { "key", jobKey },
+        //                    { "strategyId", message.StrategyId }
+        //                })
+        //            .Build();
+
+        //        var trigger = TriggerBuilder.Create()
+        //           .StartNow()
+        //           .Build();
+
+        //        await scheduler.ScheduleJob(strategyJob, trigger);
+        //    }
+        //}
         return;
 
 

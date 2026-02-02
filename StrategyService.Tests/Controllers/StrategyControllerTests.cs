@@ -127,7 +127,7 @@ public class StrategyControllerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var strategyType = StrategyEnum.None;
+        var strategyType = StrategyEnum.NONE;
         var strategies = new List<StrategySettingsModel>();
         _mockStrategyRepository.Setup(repo => repo.GetStrategiesByUserIdAsync(userId, false))
             .ReturnsAsync(strategies);

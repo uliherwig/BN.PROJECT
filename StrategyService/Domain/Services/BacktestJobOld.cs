@@ -95,7 +95,7 @@ public class BacktestJobOld : IJob
             MessageType = MessageTypeEnum.Start
         };
 
-        var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.StrategyType);
+        var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.IndicatorType);
 
         await strategyService.Initialize(StrategyTaskEnum.Backtest,strategySettings);
 

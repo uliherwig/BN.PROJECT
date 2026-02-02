@@ -2,7 +2,7 @@
 
 public interface IStrategyServiceStore
 { 
-    IStrategyService GetOrCreateStrategyService(Guid strategyId, StrategyEnum strategyEnum);
+    IStrategyService GetOrCreateStrategyService(Guid strategyId, IndicatorEnum strategyEnum);
     void RemoveStrategyService(Guid strategyId);
     void Clear();
 }

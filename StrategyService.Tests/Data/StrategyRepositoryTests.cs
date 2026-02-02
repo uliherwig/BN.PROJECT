@@ -58,7 +58,8 @@ public class StrategyRepositoryTests
             StartDate = new DateTime(2023, 1, 1),
             EndDate = new DateTime(2023, 1, 2),
             Asset = "AAPL",
-            StrategyType = StrategyEnum.Breakout,
+            StrategyType = StrategyEnum.IndicatorBased,
+            IndicatorType = IndicatorEnum.BREAKOUT,
             UserId = Guid.NewGuid(),
         };
 

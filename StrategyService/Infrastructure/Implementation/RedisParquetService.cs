@@ -1,14 +1,4 @@
-﻿using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Parquet;
-using Parquet.Data;
-using Microsoft.Data.Analysis;
-using Microsoft.Extensions.Logging;
-
-namespace BN.PROJECT.StrategyService;
+﻿namespace BN.PROJECT.StrategyService;
 
 public class RedisParquetService : IRedisParquetService
 {
@@ -50,30 +40,43 @@ public class RedisParquetService : IRedisParquetService
                 var columns = new List<DataFrameColumn>();
                 foreach (var col in dataColumns)
                 {
-                    var field = col.Field;
-                    Array data = col.Data;
-                    DataFrameColumn dfCol;
+                    try
+                    {
+                        var field = col.Field;
+                        Array data = col.Data;
+                        DataFrameColumn dfCol;
 
-                    if (field.ClrNullableIfHasNullsType == typeof(int))
-                        dfCol = new PrimitiveDataFrameColumn<int>(field.Name, (IEnumerable<int>)data);
-                    else if (field.ClrNullableIfHasNullsType == typeof(long))
-                        dfCol = new PrimitiveDataFrameColumn<long>(field.Name, (IEnumerable<long>)data);
-                    else if (field.ClrNullableIfHasNullsType == typeof(float))
-                        dfCol = new PrimitiveDataFrameColumn<float>(field.Name, (IEnumerable<float>)data);
-                    else if (field.ClrNullableIfHasNullsType == typeof(double))
-                        dfCol = new PrimitiveDataFrameColumn<double>(field.Name, (IEnumerable<double>)data);
-                    else if (field.ClrNullableIfHasNullsType == typeof(bool))
-                        dfCol = new PrimitiveDataFrameColumn<bool>(field.Name, (IEnumerable<bool>)data);
-                    else if (field.ClrNullableIfHasNullsType == typeof(string))
-                        dfCol = new StringDataFrameColumn(field.Name, (IEnumerable<string>)data);
-                    else if (field.ClrNullableIfHasNullsType == typeof(int?))
-                        dfCol = new PrimitiveDataFrameColumn<int>(field.Name, (IEnumerable<int?>)data);
-                    else if (field.ClrNullableIfHasNullsType == typeof(double?))
-                        dfCol = new PrimitiveDataFrameColumn<double>(field.Name, (IEnumerable<double?>)data);
-                    else
-                        throw new Exception(field.ClrNullableIfHasNullsType.ToString());
+                        if (field.ClrNullableIfHasNullsType == typeof(int))
+                            dfCol = new PrimitiveDataFrameColumn<int>(field.Name, (IEnumerable<int>)data);
+                        else if (field.ClrNullableIfHasNullsType == typeof(long))
+                            dfCol = new PrimitiveDataFrameColumn<long>(field.Name, (IEnumerable<long>)data);
+                        else if (field.ClrNullableIfHasNullsType == typeof(float))
+                            dfCol = new PrimitiveDataFrameColumn<float>(field.Name, (IEnumerable<float>)data);
+                        else if (field.ClrNullableIfHasNullsType == typeof(double))
+                            dfCol = new PrimitiveDataFrameColumn<double>(field.Name, (IEnumerable<double>)data);
+                        else if (field.ClrNullableIfHasNullsType == typeof(bool))
+                            dfCol = new PrimitiveDataFrameColumn<bool>(field.Name, (IEnumerable<bool>)data);
+                        else if (field.ClrNullableIfHasNullsType == typeof(string))
+                            dfCol = new StringDataFrameColumn(field.Name, (IEnumerable<string>)data);
+                        else if (field.ClrNullableIfHasNullsType == typeof(int?))
+                            dfCol = new PrimitiveDataFrameColumn<int>(field.Name, (IEnumerable<int?>)data);
+                        else if (field.ClrNullableIfHasNullsType == typeof(double?))
+                            dfCol = new PrimitiveDataFrameColumn<double>(field.Name, (IEnumerable<double?>)data);
+                        else if (field.ClrNullableIfHasNullsType == typeof(sbyte?))
+                            dfCol = new PrimitiveDataFrameColumn<sbyte>(field.Name, (IEnumerable<sbyte?>)data);
 
-                    columns.Add(dfCol);
+
+                        else
+                            continue;
+
+                        columns.Add(dfCol);
+                    }
+                    catch (Exception ex)
+                    {
+                        var test = ex;
+                        throw new Exception(ex.ToString());
+                    }
+
                 }
                 return new DataFrame(columns);
             }

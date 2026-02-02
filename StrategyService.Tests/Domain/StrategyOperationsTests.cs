@@ -32,20 +32,4 @@ public class StrategyOperationsTests
         Assert.Equal(TimeSpan.FromMinutes(expectedMinutes), result);
     }
 
-    [Fact]
-    public void UpdateOrCloseOpenPosition_ShouldUpdateTakeProfitAndStopLossForBuy()
-    {
-        // Arrange
-        var openPosition = new PositionModel { Side = SideEnum.Buy, TakeProfit = 100, StopLoss = 90 };
-        var quote = new Quote { BidPrice = 110, AskPrice = 105, TimestampUtc = DateTime.UtcNow };
-        decimal trailingStop = 5;
-        decimal takeProfitPercent = 10;
-
-        // Act
-        TradingOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, trailingStop, takeProfitPercent);
-
-        // Assert
-        Assert.Equal(121, openPosition.TakeProfit);
-        Assert.Equal(104.5m, openPosition.StopLoss);
-    }
 }

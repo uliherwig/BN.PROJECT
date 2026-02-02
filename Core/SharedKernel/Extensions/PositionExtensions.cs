@@ -11,7 +11,8 @@ public static class PositionExtensions
         decimal stopLoss,
         decimal takeProfit,
         DateTime stampOpen,
-        StrategyEnum strategyType,
+        decimal spreadPerTrade,
+        decimal overnightFeeRate,
         string StrategyParameter)
     {
         var position = new PositionModel
@@ -29,7 +30,9 @@ public static class PositionExtensions
             StopLoss = stopLoss,
             StampOpened = stampOpen.ToUniversalTime(),
             CloseSignal = "",
-            StrategyType = strategyType,
+            SpreadPerTrade = spreadPerTrade,
+            OvernightFeeRate = overnightFeeRate,
+
             StrategyParams = StrategyParameter
         };
 
@@ -44,11 +47,14 @@ public static class PositionExtensions
         return true;
     }
 
-    public static void ClosePosition(this PositionModel position, DateTime stampClose, decimal priceClose, string closeSignal)
+    public static void ClosePosition(this PositionModel position, DateTime stampClose, decimal priceClose, string closeSignal, decimal profit)
     {
         position.PriceClose = priceClose;
         position.StampClosed = stampClose.ToUniversalTime();
         position.CloseSignal = closeSignal;
-        position.ProfitLoss = (priceClose - position.PriceOpen) * position.Quantity * (position.Side == SideEnum.Buy ? 1 : -1);
+        position.ProfitLoss = profit;
     }
+
+    public static PositionModel GetOpenPosition(List<PositionModel> positions) => positions.FirstOrDefault(p => p.StampClosed == DateTime.MinValue);
+
 }

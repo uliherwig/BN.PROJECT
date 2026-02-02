@@ -1,13 +1,11 @@
-using System.Configuration;
-
 namespace BN.PROJECT.StrategyService;
 
-public class BrokerServiceClient
+public class BrokerServiceClient : IBrokerServiceClient
 {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
 
-    public BrokerServiceClient(HttpClient httpClient, 
+    public BrokerServiceClient(HttpClient httpClient,
         IConfiguration configuration)
     {
         _httpClient = httpClient;

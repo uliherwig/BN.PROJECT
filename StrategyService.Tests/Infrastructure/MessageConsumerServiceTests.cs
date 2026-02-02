@@ -64,11 +64,11 @@ public class MessageConsumerServiceTests
     public void ConsumeMessage_ShouldDeserializeMessage_WhenMessageIsNotNull()
     {
         // Arrange
-        var message = new StrategyMessage { Strategy = StrategyEnum.SMA, MessageType = MessageTypeEnum.Start };
+        var message = new StrategyMessage { Strategy = StrategyEnum.IndicatorBased, MessageType = MessageTypeEnum.Start };
         var messageJson = message.ToJson();
 
         var strategyServiceMock = new Mock<IStrategyService>();
-        strategyServiceMock.Setup(x => x.CanHandle(message.Strategy)).Returns(true);
+        strategyServiceMock.Setup(x => x.CanHandle(IndicatorEnum.BREAKOUT)).Returns(true);
 
         var strategyServices = new List<IStrategyService> { strategyServiceMock.Object };
 

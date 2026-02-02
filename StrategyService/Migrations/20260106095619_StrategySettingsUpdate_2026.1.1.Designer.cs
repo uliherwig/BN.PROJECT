@@ -3,6 +3,7 @@ using System;
 using BN.PROJECT.StrategyService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.StrategyService.Migrations
 {
     [DbContext(typeof(StrategyDbContext))]
-    partial class StrategyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260106095619_StrategySettingsUpdate_2026.1.1")]
+    partial class StrategySettingsUpdate_202611
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,9 +153,6 @@ namespace BN.PROJECT.StrategyService.Migrations
 
                     b.Property<decimal>("TakeProfitPercent")
                         .HasColumnType("numeric");
-
-                    b.Property<int>("TimeFrame")
-                        .HasColumnType("integer");
 
                     b.Property<decimal>("TrailingStop")
                         .HasColumnType("numeric");

@@ -73,9 +73,9 @@ public class OptimizeJob : IJob
 
         // create combinations for optimization
         var combinations = Enumerable.Empty<dynamic>();
-        switch (strategySettings.StrategyType)
+        switch (strategySettings.IndicatorType)
         {
-            case StrategyEnum.Breakout:
+            case IndicatorEnum.BREAKOUT:
                 var strategyParams = JsonConvert.DeserializeObject<BreakoutModel>(strategySettings.StrategyParams);
                 if (strategyParams == null)
                 {
@@ -117,7 +117,7 @@ public class OptimizeJob : IJob
 
                 foreach (var combo in combinations)
                 {
-                    var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.StrategyType);
+                    var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.IndicatorType);
 
                     switch (strategyParams.StopLossType)
                     {
@@ -183,118 +183,7 @@ public class OptimizeJob : IJob
                 }
                 break;
 
-            case StrategyEnum.SMA:
-                var smaSettings = JsonConvert.DeserializeObject<SmaModel>(strategySettings.StrategyParams);
-                if (smaSettings == null)
-                {
-                    _logger.LogError($"Failed to deserialize SMA settings for strategy {strategySettings.Name}.");
-                    return;
-                }
-
-                switch (smaSettings.StopLossType)
-                {
-                    case StopLossTypeEnum.None:
-
-                        var tp_sl_Grid = new Dictionary<string, IEnumerable<decimal>>
-                        {
-                            { "sl", Enumerable.Range(0, 2).Select(i => 0.5m + i * 0.2m) },  // 10 to 95
-                            { "tp", Enumerable.Range(0, 2).Select(i => 0.5m + i * 0.2m) }   // 50 to 290
-                        };
-
-                        combinations =
-                           from sl in tp_sl_Grid["sl"]
-                           from tp in tp_sl_Grid["tp"]
-
-                           select new { testSl = sl, testTp = tp };
-                        break;
-
-                    case StopLossTypeEnum.SMAIntersection:
-                        int smaShortPeriod = smaSettings.ShortPeriod;
-                        int smaLongPeriod = smaSettings.LongPeriod;
-                        var paramGrid = new Dictionary<string, IEnumerable<int>>
-                        {
-                            { "ma_short", Enumerable.Range(0, 2).Select(i => smaShortPeriod + i * 10) },  // 10 to 95
-                            { "ma_long", Enumerable.Range(0, 2).Select(i => smaLongPeriod + i * 10) }   // 50 to 290
-                        };
-
-                        combinations =
-                           from maShort in paramGrid["ma_short"]
-                           from maLong in paramGrid["ma_long"]
-                           where maShort < maLong  // Optional: skip invalid combos
-                           select new { ma_short = maShort, ma_long = maLong };
-                        break;
-                    default:
-                        _logger.LogError($"Unknown StopLossType for strategy {strategySettings.Name}.");
-                        return;
-                }
-
-                foreach (var combo in combinations)
-                {
-                    var strategyService = _serviceStore.GetOrCreateStrategyService(strategyId, strategySettings.StrategyType);
-
-                    switch (smaSettings.StopLossType)
-                    {
-                        case StopLossTypeEnum.None:
-                            strategySettings.TakeProfitPercent = combo.testTp;
-                            strategySettings.StopLossPercent = combo.testSl;
-                            break;
-                        case StopLossTypeEnum.SMAIntersection:
-                            smaSettings.ShortPeriod = combo.ma_short;
-                            smaSettings.LongPeriod = combo.ma_long;
-                            break;
-                        default:
-                            _logger.LogError($"Unknown StopLossType for strategy {strategySettings.Name}.");
-                            return;
-                    }
-
-
-                    strategySettings.StrategyParams = JsonConvert.SerializeObject(
-                        smaSettings,
-                        new JsonSerializerSettings
-                        {
-                            ContractResolver = new CamelCasePropertyNamesContractResolver()
-                        }
-                    );
-
-                    var strategyMessage = new StrategyMessage
-                    {
-                        StrategyId = strategySettings.Id,
-                        IsBacktest = true,
-                        UserId = strategySettings.UserId,
-                        Settings = strategySettings,
-                        Strategy = strategySettings.StrategyType,
-                        MessageType = MessageTypeEnum.Start
-                    };
-
-                    await strategyService.StartTest(strategyMessage);
-
-                    foreach (var q in quotes)
-                    {
-                        await strategyService.EvaluateQuote(strategySettings.Id, strategyMessage.UserId, q);
-                    }
-
-                    var positions = strategyService.GetPositions();
-                    var testResult = await strategyService.GetTestResult();
-                    if (positions == null || testResult == null)
-                    {
-                        continue;
-                    }
-
-                    if (positions.Count > 10 && testResult.TotalProfitLoss > optimizationResult.Profit)
-                    {
-                        optimizationResult = new OptimizationResultModel
-                        {
-                            StrategyId = strategySettings.Id,
-                            Settings = strategySettings,
-                            Positions = positions,
-                            Profit = testResult.TotalProfitLoss,
-                            Result = testResult
-                        };
-                    }
-                    _serviceStore.RemoveStrategyService(strategyId);
-                }
-                break;
-
+      
             default:
                 _logger.LogWarning($"Unknown strategy type for {strategySettings.Name}.");
                 return;

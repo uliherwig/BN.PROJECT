@@ -2,6 +2,15 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2026.2.1
+
+- Implementation of AI-based trading strategies using FinAIService
+
+## Version 2026.1.1
+
+- Usage of Ta-Lib for technical indicators calculations
+- IndicatorEnum added
+
 ## Version 2025.12.2
 
 - Replacement of Kafka with Redis for message brokering

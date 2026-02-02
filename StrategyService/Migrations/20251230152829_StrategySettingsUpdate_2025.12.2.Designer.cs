@@ -3,6 +3,7 @@ using System;
 using BN.PROJECT.StrategyService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.StrategyService.Migrations
 {
     [DbContext(typeof(StrategyDbContext))]
-    partial class StrategyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251230152829_StrategySettingsUpdate_2025.12.2")]
+    partial class StrategySettingsUpdate_2025122
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,9 +38,6 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<Guid>("ExecutionId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("OvernightFeeRate")
-                        .HasColumnType("numeric");
-
                     b.Property<decimal>("PriceClose")
                         .HasColumnType("numeric");
 
@@ -52,9 +52,6 @@ namespace BN.PROJECT.StrategyService.Migrations
 
                     b.Property<int>("Side")
                         .HasColumnType("integer");
-
-                    b.Property<decimal>("SpreadPerTrade")
-                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("StampClosed")
                         .HasColumnType("timestamp with time zone");
@@ -71,6 +68,9 @@ namespace BN.PROJECT.StrategyService.Migrations
                     b.Property<string>("StrategyParams")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("StrategyType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Symbol")
                         .IsRequired()
@@ -150,9 +150,6 @@ namespace BN.PROJECT.StrategyService.Migrations
 
                     b.Property<decimal>("TakeProfitPercent")
                         .HasColumnType("numeric");
-
-                    b.Property<int>("TimeFrame")
-                        .HasColumnType("integer");
 
                     b.Property<decimal>("TrailingStop")
                         .HasColumnType("numeric");

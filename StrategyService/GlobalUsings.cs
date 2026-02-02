@@ -11,3 +11,6 @@ global using System.Collections.Concurrent;
 global using System.Net.Http.Headers;
 global using System.Text;
 global using NuGet.Protocol;
+global using StackExchange.Redis;
+global using Parquet;
+global using Microsoft.Data.Analysis;

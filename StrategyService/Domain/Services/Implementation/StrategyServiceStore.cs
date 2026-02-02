@@ -10,7 +10,7 @@ public class StrategyServiceStore : IStrategyServiceStore
         _serviceProvider = serviceProvider;
     }
 
-    public IStrategyService GetOrCreateStrategyService(Guid strategyId, StrategyEnum strategyEnum)
+    public IStrategyService GetOrCreateStrategyService(Guid strategyId, IndicatorEnum strategyEnum)
     {
         return _strategyServices.GetOrAdd(strategyId, _ =>
         {

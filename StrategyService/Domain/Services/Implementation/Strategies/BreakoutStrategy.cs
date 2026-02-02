@@ -176,13 +176,13 @@ public class BreakoutStrategy : IStrategyService
             if (_strategy.ClosePositionEod == false && quote.TimestampUtc.TimeOfDay > _marketCloseTime)
             {
                 var closePrice = openPosition.Side == SideEnum.Buy ? quote.BidPrice : quote.AskPrice;
-                openPosition.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close");
+                openPosition.ClosePosition(quote.TimestampUtc, closePrice, "EoD Close",0);
             }
 
             // handle normal SL / TP operation
             else if (_breakoutSettings.StopLossType == StopLossTypeEnum.None)
             {
-                TradingOperations.UpdateOrCloseOpenPosition(ref openPosition, quote, _strategy.TrailingStop, _strategy.TakeProfitPercent);
+               
 
             }
 
@@ -220,7 +220,8 @@ public class BreakoutStrategy : IStrategyService
                         sl,
                         tp,
                         quote.TimestampUtc,
-                        _strategy.StrategyType,
+                        _strategy.SpreadPerTrade,
+                        _strategy.OvernightFeeRate,                    
                         JsonConvert.SerializeObject(_breakoutSettings));
 
             _positions.Add(position);
@@ -259,8 +260,8 @@ public class BreakoutStrategy : IStrategyService
         return testResult;
     }
 
-    public bool CanHandle(StrategyEnum strategy) =>
-     strategy == StrategyEnum.Breakout;
+    public bool CanHandle(IndicatorEnum strategy) =>
+     strategy == IndicatorEnum.BREAKOUT;
 
 
     public Task StartTest(StrategyMessage message)

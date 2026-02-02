@@ -2,7 +2,7 @@
 
 public class MovingAvgModel
 {
-    public StrategyEnum Strategy { get; set; } = StrategyEnum.SMA;
+    public IndicatorEnum Strategy { get; set; } = IndicatorEnum.SMA;
     public int ShortPeriod { get; set; } = 30;
     public int LongPeriod { get; set; } = 60;
     public int SlopeWindow { get; set; } = 5;

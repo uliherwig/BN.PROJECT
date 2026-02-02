@@ -92,7 +92,8 @@ namespace BN.PROJECT.AlpacaService.Tests
                 StartDate = new DateTime(2023, 1, 1),
                 EndDate = new DateTime(2023, 1, 2),
                 Asset = "AAPL",
-                StrategyType = StrategyEnum.Breakout,
+                StrategyType = StrategyEnum.IndicatorBased,
+                IndicatorType = IndicatorEnum.BREAKOUT,
                 UserId = Guid.NewGuid(),
             };
             var result = "true";
@@ -124,7 +125,8 @@ namespace BN.PROJECT.AlpacaService.Tests
                 StartDate = new DateTime(2023, 1, 1),
                 EndDate = new DateTime(2023, 1, 2),
                 Asset = "AAPL",
-                StrategyType = StrategyEnum.Breakout,
+                StrategyType = StrategyEnum.IndicatorBased,
+                IndicatorType = IndicatorEnum.BREAKOUT,
                 UserId = Guid.NewGuid(),
             };
             var result = "BadRequest";

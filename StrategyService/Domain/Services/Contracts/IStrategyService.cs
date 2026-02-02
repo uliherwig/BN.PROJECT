@@ -9,5 +9,5 @@ public interface IStrategyService
     Task StopTest(StrategyMessage message);
     Task<TestResult> GetTestResult();
     List<PositionModel> GetPositions();
-    bool CanHandle(StrategyEnum strategy);
+    bool CanHandle(IndicatorEnum strategy);
 }

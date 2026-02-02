@@ -9,10 +9,12 @@ public class StrategySettingsModel
     public DateTime StampEnd { get; set; } = new DateTime(1, 1, 1, 0, 0, 0).ToUniversalTime();
     public Guid UserId { get; set; }
     public StrategyEnum StrategyType { get; set; }
+    public IndicatorEnum IndicatorType { get; set; }
     public string Broker { get; set; }
     public string Name { get; set; }
     public string Asset { get; set; }
     public int Quantity { get; set; }
+    public TimeFrameEnum TimeFrame { get; set; }
     public decimal TakeProfitPercent { get; set; }
     public decimal StopLossPercent { get; set; }
     public DateTime StartDate { get; set; }

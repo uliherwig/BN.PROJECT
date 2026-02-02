@@ -113,6 +113,8 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IStrategyRepository, StrategyRepository>();
 
     services.AddWithAllDerivedTypes<IStrategyService>();  // adds all classes that implement IStrategyService as Singleton
+
+    services.AddScoped<IFinAIServiceClient, FinAIServiceClient>();
 }
 
 static void ConfigureEndpoints(WebApplication app)

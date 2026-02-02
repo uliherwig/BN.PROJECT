@@ -56,7 +56,8 @@ public class StrategyTests
         var strategySettings = new StrategySettingsModel
         {
             UserId = Guid.NewGuid(),
-            StrategyType = StrategyEnum.Breakout,
+            StrategyType = StrategyEnum.IndicatorBased,
+            IndicatorType = IndicatorEnum.BREAKOUT,
             Broker = "Alpaca",
             Name = "ExampleStrategy",
             Asset = "SPY",
@@ -72,7 +73,7 @@ public class StrategyTests
         };
 
         // Act
-        await _breakoutStrategy.StartTest(new StrategyMessage { IsBacktest = true, StrategyId = strategySettings.Id, Strategy = StrategyEnum.Breakout, Settings = strategySettings });
+        await _breakoutStrategy.StartTest(new StrategyMessage { IsBacktest = true, StrategyId = strategySettings.Id, Strategy = StrategyEnum.IndicatorBased, Settings = strategySettings });
 
         foreach (var quote in testData)
         {

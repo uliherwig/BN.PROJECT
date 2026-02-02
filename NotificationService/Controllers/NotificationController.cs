@@ -47,6 +47,8 @@ public class NotificationController : ControllerBase
 
         }
 
-        return Ok("Notification Service is running");
+        var message = new { Message = "Notification Service is running" };
+
+        return Ok(message);
     }
 }

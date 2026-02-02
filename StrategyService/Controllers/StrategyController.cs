@@ -79,7 +79,7 @@ public class StrategyController : ControllerBase
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
         var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), false);
-        if (strategyType != StrategyEnum.None)
+        if (strategyType != StrategyEnum.NONE)
         {
             settings = settings.Where(s => s.StrategyType == strategyType).ToList();
         }
