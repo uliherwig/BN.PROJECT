@@ -37,12 +37,16 @@ public class NotificationController : ControllerBase
         var notificationMessage = new NotificationMessage
         {
             UserId = new Guid(userId),
-            NotificationType = notificationEnum
+            NotificationType = notificationEnum,
+            JsonData = "test"
+
         };
 
         var connectionId = await _redisDatabase.StringGetAsync(userId.ToString());
         if (!string.IsNullOrEmpty(connectionId.ToString()))
         {
+
+            var client = _hubContext.Clients.Client(connectionId);
             await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", notificationMessage.ToJson());
 
         }

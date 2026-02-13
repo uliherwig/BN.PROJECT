@@ -31,7 +31,7 @@ public class StrategyServiceClient : IStrategyServiceClient
         {
             var json = JsonConvert.SerializeObject(testSettings);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"/internalstrategy/test", content);
+            var response = await _httpClient.PostAsync($"/internalstrategy/add", content);
 
             var result = await response.Content.ReadAsStringAsync();
             return result;

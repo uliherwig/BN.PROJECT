@@ -15,6 +15,7 @@ namespace BN.PROJECT.AlpacaService.Tests
         private readonly Mock<IFinAIServiceClient> _mockOptimizerServiceClient;
         private readonly Mock<ILogger<AlpacaTestController>> _mockLogger;
         private readonly AlpacaTestController _alpacaTestController;
+        private readonly Mock<IRedisPublisher> _mockRedisPublisher;
 
         public AlpacaTestControllerTests()
         {
@@ -24,12 +25,14 @@ namespace BN.PROJECT.AlpacaService.Tests
             _mockStrategyServiceClient = new Mock<IStrategyServiceClient>();
             _mockOptimizerServiceClient = new Mock<IFinAIServiceClient>();
             _mockLogger = new Mock<ILogger<AlpacaTestController>>();
+            _mockRedisPublisher = new Mock<IRedisPublisher>();
             _alpacaTestController = new AlpacaTestController(_mockEnv.Object,
                                               _mockAlpacaRepository.Object,
                                               _mockBacktestService.Object,
                                               _mockStrategyServiceClient.Object,
                                                _mockOptimizerServiceClient.Object,
-                                              _mockLogger.Object);
+                                              _mockLogger.Object,
+                                              _mockRedisPublisher.Object);
         }
 
         [Fact]

@@ -1,6 +1,4 @@
-﻿using Alpaca.Markets;
-
-namespace BN.PROJECT.AlpacaService;
+﻿namespace BN.PROJECT.AlpacaService;
 
 [Route("[controller]")]
 [ApiController]
@@ -13,6 +11,7 @@ public class AlpacaTestController : ControllerBase
     private readonly IStrategyServiceClient _strategyServiceClient;
     private readonly IFinAIServiceClient _finAIServiceClient;
     private readonly ILogger<AlpacaTestController> _logger;
+    private readonly IRedisPublisher _publisher;
 
     public AlpacaTestController(
         IWebHostEnvironment env,
@@ -20,7 +19,8 @@ public class AlpacaTestController : ControllerBase
         IStrategyTestService backtestService,
         IStrategyServiceClient strategyServiceClient,
         IFinAIServiceClient finAIServiceClient,
-        ILogger<AlpacaTestController> logger)
+        ILogger<AlpacaTestController> logger,
+        IRedisPublisher redisPublisher)
     {
         _env = env;
         _alpacaRepository = alpacaRepository;
@@ -28,6 +28,7 @@ public class AlpacaTestController : ControllerBase
         _strategyServiceClient = strategyServiceClient;
         _finAIServiceClient = finAIServiceClient;
         _logger = logger;
+        _publisher = redisPublisher;
     }
 
     [HttpGet("historical-bars/{symbol}")]
@@ -64,6 +65,7 @@ public class AlpacaTestController : ControllerBase
         {
             return BadRequest("StrategySettingsModel cannot be null");
         }
+        // TODO add complet validation of settings
         var userId = HttpContext.Items["UserId"]?.ToString();
         settings.UserId = new Guid(userId!);
         settings.Id = Guid.NewGuid();
@@ -72,10 +74,15 @@ public class AlpacaTestController : ControllerBase
         settings.StampStart = DateTime.UtcNow.ToUniversalTime();
         settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
 
-
         var startResponse = await _strategyServiceClient.StartStrategyAsync(settings);
         if (startResponse == "true")
         {
+            var notificationTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Notification);
+            var notificationMessage = NotificationMessageFactory.CreateNotificationMessage(
+                settings.UserId,
+                NotificationEnum.BacktestStart
+            );
+            await _publisher.PublishAsync(notificationTopic, notificationMessage.ToJson());
             await _strategyTestService.StoreQuotesToRedis(settings);
             await _finAIServiceClient.CreateDataframeAsync(settings);          
 

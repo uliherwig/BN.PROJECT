@@ -61,14 +61,6 @@ public class BacktestJob : IJob
         }
 
 
-        var notificationTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Notification);
-        var notificationMessage = NotificationMessageFactory.CreateNotificationMessage(
-            strategySettings.UserId,
-            NotificationEnum.BacktestStart
-        );
-        await _publisher.PublishAsync(notificationTopic, notificationMessage.ToJson());
-
-
         // read dataframe from redis using parquet file
         var key = strategySettings.StrategyType == StrategyEnum.IndicatorBased ?
             $"strategy_test_data:{strategySettings.Id}" :
@@ -237,9 +229,12 @@ public class BacktestJob : IJob
             await _strategyRepository.AddPositionsAsync(positions);
 
             // Notify user
-            notificationMessage.NotificationType = NotificationEnum.BacktestStop;
+            var notificationTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Notification);
+            var notificationMessage = NotificationMessageFactory.CreateNotificationMessage(
+                strategySettings.UserId,
+                NotificationEnum.BacktestStop
+            );
             await _publisher.PublishAsync(notificationTopic, notificationMessage.ToJson());
-
 
         }
         catch (Exception ex)

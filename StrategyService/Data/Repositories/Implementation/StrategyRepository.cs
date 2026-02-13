@@ -24,10 +24,11 @@ public class StrategyRepository : IStrategyRepository
     public async Task<StrategySettingsModel?> GetStrategyByIdAsync(Guid testId) =>
         await _context.Strategies.Where(s => s.Id == testId).FirstOrDefaultAsync();
 
-    public async Task AddStrategyAsync(StrategySettingsModel strategySettings)
+    public async Task<int> AddStrategyAsync(StrategySettingsModel strategySettings)
     {
         await _context.Strategies.AddAsync(strategySettings);
-        await _context.SaveChangesAsync();
+        return await _context.SaveChangesAsync();
+       
     }
 
     public async Task<int> UpdateStrategyAsync(StrategySettingsModel strategySettings)

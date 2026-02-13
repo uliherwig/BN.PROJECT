@@ -8,7 +8,7 @@ public interface IStrategyRepository
 
     Task<StrategySettingsModel?> GetStrategyByIdAsync(Guid testId);
 
-    Task AddStrategyAsync(StrategySettingsModel strategySettings);
+    Task<int> AddStrategyAsync(StrategySettingsModel strategySettings);
 
     Task DeleteStrategyAsync(StrategySettingsModel strategySettings);
 
