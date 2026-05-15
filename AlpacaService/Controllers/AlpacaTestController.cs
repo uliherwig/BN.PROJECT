@@ -12,6 +12,7 @@ public class AlpacaTestController : ControllerBase
     private readonly IFinAIServiceClient _finAIServiceClient;
     private readonly ILogger<AlpacaTestController> _logger;
     private readonly IRedisPublisher _publisher;
+ 
 
     public AlpacaTestController(
         IWebHostEnvironment env,
@@ -28,7 +29,7 @@ public class AlpacaTestController : ControllerBase
         _strategyServiceClient = strategyServiceClient;
         _finAIServiceClient = finAIServiceClient;
         _logger = logger;
-        _publisher = redisPublisher;
+        _publisher = redisPublisher;     
     }
 
     [HttpGet("historical-bars/{symbol}")]
@@ -39,33 +40,34 @@ public class AlpacaTestController : ControllerBase
     }
 
     [HttpGet("historical-quotes/{symbol}")]
-    public async Task<IActionResult> GetHistoricalQuotesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public async Task<ActionResult<IEnumerable<PriceQuote>>> GetHistoricalQuotesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         var bars = await _alpacaRepository.GetHistoricalBars(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
 
-        var quotes = new List<Quote>();
+        var quotes = new List<PriceQuote>();
         foreach (var bar in bars)
         {
-            var q = new Quote
+            var q = new PriceQuote
             {
                 Symbol = symbol,
                 AskPrice = bar.C + 0.1m,
                 BidPrice = bar.C - 0.1m,
-                TimestampUtc = bar.T.ToUniversalTime()
+                TimestampUtc = bar.T.ToUniversalTime(),
+                Volume = bar.V
             };
             quotes.Add(q);
         }
-        return Ok(quotes);
+        return quotes;
     }
 
     [HttpPost("run-test")]
-    public async Task<IActionResult> RunBacktest([FromBody] StrategySettingsModel settings)
+    public async Task<ActionResult> RunBacktest([FromBody] StrategySettingsModel settings)
     {
         if (settings == null)
         {
             return BadRequest("StrategySettingsModel cannot be null");
         }
-        // TODO add complet validation of settings
+
         var userId = HttpContext.Items["UserId"]?.ToString();
         settings.UserId = new Guid(userId!);
         settings.Id = Guid.NewGuid();
@@ -73,6 +75,9 @@ public class AlpacaTestController : ControllerBase
         settings.EndDate = settings.EndDate.ToUniversalTime();
         settings.StampStart = DateTime.UtcNow.ToUniversalTime();
         settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
+        await _strategyTestService.StoreBarsToRedis(settings.Asset);
+
+
 
         var startResponse = await _strategyServiceClient.StartStrategyAsync(settings);
         if (startResponse == "true")
@@ -83,8 +88,12 @@ public class AlpacaTestController : ControllerBase
                 NotificationEnum.BacktestStart
             );
             await _publisher.PublishAsync(notificationTopic, notificationMessage.ToJson());
-            await _strategyTestService.StoreQuotesToRedis(settings);
-            await _finAIServiceClient.CreateDataframeAsync(settings);          
+
+            var msg = new BacktestMessage
+            {
+                StrategyId = settings.Id
+            };
+            await _publisher.PublishAsync(RedisUtilities.GetChannelName(RedisChannelEnum.Strategy), msg.ToJson());
 
         }
         return Ok(startResponse);
@@ -120,19 +129,9 @@ public class AlpacaTestController : ControllerBase
     }
 
     [HttpPost("store-to-redis")]
-    public async Task<IActionResult> StoreToRedis([FromBody] StrategySettingsModel settings)
+    public async Task<IActionResult> StoreToRedis([FromBody] string asset)
     {
-        if (settings == null)
-        {
-            return BadRequest("StrategySettingsModel cannot be null");
-        }
-
-        settings.StartDate = settings.StartDate.ToUniversalTime();
-        settings.EndDate = settings.EndDate.ToUniversalTime();
-        settings.StampStart = DateTime.UtcNow.ToUniversalTime();
-        settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
-        await _strategyTestService.StoreQuotesToRedis(settings);
-
+        await _strategyTestService.StoreBarsToRedis(asset);
         return Ok();
     }
 

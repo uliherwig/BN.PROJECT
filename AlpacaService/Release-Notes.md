@@ -4,7 +4,7 @@ BN.PROJECT is a platform which combines brokerage operations with algorithmic tr
 
 ## Version 2026.2.2
 
-- Implementation of AI-based trading strategies using FinAIService
+- Backtest refactored
 
 ## Version 2026.2.1
 

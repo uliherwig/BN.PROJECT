@@ -6,6 +6,6 @@ public class OptimizationResultModel
     public decimal Profit { get; set; } = -10000m;
     public TestResult Result { get; set; } = new();
 
-    public StrategySettingsModel Settings { get; set; } = new();
+    public required StrategySettingsModel Settings { get; set; }
     public List<PositionModel> Positions { get; set; } = [];
 }

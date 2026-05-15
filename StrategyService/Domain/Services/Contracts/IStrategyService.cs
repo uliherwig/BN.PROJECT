@@ -5,7 +5,7 @@ public interface IStrategyService
     Task Initialize(StrategyTaskEnum strategyTask, StrategySettingsModel strategySettings);
 
     Task StartTest(StrategyMessage message);
-    Task EvaluateQuote(Guid strategyId, Guid userId, Quote quote);
+    Task EvaluateQuote(Guid strategyId, Guid userId, PriceQuote quote);
     Task StopTest(StrategyMessage message);
     Task<TestResult> GetTestResult();
     List<PositionModel> GetPositions();

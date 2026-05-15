@@ -1,8 +1,8 @@
 ﻿namespace BN.PROJECT.StrategyService
 {
-    [Route("[controller]")]
     [ApiController]
-    //[AuthorizeUser(["user", "admin"])]
+    [Route("[controller]")]
+    [AuthorizeUser(["user", "admin"])]
     public class MachineLearningController : ControllerBase
     {
         private readonly ILogger<MachineLearningController> _logger;

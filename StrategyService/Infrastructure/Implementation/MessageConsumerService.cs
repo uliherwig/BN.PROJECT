@@ -29,7 +29,12 @@ public class MessageConsumerService : IHostedService
 
                 redisSubscriber.Subscribe(channelName, (channel, msg) =>
                 {
-                    ConsumeMessage(msg);
+                    if (string.IsNullOrEmpty(msg))
+                    {
+                        _logger.LogWarning("Received null message on channel {Channel}", channel);
+                        return;
+                    }
+                    ConsumeMessage(msg!);
                 });
             }
         }
@@ -47,35 +52,20 @@ public class MessageConsumerService : IHostedService
 
     public async void ConsumeMessage(string messageJson)
     {
-        var message = JsonConvert.DeserializeObject<Dictionary<string, string>>(messageJson);
+        var message = JsonConvert.DeserializeObject<BacktestMessage>(messageJson);
 
         if (message != null)
         {
-
-
-            if(message.TryGetValue("status", out var statusValue) &&
-               message.TryGetValue("strategy_id", out var strategyIdValue) &&
-               Guid.TryParse(strategyIdValue, out var strategyId))
-            {
-        
-                if (statusValue == "NO_DATA")
-                {
-                    // TODO Notify user
-                    return;
-                }
-                if (statusValue == "DATA_ERROR")
-                {
-                    // TODO Notify user
-                    return;
-                }
-                if (statusValue == "DATA_READY")
+            if (message.StrategyId != Guid.Empty)
+            {                
+                if (message.StrategyTask == StrategyTaskEnum.Backtest)
                 {
                     using (var scope = _serviceProvider.CreateScope())
                     {
                         Type jobType = typeof(BacktestJob);
                         var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
                         var scheduler = await schedulerFactory.GetScheduler();
-                        var jobKey = new JobKey($"Strategy_Test_Job_{strategyId}", "strategyGroup");
+                        var jobKey = new JobKey($"Strategy_Test_Job_{message.StrategyId}", "strategyGroup");
                         //Type jobType = message.StrategyTask switch
                         //{
                         //    StrategyTaskEnum.Backtest => typeof(BacktestJob),
@@ -86,9 +76,10 @@ public class MessageConsumerService : IHostedService
                             .WithIdentity(jobKey)
                             .SetJobData(new JobDataMap
                                 {
-                            { "key", jobKey },
-                            { "strategyId", strategyId }
+                                    { "key", jobKey },
+                                    { "strategyId", message.StrategyId }
                                 })
+                            .DisallowConcurrentExecution(false)
                             .Build();
 
                         var trigger = TriggerBuilder.Create()

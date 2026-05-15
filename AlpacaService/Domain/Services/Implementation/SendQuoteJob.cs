@@ -46,11 +46,11 @@ public class SendQuoteJob : IJob
 
             if (quote == null)
             {
-                _logger.LogError("Quote not found for asset: " + exec.Assets);
+                _logger.LogError("PriceQuote not found for asset: " + exec.Assets);
                 continue;
             }
 
-            var q = new Quote
+            var q = new PriceQuote
             {
                 Symbol = quote.Symbol,
                 AskPrice = quote.AskPrice,
@@ -86,6 +86,6 @@ public class SendQuoteJob : IJob
             }
         }
 
-        _logger.LogInformation("Instance " + key + " Send Quote Job end");
+        _logger.LogInformation("Instance " + key + " Send PriceQuote Job end");
     }
 }

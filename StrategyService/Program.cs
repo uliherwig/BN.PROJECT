@@ -1,9 +1,6 @@
-using Microsoft.OpenApi.Models;
-using Quartz.Impl;
-using StackExchange.Redis;
 var builder = WebApplication.CreateBuilder(args);
 
-ConfigureLogging(builder.Host);
+// ConfigureLogging(builder.Host);
 
 ConfigureServices(builder.Services, builder.Configuration);
 
@@ -11,22 +8,21 @@ var app = builder.Build();
 
 ConfigureMiddleware(app);
 
-ConfigureEndpoints(app);
-
 MigrateDatabase(app);
 app.MapHealthChecks("/health");
 
+
 app.Run();
 
-static void ConfigureLogging(IHostBuilder hostBuilder)
-{
-    Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Information()
-        .WriteTo.Console()
-        .WriteTo.Seq("http://localhost:9017")
-        .CreateLogger();
-    hostBuilder.UseSerilog(Log.Logger);
-}
+// static void ConfigureLogging(IHostBuilder hostBuilder)
+// {
+//     Log.Logger = new LoggerConfiguration()
+//         .MinimumLevel.Information()
+//         .WriteTo.Console()
+//         .WriteTo.Seq("http://localhost:9017")
+//         .CreateLogger();
+//     hostBuilder.UseSerilog(Log.Logger);
+// }
 
 static void ConfigureMiddleware(WebApplication app)
 {
@@ -40,7 +36,8 @@ static void ConfigureMiddleware(WebApplication app)
 
     app.UseHttpsRedirection();
     app.UseRouting();
-    app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+    app.MapControllers();
+    app.UseCors("AllowAll");
     app.UseAuthentication();
     app.UseAuthorization();
 }
@@ -52,6 +49,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         options.UseNpgsql(connectionString));
 
     services.AddControllers();
+    services.AddHttpContextAccessor();
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen(c =>
     {
@@ -91,13 +89,14 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     var redisConnection = configuration["RedisConnection"];
     var redis = ConnectionMultiplexer.Connect(redisConnection);
     services.AddSingleton<IConnectionMultiplexer>(redis);
-    services.AddSingleton<ConnectionMultiplexer>(redis);
+
 
     // Register your publisher/subscriber services
+
     services.AddScoped<IRedisPublisher, RedisPublisher>();
     services.AddScoped<IRedisSubscriber, RedisSubscriber>();
     services.AddScoped<IRedisParquetService, RedisParquetService>();
-
+    
     // Quartz-Services
     services.AddQuartz();
     services.AddQuartzHostedService(opt =>
@@ -112,17 +111,31 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddScoped<IStrategyRepository, StrategyRepository>();
 
-    services.AddWithAllDerivedTypes<IStrategyService>();  // adds all classes that implement IStrategyService as Singleton
+    services.AddWithAllDerivedTypes<IStrategyService>();  // adds all classes that implement IStrategyService as Scoped
+    services.AddWithAllDerivedTypes<IIndicatorService>();  // adds all classes that implement IIndicatorService as Scoped
+
 
     services.AddScoped<IFinAIServiceClient, FinAIServiceClient>();
-}
 
-static void ConfigureEndpoints(WebApplication app)
-{
-    app.UseEndpoints(endpoints =>
+    services.AddCors(options =>
     {
-        endpoints.MapControllers();
+        options.AddPolicy("CorsPolicy", builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
     });
+
+    services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAll", policy =>
+        {
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        });
+    });
+
 }
 
 static void MigrateDatabase(WebApplication app)

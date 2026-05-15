@@ -1,5 +1,6 @@
 ﻿namespace BN.PROJECT.StrategyService;
 
+// Service to read Parquet data from Redis and convert it to a DataFrame like in python
 public class RedisParquetService : IRedisParquetService
 {
     private readonly IDatabaseAsync _redis;

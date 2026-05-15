@@ -12,6 +12,6 @@ public class RedisSubscriber : IRedisSubscriber
     public void Subscribe(string channel, Action<RedisChannel, RedisValue> handler)
     {
         var subscriber = _redis.GetSubscriber();
-        subscriber.Subscribe(channel, handler);
+        subscriber.Subscribe(new RedisChannel(channel, RedisChannel.PatternMode.Literal), handler);
     }
 }

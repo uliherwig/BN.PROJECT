@@ -17,7 +17,7 @@ namespace BN.PROJECT.AlpacaService.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -81,6 +81,9 @@ namespace BN.PROJECT.AlpacaService.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Symbol", "T")
+                        .IsUnique();
 
                     b.ToTable("Bars");
                 });
@@ -330,7 +333,7 @@ namespace BN.PROJECT.AlpacaService.Migrations
                     b.ToTable("Quotes");
                 });
 
-            modelBuilder.Entity("BN.PROJECT.AlpacaService.UserSettings", b =>
+            modelBuilder.Entity("BN.PROJECT.AlpacaService.UserSettingsModel", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("text");

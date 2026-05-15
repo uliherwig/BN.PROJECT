@@ -9,5 +9,5 @@ public class StrategyMessage
     public StrategyEnum Strategy { get; set; } = StrategyEnum.NONE;
     public MessageTypeEnum MessageType { get; set; } = MessageTypeEnum.Start;
     public StrategySettingsModel? Settings { get; set; } = null;
-    public List<Quote>? Quotes { get; set; } = null;
+    public List<PriceQuote>? Quotes { get; set; } = null;
 }

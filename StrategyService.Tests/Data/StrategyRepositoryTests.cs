@@ -22,7 +22,7 @@ public class StrategyRepositoryTests
         var repository = new StrategyRepository(_dbContext, _mockLogger.Object);
 
         // Act
-        var result = await repository.GetStrategiesByUserIdAsync(DataBaseGenerator.TestGuid, false);
+        var result = await repository.GetStrategiesByUserIdAsync(DataBaseGenerator.TestGuid, StrategyEnum.NONE, false);
 
         // Assert
         Assert.Equal(2, result.Count);

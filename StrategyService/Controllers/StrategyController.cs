@@ -18,23 +18,22 @@ public class StrategyController : ControllerBase
     }
 
     [HttpGet("{strategyId}")]
-    public async Task<IActionResult> GetStrategyById(Guid strategyId)
+    public async Task<ActionResult<StrategySettingsModel>> GetStrategyById(Guid strategyId)
     {
-        var test = await _strategyRepository.GetStrategyByIdAsync(strategyId);
-        if (test == null)
+        var strategy = await _strategyRepository.GetStrategyByIdAsync(strategyId);
+        if (strategy == null)
         {
             return NotFound();
         }
-        return Ok(test);
+        return strategy;
     }
 
     [HttpGet("exists/{name}")]
-    public async Task<IActionResult> GetStrategyNameExists(string name)
+    public async Task<ActionResult<bool>> GetStrategyNameExists(string name)
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
-        var strategies = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), false);
-        var isStrategy = strategies.Any(s => s.Name == name);
-        return Ok(isStrategy);
+        var strategies = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), StrategyEnum.IndicatorBased, false);      
+        return strategies.Any(s => s.Name == name);
     }
 
     //[HttpPost]
@@ -65,12 +64,12 @@ public class StrategyController : ControllerBase
         await _strategyRepository.DeletePositionsAsync(positions);
         return Ok(true);
     }
- 
+
     [HttpGet("settings")]
-    public async Task<IActionResult> GetStrategiesByUserId(bool bookmarked = false)
+    public async Task<IActionResult> GetStrategiesByUserId(StrategyEnum strategyType, bool showBookmarked = false)
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
-        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), bookmarked);
+        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), StrategyEnum.IndicatorBased, showBookmarked);
         return Ok(settings);
     }
 
@@ -78,7 +77,7 @@ public class StrategyController : ControllerBase
     public async Task<IActionResult> GetStrategyInfosByUserId(StrategyEnum strategyType)
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
-        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), false);
+        var settings = await _strategyRepository.GetStrategiesByUserIdAsync(new Guid(userId!), StrategyEnum.IndicatorBased, false);
         if (strategyType != StrategyEnum.NONE)
         {
             settings = settings.Where(s => s.StrategyType == strategyType).ToList();
@@ -107,6 +106,9 @@ public class StrategyController : ControllerBase
         var positions = await _strategyRepository.GetPositionsByStrategyIdAsync(strategyId);
         positions = positions.Where(p => p.PriceClose > 0).ToList();
 
+        var sr = StrategyOperations.CalculateSharpeRatio(positions, strategySettings.StartDate, strategySettings.EndDate);
+        var avgProfitLoss = positions.Count > 0 ? positions.Sum(p => p.ProfitLoss) / positions.Count : 0;
+
         var testResult = new TestResult
         {
             Id = strategyId,
@@ -118,7 +120,9 @@ public class StrategyController : ControllerBase
             NumberOfSellPositions = positions.Count(p => p.Side == SideEnum.Sell),
             TotalProfitLoss = positions.Sum(p => p.ProfitLoss),
             BuyProfitLoss = positions.Where(p => p.Side == SideEnum.Buy).Sum(p => p.ProfitLoss),
-            SellProfitLoss = positions.Where(p => p.Side == SideEnum.Sell).Sum(p => p.ProfitLoss)
+            SellProfitLoss = positions.Where(p => p.Side == SideEnum.Sell).Sum(p => p.ProfitLoss),
+            AverageProfitLossPerPosition = avgProfitLoss,
+            SharpeRatio = sr
         };
         return Ok(testResult);
     }

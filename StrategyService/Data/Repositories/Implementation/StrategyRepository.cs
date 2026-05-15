@@ -11,9 +11,18 @@ public class StrategyRepository : IStrategyRepository
         _logger = logger;
     }
 
-    public async Task<List<StrategySettingsModel>> GetStrategiesByUserIdAsync(Guid userId, bool bookmarked) =>
-        bookmarked ? await _context.Strategies.Where(s => s.UserId == userId && s.Bookmarked).OrderByDescending(s => s.StampStart).ToListAsync()
-        : await _context.Strategies.Where(s => s.UserId == userId).OrderByDescending(s => s.StampStart).ToListAsync();
+    public async Task<List<StrategySettingsModel>> GetStrategiesByUserIdAsync(Guid userId, StrategyEnum strategyType, bool showBookmarked = false)
+    {
+        if(strategyType == StrategyEnum.NONE)
+        {
+            return await _context.Strategies.Where(s => s.UserId == userId).OrderByDescending(s => s.StampStart).ToListAsync();
+        }
+        if(showBookmarked)
+        {
+            return await _context.Strategies.Where(s => s.UserId == userId && s.StrategyType == strategyType && s.Bookmarked).OrderByDescending(s => s.StampStart).ToListAsync();
+        }
+        return await _context.Strategies.Where(s => s.UserId == userId && s.StrategyType == strategyType).OrderByDescending(s => s.StampStart).ToListAsync();
+    }
 
     public async Task<List<StrategySettingsModel>> GetStartedStrategies()
     {
@@ -28,7 +37,7 @@ public class StrategyRepository : IStrategyRepository
     {
         await _context.Strategies.AddAsync(strategySettings);
         return await _context.SaveChangesAsync();
-       
+
     }
 
     public async Task<int> UpdateStrategyAsync(StrategySettingsModel strategySettings)

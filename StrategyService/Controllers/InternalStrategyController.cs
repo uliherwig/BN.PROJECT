@@ -1,7 +1,8 @@
 ﻿namespace BN.PROJECT.StrategyService;
 
-[Route("[controller]")]
 [ApiController]
+[Route("[controller]")]
+
 public class InternalStrategyController : ControllerBase
 {
     private readonly ILogger<InternalStrategyController> _logger;

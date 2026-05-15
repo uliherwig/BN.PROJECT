@@ -1,5 +1,6 @@
 ﻿namespace BN.PROJECT.AlpacaService;
 
+[Index(nameof(Symbol), nameof(T), IsUnique = true)]
 public class AlpacaBar
 {
     [Key]

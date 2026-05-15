@@ -9,4 +9,6 @@ public static class RedisUtilities
 
     public static string GetChannelName(RedisChannelEnum topic) => topic.ToString().ToLowerInvariant();
 
+    public static string GetBarsKey(string asset, DateTime stamp) => $"bars:{asset}:{stamp:yyyy-MM-dd}";
+
 }

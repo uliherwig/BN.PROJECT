@@ -2,7 +2,7 @@
 
 public interface IStrategyRepository
 {
-    Task<List<StrategySettingsModel>> GetStrategiesByUserIdAsync(Guid userId, bool bookmarked);
+    Task<List<StrategySettingsModel>> GetStrategiesByUserIdAsync(Guid userId, StrategyEnum strategyType, bool showBookmarked);
 
     Task<List<StrategySettingsModel>> GetStartedStrategies();
 

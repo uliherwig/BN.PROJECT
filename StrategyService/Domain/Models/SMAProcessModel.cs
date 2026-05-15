@@ -8,6 +8,6 @@ public class SmaProcessModel : ProcessBaseModel
     public int ShortPeriod { get; set; }
     public int LongPeriod { get; set; }
     public StopLossTypeEnum StopLossType { get; set; }
-    public List<Quote> LastQuotes { get; set; } = [];
+    public List<PriceQuote> LastQuotes { get; set; } = [];
     public List<SmaTick> LastSmas { get; set; } = [];
 }

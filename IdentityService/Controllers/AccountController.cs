@@ -30,7 +30,7 @@ public class AccountController : ControllerBase
 
     [HttpGet("my-account")]
     [AuthorizeUser(["user", "admin"])]
-    public async Task<IActionResult> GetMyAccount()
+    public async Task<ActionResult<User>> GetMyAccount()
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
         var user = await _identityRepository.GetUserByIdAsync(new Guid(userId!));
@@ -42,7 +42,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("sign-in")]
-    public async Task<IActionResult> SignIn([FromBody] SignInRequest signInRequest)
+    public async Task<ActionResult<SignInResponse>> SignIn([FromBody] SignInRequest signInRequest)
     {
         var user = await _identityRepository.GetUserByEmailAsync(signInRequest.Username.ToLower());
         if (user == null)
@@ -96,7 +96,7 @@ public class AccountController : ControllerBase
 
     [HttpPost("sign-out")]
     [AuthorizeUser(["user", "admin"])]
-    public async Task<IActionResult> Logout([FromBody] SignOutRequest signOutRequest)
+    public async Task<ActionResult<bool>> Logout([FromBody] SignOutRequest signOutRequest)
     {
         var userId = HttpContext.Items["UserId"]?.ToString();
         signOutRequest.UserId = userId!;
@@ -118,7 +118,7 @@ public class AccountController : ControllerBase
     [HttpPost("refresh-token")]
 
 
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
+    public async Task<ActionResult<JwtToken>> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
         var response = await _keycloakServiceClient.RefreshToken(refreshTokenRequest);
         if (response == null || string.IsNullOrEmpty(response.AccessToken))
@@ -142,7 +142,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("sign-up")]
-    public async Task<IActionResult> SignUp([FromBody] SignUpRequest signUpRequest)
+    public async Task<ActionResult<SignUpResponse>> SignUp([FromBody] SignUpRequest signUpRequest)
     {
         var user = await _identityRepository.GetUserByEmailAsync(signUpRequest.Username.ToLower());
         if (user != null)
@@ -250,7 +250,7 @@ public class AccountController : ControllerBase
 
     [HttpDelete]
     [AuthorizeUser(["user", "admin"])]
-    public async Task<IActionResult> Delete()
+    public async Task<ActionResult<SignOutResponse>> Delete()
     {
         // to delete
         // 1.  postions strategies
@@ -275,7 +275,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("get-user")]
-    [AuthorizeUser(["user", "admin"])]
+    // [AuthorizeUser(["user", "admin"])]
     public async Task<IActionResult> GetUserByName(string userName)
     {
         var response = await _keycloakServiceClient.GetUserByName(userName);

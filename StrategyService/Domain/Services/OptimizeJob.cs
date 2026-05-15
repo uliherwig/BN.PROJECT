@@ -1,5 +1,4 @@
 using Newtonsoft.Json.Serialization;
-using StackExchange.Redis;
 
 namespace BN.PROJECT.StrategyService;
 
@@ -33,13 +32,18 @@ public class OptimizeJob : IJob
         var dataMap = context.JobDetail.JobDataMap;
         var strategyId = (Guid)dataMap.WrappedMap["strategyId"];
 
-        var optimizationResult = new OptimizationResultModel();
+   
         var strategySettings = await _strategyRepository.GetStrategyByIdAsync(strategyId);
         if (strategySettings == null)
         {
             _logger.LogError($"Strategy with ID {strategyId} not found.");
             return;
         }
+        var optimizationResult = new OptimizationResultModel
+        {
+            StrategyId = strategySettings.Id,
+            Settings = strategySettings
+        };
 
         // Initialize Kafka producer for notifications
         var notificationTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Notification);
@@ -51,7 +55,7 @@ public class OptimizeJob : IJob
 
 
         // create quotes
-        var quotes = new List<Quote>();
+        var quotes = new List<PriceQuote>();
         var symbol = strategySettings.Asset;
         var startDate = strategySettings.StartDate.ToUniversalTime();
         var endDate = strategySettings.EndDate.ToUniversalTime();
@@ -65,7 +69,7 @@ public class OptimizeJob : IJob
             if (_redisDatabase.KeyExists(key))
             {
                 var quotesDay = _redisDatabase.StringGet(key);
-                quotes.AddRange(quotesDay.ToString().FromJson<List<Quote>>());
+                quotes.AddRange(quotesDay.ToString().FromJson<List<PriceQuote>>());
             }
             stamp = stamp.Add(timeFrame).ToUniversalTime();
         }

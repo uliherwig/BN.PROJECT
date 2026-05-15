@@ -9,12 +9,10 @@ var app = builder.Build();
 
 ConfigureMiddleware(app);
 
-ConfigureEndpoints(app);
-
 MigrateDatabase(app);
-
-app.MapHub<AlpacaHub>("/alpacahub");
 app.MapHealthChecks("/health");
+app.MapHub<AlpacaHub>("/alpacahub");
+
 
 app.Run();
 
@@ -27,6 +25,26 @@ app.Run();
 //        .CreateLogger();
 //    hostBuilder.UseSerilog(Log.Logger);
 //}
+
+static void ConfigureMiddleware(WebApplication app)
+{
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseRouting();
+    app.MapControllers();
+
+    app.UseCors("CorsPolicy");
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
+
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     var connectionString = configuration.GetConnectionString("AlpacaDbConnection");
@@ -34,7 +52,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         options.UseNpgsql(connectionString));
 
     services.AddControllers();
-    services.AddHttpContextAccessor();
+    services.AddHttpContextAccessor();  // TODO check if needed for services that require access to HttpContext
 
     services.AddEndpointsApiExplorer();
 
@@ -68,9 +86,10 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         });
     });
 
-    services.AddKeyCloakAuthentication(configuration);   
+    services.AddKeyCloakAuthentication(configuration);
 
     services.AddHttpClient();
+    services.AddHealthChecks();
     services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
     services.AddHttpClient<IFinAIServiceClient, FinAIServiceClient>();
 
@@ -81,23 +100,23 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IStrategyTestService, StrategyTestService>();
     services.AddHostedService<MessageConsumerService>();
 
-    var redisConnection = configuration["RedisConnection"]; 
+    var redisConnection = configuration["RedisConnection"];
     var redis = ConnectionMultiplexer.Connect(redisConnection);
 
     // Register both the interface and the concrete type so DI can resolve either.
     services.AddSingleton<IConnectionMultiplexer>(redis);
-    services.AddSingleton<ConnectionMultiplexer>(redis);
 
-    // Register your publisher/subscriber services
+    // Register publisher/subscriber services
     services.AddScoped<IRedisPublisher, RedisPublisher>();
     services.AddScoped<IRedisSubscriber, RedisSubscriber>();
+
 
     services.AddSignalR()
     .AddStackExchangeRedis(redisConnection, options =>
     {
         options.Configuration.AbortOnConnectFail = false;
         options.Configuration.ChannelPrefix = "SignalR";
-    }); 
+    });
 
     // Quartz-Services
     services.AddQuartz();
@@ -109,42 +128,20 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     services.AddHostedService<SendQuoteTaskService>();
     services.AddHostedService<AlpacaHistoryService>();
-    services.AddControllers();
-    services.AddHealthChecks();
+
+
     services.AddCors(options =>
     {
         options.AddPolicy("CorsPolicy", builder =>
         {
-            builder.WithOrigins("http://localhost:3000") 
+            builder.WithOrigins("http://localhost:3000")
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                    .AllowCredentials();
         });
     });
 }
-static void ConfigureMiddleware(WebApplication app)
-{
-    app.UseMiddleware<GlobalExceptionMiddleware>();
 
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
-
-    app.UseHttpsRedirection();
-    app.UseRouting();
-    app.UseCors("CorsPolicy");
-    app.UseAuthentication();
-    app.UseAuthorization();
-}
-static void ConfigureEndpoints(WebApplication app)
-{
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllers();
-    });
-}
 static void MigrateDatabase(WebApplication app)
 {
     using (var scope = app.Services.CreateScope())

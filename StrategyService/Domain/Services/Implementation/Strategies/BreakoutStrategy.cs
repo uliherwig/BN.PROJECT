@@ -13,7 +13,7 @@ public class BreakoutStrategy : IStrategyService
     private BreakoutModel? _breakoutSettings;
 
 
-    private List<Quote> _quotes = [];
+    private List<PriceQuote> _quotes = [];
     private decimal _prevHigh = 0.0m;
     private decimal _prevLow = 0.0m;
 
@@ -98,7 +98,7 @@ public class BreakoutStrategy : IStrategyService
         return Task.CompletedTask;
     }
 
-    public Task EvaluateQuote(Guid strategyId, Guid userId, Quote quote)
+    public Task EvaluateQuote(Guid strategyId, Guid userId, PriceQuote quote)
     {
         var stopwatch = Stopwatch.StartNew();
 

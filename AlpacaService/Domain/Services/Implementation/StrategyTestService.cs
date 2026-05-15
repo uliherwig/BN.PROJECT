@@ -49,7 +49,7 @@ public class StrategyTestService : IStrategyTestService
     public async Task OptimizeStrategy(StrategySettingsModel testSettings)
     {
         var optimizeTopic = RedisUtilities.GetChannelName(RedisChannelEnum.Strategy);
-        await StoreQuotesToRedis(testSettings);
+        await StoreBarsToRedis(testSettings.Asset);
 
         var message = new StrategyMessage
         {
@@ -122,52 +122,37 @@ public class StrategyTestService : IStrategyTestService
         await _alpacaTradingService.CreateOrderAsync(userSettings, symbol, qty, side, orderType, timeInForce);
 
     }
-    public async Task StoreQuotesToRedis(StrategySettingsModel testSettings)
-    {
-        var symbol = testSettings.Asset;
-        var startDate = testSettings.StartDate.ToUniversalTime();
-        var endDate = testSettings.EndDate.ToUniversalTime();
+    public async Task StoreBarsToRedis(string asset)
+    {      
+        var stamp = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);       
+        var alpacaBars = await _alpacaRepository.GetHistoricalBars(asset, stamp, DateTime.UtcNow); 
 
-        var bars = await _alpacaRepository.GetHistoricalBars(symbol, startDate, endDate);
-
-        // send quotes per day
-        TimeSpan timeFrame = TimeSpan.FromDays(1);
-        var stamp = startDate.ToUniversalTime();
-
-        while (stamp < endDate)
+        // convert AlpacaBars to BarModel
+        var barModels = alpacaBars.Select(b => new BarModel
         {
-            var quoteskey = $"quotes:{symbol}:{stamp:yyyy-MM-dd}";
-            var barskey = $"bars:{symbol}:{stamp:yyyy-MM-dd}";
-            if (!_redisDatabase.KeyExists(quoteskey) || !_redisDatabase.KeyExists(barskey))
+            Asset = asset,
+            TimestampUtc = b.T,
+            Open = b.O,
+            High = b.H,
+            Low = b.L,
+            Close = b.C,
+            Volume = b.V
+        }).ToList();
+
+        // group bars by day and store in Redis with key pattern "bars:{symbol}:{date}"
+        var barsByDay = barModels
+            .GroupBy(b => b.TimestampUtc.Date)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var kvp in barsByDay)
+        {
+            var date = kvp.Key;
+            var barsForDay = kvp.Value;
+            var barsKey = RedisUtilities.GetBarsKey(asset, date);
+            if (!_redisDatabase.KeyExists(barsKey))
             {
-                var stampEnd = stamp.Add(timeFrame).ToUniversalTime();
-                if (bars.Count == 0)
-                {
-                    stamp = stamp.Add(timeFrame).ToUniversalTime();
-                    continue;
-                }
-                var quotesDay = new List<Quote>();
-                var barsDay = new List<AlpacaBar>();
-                foreach (var bar in bars.Where(b => b.T > stamp && b.T < stampEnd))
-                {
-                    var q = new Quote
-                    {
-                        Symbol = symbol,
-                        AskPrice = bar.C + 0.1m,
-                        BidPrice = bar.C - 0.1m,
-                        TimestampUtc = bar.T.ToUniversalTime()
-                    };
-                    quotesDay.Add(q);
-                    barsDay.Add(bar);
-                }
-
-                _redisDatabase.StringSet($"quotes:{symbol}:{stamp:yyyy-MM-dd}", quotesDay.ToJson(), TimeSpan.FromDays(100));
-                _redisDatabase.StringSet($"bars:{symbol}:{stamp:yyyy-MM-dd}", barsDay.ToJson(), TimeSpan.FromDays(100));
+                _redisDatabase.StringSet(barsKey, barsForDay.ToJson(), TimeSpan.FromDays(100));
             }
-
-            stamp = stamp.Add(timeFrame).ToUniversalTime();
-        }
+        }   
     }
-
-
 }

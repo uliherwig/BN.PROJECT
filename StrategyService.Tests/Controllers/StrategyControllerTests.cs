@@ -46,7 +46,7 @@ public class StrategyControllerTests
         {
             new StrategySettingsModel { Name = name }
         };
-        _mockStrategyRepository.Setup(repo => repo.GetStrategiesByUserIdAsync(userId, false))
+        _mockStrategyRepository.Setup(repo => repo.GetStrategiesByUserIdAsync(userId, StrategyEnum.NONE, false))
             .ReturnsAsync(strategies);
 
         // Act
@@ -111,11 +111,11 @@ public class StrategyControllerTests
         // Arrange
         var userId = Guid.NewGuid();
         var strategies = new List<StrategySettingsModel>();
-        _mockStrategyRepository.Setup(repo => repo.GetStrategiesByUserIdAsync(userId, false))
+        _mockStrategyRepository.Setup(repo => repo.GetStrategiesByUserIdAsync(userId, StrategyEnum.IndicatorBased, false))
             .ReturnsAsync(strategies);
 
         // Act
-        var result = await _controller.GetStrategiesByUserId();
+        var result = await _controller.GetStrategiesByUserId(StrategyEnum.IndicatorBased, false);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -129,11 +129,11 @@ public class StrategyControllerTests
         var userId = Guid.NewGuid();
         var strategyType = StrategyEnum.NONE;
         var strategies = new List<StrategySettingsModel>();
-        _mockStrategyRepository.Setup(repo => repo.GetStrategiesByUserIdAsync(userId, false))
+        _mockStrategyRepository.Setup(repo => repo.GetStrategiesByUserIdAsync(userId, StrategyEnum.IndicatorBased,false))
             .ReturnsAsync(strategies);
 
         // Act
-        var result = await _controller.GetStrategyInfosByUserId( strategyType);
+        var result = await _controller.GetStrategyInfosByUserId(strategyType);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
