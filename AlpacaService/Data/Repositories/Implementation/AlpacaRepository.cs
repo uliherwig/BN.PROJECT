@@ -37,7 +37,15 @@ public class AlpacaRepository : IAlpacaRepository
 
     public async Task AddBarsAsync(List<AlpacaBar> bars)
     {
-        await _context.Bars.AddRangeAsync(bars);
+        foreach (var bar in bars)
+        {
+            var existingBar = await _context.Bars.FirstOrDefaultAsync(b => b.Symbol == bar.Symbol && b.T == bar.T);
+            if (existingBar == null)
+            {       
+                // Add new bar
+                await _context.Bars.AddAsync(bar);
+            }
+        }   
         await _context.SaveChangesAsync();
     }
 
