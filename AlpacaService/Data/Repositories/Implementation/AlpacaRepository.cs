@@ -71,6 +71,27 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<AlpacaTrade?> GetLatestTrade(string symbol)
+    {
+        var trades = await _context.Trades
+            .Where(b => b.Symbol == symbol)
+            .OrderByDescending(b => b.TimestampUtc)
+            .FirstOrDefaultAsync();
+        return trades;
+    }
+
+    public async Task<List<AlpacaTrade>> GetHistoricalTrades(string symbol, DateTime startDate, DateTime endDate)
+    {
+        return await _context.Trades
+            .Where(b => b.Symbol == symbol && b.TimestampUtc > startDate && b.TimestampUtc < endDate)
+            .OrderBy(b => b.TimestampUtc).ToListAsync();
+    }
+    public async Task AddTradesAsync(List<AlpacaTrade> trades)
+    {
+        await _context.Trades.AddRangeAsync(trades);
+        await _context.SaveChangesAsync();
+    }
+
     // Create
     public async Task AddOrderAsync(AlpacaOrder order)
     {

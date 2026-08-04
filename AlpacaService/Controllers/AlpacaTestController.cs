@@ -2,7 +2,7 @@
 
 [Route("[controller]")]
 [ApiController]
-[AuthorizeUser(["user", "admin"])]
+//[AuthorizeUser(["user", "admin"])]
 public class AlpacaTestController : ControllerBase
 {
     private readonly IWebHostEnvironment _env;

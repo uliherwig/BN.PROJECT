@@ -17,8 +17,12 @@ public interface IAlpacaRepository
     Task<AlpacaQuote?> GetLatestQuote(string symbol);
 
     Task<List<AlpacaQuote>> GetHistoricalQuotes(string symbol, DateTime startDate, DateTime endDate);
-
     Task AddQuotesAsync(List<AlpacaQuote> quotes);
+    Task<AlpacaTrade?> GetLatestTrade(string symbol);
+
+    Task<List<AlpacaTrade>> GetHistoricalTrades(string symbol, DateTime startDate, DateTime endDate);
+
+    Task AddTradesAsync(List<AlpacaTrade> trades);
 
     Task AddOrderAsync(AlpacaOrder order);
 

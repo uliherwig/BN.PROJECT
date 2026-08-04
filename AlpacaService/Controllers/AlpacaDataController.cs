@@ -35,15 +35,22 @@ public class AlpacaDataController : ControllerBase
     [HttpGet("latest-quote/{symbol}")]
     public async Task<IActionResult> GetLatestQuoteBySymbol(string symbol)
     {
-        var bar = await _alpacaDataService.GetLatestQuoteBySymbol(symbol);
-        return Ok(bar);
+        var quote = await _alpacaDataService.GetLatestQuoteBySymbol(symbol);
+        return Ok(quote);
     }
 
-    // TODO check if this is needed
-    //[HttpGet("trades/{symbol}")]
-    //public async Task<IActionResult> GetTradesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
-    //{
-    //    var trades = await _alpacaDataService.GetTradesBySymbol(symbol, startDate, endDate);
-    //    return Ok(trades);
-    //}
+
+    [HttpGet("historical-trades/{symbol}")]
+    public async Task<IActionResult> GetHistoricalTradesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var trades = await _alpacaDataService.GetTradesBySymbol(symbol, startDate, endDate);
+        return Ok(trades);
+    }
+
+    [HttpGet("latest-trades/{symbol}")]
+    public async Task<IActionResult> GetLatestTradeBySymbol(string symbol)
+    {
+        var trade = await _alpacaDataService.GetLatestTradeBySymbol(symbol);
+        return Ok(trade);
+    }
 }

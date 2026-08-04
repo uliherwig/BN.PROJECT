@@ -46,20 +46,28 @@ public class AlpacaDataService : IAlpacaDataService
 
     // Trades
 
-    public async Task<List<ITrade>> GetTradesBySymbol(string symbol, DateTime startDate, DateTime endDate)
+    public async Task<List<AlpacaTrade>> GetTradesBySymbol(string symbol, DateTime startDate, DateTime endDate)
     {
         var client = _alpacaClient.GetAlpacaDataClient();
 
-        var into = DateTime.Now;
-        var from = into.Subtract(TimeSpan.FromMinutes(25));
-
-        var tradesRequest = new HistoricalTradesRequest(symbol, from, into)
+        var tradesRequest = new HistoricalTradesRequest(symbol, startDate, endDate)
         {
             Feed = MarketDataFeed.Iex
         };
         var tradeSet = await client.GetHistoricalTradesAsync(tradesRequest);
-        var trades = tradeSet.Items;
-        return trades[symbol].ToList();
+        var trades = tradeSet.Items[symbol].Select(t => t.ToAlpacaTrade()).ToList();
+        return trades;
+    }
+
+    public async Task<AlpacaTrade> GetLatestTradeBySymbol(string symbol)
+    {
+        var client = _alpacaClient.GetAlpacaDataClient();
+
+        var trade = await client.GetLatestTradeAsync(new LatestMarketDataRequest(symbol)
+        {
+            Feed = MarketDataFeed.Iex
+        });
+        return trade.ToAlpacaTrade();
     }
 
     // Quotes

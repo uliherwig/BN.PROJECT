@@ -108,6 +108,23 @@
 
         public static AlpacaQuote ToAlpacaQuote(this IQuote quote)
         {
+            /*
+                {
+                "ap": 760.37,  // Ask: 760.37 $ (Käufer zahlen diesen Preis)
+                "as": 80,      // 80 Aktien zum Ask-Preis verfügbar
+                "ax": "V",     // Ask kommt von NYSE
+                "bp": 760.25,  // Bid: 760.25 $ (Verkäufer erhalten diesen Preis)
+                "bs": 80,      // 80 Aktien zum Bid-Preis nachgefragt
+                "bx": "V",     // Bid kommt von NYSE
+                "c": ["R"],    // Regular Sale (normaler Handel)
+                "t": "2026-08-04T12:29:32.961151393Z",  // Zeitstempel (UTC)
+                "z": "B"       // Trade wurde auf NASDAQ gemeldet
+                }
+             */
+
+
+
+
             return new AlpacaQuote
             {
                 Symbol = quote.Symbol,
@@ -119,7 +136,35 @@
                 BidExchange = quote.BidExchange,
                 AskExchange = quote.AskExchange,
                 Tape = quote.Tape
+            };  
+        }
+
+        public static AlpacaTrade ToAlpacaTrade(this ITrade trade)
+        {
+            /*
+                {
+                "p": 760.30,  // Ausführungspreis
+                "s": 100,     // Ausgeführtes Volumen (Anzahl Aktien)
+                "x": "V",     // Börse (z. B. "V" für NYSE, "Q" für NASDAQ)
+                "t": "2026-08-04T12:29:32.961151393Z",  // Zeitstempel (UTC)
+                "c": ["R"],   // Handelsbedingungen (z. B. ["R"] für Regular Sale)
+                "i": 12345,   // Eindeutige Trade-ID
+                "z": "A"      // Tape (z. B. "A", "B", "C")
+                }
+             */
+
+            return new AlpacaTrade
+            {
+                Symbol = trade.Symbol,
+                Price = trade.Price,
+                Size = trade.Size,
+                TimestampUtc = trade.TimestampUtc,
+                Exchange = trade.Exchange,
+                Conditions = trade.Conditions.ToArray(),
+                TradeId = (long)trade.TradeId,
+                Tape = trade.Tape
             };
         }
+
     }
 }

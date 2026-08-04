@@ -10,5 +10,6 @@ public interface IAlpacaDataService
 
     Task<AlpacaQuote> GetLatestQuoteBySymbol(string symbol);
 
-    Task<List<ITrade>> GetTradesBySymbol(string symbol, DateTime startDate, DateTime endDate);
+    Task<List<AlpacaTrade>> GetTradesBySymbol(string symbol, DateTime startDate, DateTime endDate);
+    Task<AlpacaTrade> GetLatestTradeBySymbol(string symbol);
 }

@@ -39,7 +39,7 @@ public class AlpacaHistoryJob : IJob
         await UpdateHistoricalBars(assetsSelection);
 
         // TODO filter data by timespan to avoid overloading
-        //await UpdateHistoricalQuotes(assetsSelection);
+        await UpdateHistoricalTrades(assetsSelection);
 
         _logger.LogInformation("Instance " + key + " History Job end");
     }
@@ -104,27 +104,27 @@ public class AlpacaHistoryJob : IJob
         _logger.LogInformation("UpdateHistoricalBars: DONE ");
     }
 
-    private async Task UpdateHistoricalQuotes(List<string> assetsSelection)
+    private async Task UpdateHistoricalTrades(List<string> assetsSelection)
     {
         foreach (var symbol in assetsSelection)
         {
-            _logger.LogInformation("Asset: " + symbol);
+            _logger.LogInformation("UpdateHistoricalTrades Asset: " + symbol);
 
-            var latestQuoteFromDb = await _alpacaRepository.GetLatestQuote(symbol);
-            var latestBarFromAlpaca = await _alpacaDataService.GetLatestQuoteBySymbol(symbol);
+            var latestTradeFromDb = await _alpacaRepository.GetLatestTrade(symbol);
+            var latestTradeFromAlpaca = await _alpacaDataService.GetTradesBySymbol(symbol, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
 
-            var startDate = latestQuoteFromDb == null ? new DateTime(2024, 1, 1) : latestQuoteFromDb.TimestampUtc;
+            var startDate = latestTradeFromDb == null ? new DateTime(2024, 1, 1) : latestTradeFromDb.TimestampUtc;
 
-            while (startDate < latestBarFromAlpaca.TimestampUtc)
+            while (startDate < latestTradeFromAlpaca.Last().TimestampUtc)
             {
                 var endDate = startDate.AddDays(1);
-                var quotes = await _alpacaDataService.GetQuotesBySymbol(symbol, startDate, endDate);
-                _logger.LogInformation("Start: " + startDate.ToString() + "  Quotes: " + quotes.Count);
+                var trades = await _alpacaDataService.GetTradesBySymbol(symbol, startDate, endDate);
+                _logger.LogInformation("Start: " + startDate.ToString() + "  Trades: " + trades.Count);
 
-                if (quotes.Count > 0)
+                if (trades.Count > 0)
                 {
-                    await _alpacaRepository.AddQuotesAsync(quotes);
-                    startDate = quotes.Last().TimestampUtc;
+                    await _alpacaRepository.AddTradesAsync(trades);
+                    startDate = trades.Last().TimestampUtc;
                 }
                 else
                 {
