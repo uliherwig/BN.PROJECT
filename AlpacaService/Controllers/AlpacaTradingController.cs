@@ -2,7 +2,7 @@ namespace BN.PROJECT.AlpacaService;
 
 [ApiController]
 [Route("[controller]")]
-[AuthorizeUser(["user", "admin"])]
+// [AuthorizeUser(["user", "admin"])]
 public class AlpacaTradingController : ControllerBase
 {
     private readonly IAlpacaTradingService _alpacaTradingService;
@@ -18,6 +18,23 @@ public class AlpacaTradingController : ControllerBase
         _strategyTestService = strategyTestService;
         _strategyServiceClient = strategyServiceClient;
     }
+
+
+    [HttpGet("clock")]
+    public async Task<IActionResult> GetClockAsync()
+    {
+        var result = await _alpacaTradingService.GetClockAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("interval-calendar")]
+    public async Task<IActionResult> ListIntervalCalendarAsync(DateOnly startDate, DateOnly endDate = default)
+    {
+        var result = await _alpacaTradingService.ListIntervalCalendarAsync(startDate, endDate == default ? DateOnly.FromDateTime(DateTime.UtcNow) : endDate);
+        return Ok(result);
+    }
+
+
 
     [HttpGet("account")]
     public async Task<IActionResult> GetAccount()

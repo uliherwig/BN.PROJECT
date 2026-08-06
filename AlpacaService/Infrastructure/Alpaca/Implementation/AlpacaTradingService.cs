@@ -1,5 +1,7 @@
 
 
+using Alpaca.Markets.Extensions;
+
 namespace BN.PROJECT.AlpacaService
 {
     public class AlpacaTradingService : IAlpacaTradingService
@@ -13,6 +15,33 @@ namespace BN.PROJECT.AlpacaService
             _alpacaClient = alpacaClient;
             _logger = logger;
         }
+
+        // Check if markets are open
+        public async Task<IClock> GetClockAsync()
+        {
+            var tradingClient = _alpacaClient.GetCommonTradingClient();
+            return await tradingClient.GetClockAsync();
+        }
+
+        public async Task<List<AlpacaCalendar>?> ListIntervalCalendarAsync(DateOnly startDate, DateOnly endDate = default)
+        {
+            var alpacaCalendar = new List<AlpacaCalendar>();
+            var tradingClient = _alpacaClient.GetCommonTradingClient();
+
+            CalendarRequest req = new(
+                startDate,
+                endDate == default ? DateOnly.FromDateTime(DateTime.UtcNow) : endDate);
+
+            var calendarList = await tradingClient.ListIntervalCalendarAsync(req);
+            foreach (var calendar in calendarList)
+            {
+                alpacaCalendar.Add(calendar.ToAlpacaCalendar());
+            }
+
+            return alpacaCalendar;
+        }
+
+
 
         public async Task<IAccount?> GetAccountAsync(UserSettingsModel userSettings)
         {

@@ -2,6 +2,9 @@
 
 public interface IAlpacaRepository
 {
+    Task<List<AlpacaCalendar>> GetCalendarAsync(DateOnly startDate = default, DateOnly endDate = default);
+    Task<AlpacaCalendar?> GetLatestCalendar();
+    Task AddCalendarAsync(List<AlpacaCalendar> calendars);
     Task AddAssetsAsync(List<AlpacaAsset> assets);
 
     Task<List<AlpacaAsset>> GetAssets();

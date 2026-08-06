@@ -166,5 +166,22 @@
             };
         }
 
+        public static AlpacaCalendar ToAlpacaCalendar(this IIntervalCalendar calendar)
+        {
+            var tradingOpenEst = calendar.Trading.OpenEst;
+            var tradingCloseEst = calendar.Trading.CloseEst;
+            var sessionOpenEst = calendar.Session.OpenEst;
+            var sessionCloseEst = calendar.Session.CloseEst;
+
+            return new AlpacaCalendar
+            {
+                TradingDate = DateOnly.FromDateTime(tradingOpenEst.DateTime),
+                TradingOpen = tradingOpenEst.TimeOfDay,
+                TradingClose = tradingCloseEst.TimeOfDay,
+                SessionOpen = sessionOpenEst.TimeOfDay,
+                SessionClose = sessionCloseEst.TimeOfDay
+            };
+        }
+
     }
 }

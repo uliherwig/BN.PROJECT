@@ -2,6 +2,10 @@ namespace BN.PROJECT.AlpacaService
 {
     public interface IAlpacaTradingService
     {
+        Task<IClock> GetClockAsync();
+
+        Task<List<AlpacaCalendar>?> ListIntervalCalendarAsync(DateOnly startDate, DateOnly endDate = default);
+        
         Task<IAccount?> GetAccountAsync(UserSettingsModel userSettings);
 
         Task<List<AlpacaAsset>> GetAssetsAsync();

@@ -126,7 +126,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     });
 
 
-    services.AddHostedService<SendQuoteTaskService>();
+    //  services.AddHostedService<SendQuoteTaskService>();
     services.AddHostedService<AlpacaHistoryService>();
 
 

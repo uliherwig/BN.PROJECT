@@ -11,6 +11,8 @@ public class AlpacaDataService : IAlpacaDataService
         _logger = logger;
     }
 
+    // Bars   
+
     public async Task<List<AlpacaBar>> GetHistoricalBarsBySymbol(string symbol, DateTime startDate, DateTime endDate, BarTimeFrame timeFrame)
     {
         var result = new List<AlpacaBar>();
@@ -62,11 +64,11 @@ public class AlpacaDataService : IAlpacaDataService
     public async Task<AlpacaTrade> GetLatestTradeBySymbol(string symbol)
     {
         var client = _alpacaClient.GetAlpacaDataClient();
-
-        var trade = await client.GetLatestTradeAsync(new LatestMarketDataRequest(symbol)
+        var req = new LatestMarketDataRequest(symbol)
         {
-            Feed = MarketDataFeed.Iex
-        });
+            Feed = MarketDataFeed.Iex,
+        };
+        var trade = await client.GetLatestTradeAsync(req);
         return trade.ToAlpacaTrade();
     }
 

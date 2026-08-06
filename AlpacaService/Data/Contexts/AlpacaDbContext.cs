@@ -2,6 +2,7 @@
 
 public class AlpacaDbContext : DbContext
 {
+    public virtual DbSet<AlpacaCalendar> Calendars { get; set; }    
     public virtual DbSet<AlpacaAsset> Assets { get; set; }
     public virtual DbSet<AlpacaOrder> Orders { get; set; }
     public virtual DbSet<AlpacaBar> Bars { get; set; }
