@@ -2,6 +2,11 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2026.8.3
+
+- Fix Historical Service
+- Trade Storage removed
+
 ## Version 2026.8.2
 
 - AlpacaCalendar added

@@ -32,6 +32,39 @@ public class AlpacaTestController : ControllerBase
         _publisher = redisPublisher;     
     }
 
+    [HttpGet("create-bars/{symbol}")]
+    public async Task<IActionResult> CreateBarsFromTrades(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        List<AlpacaTrade> trades = await _alpacaRepository.GetHistoricalTrades(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
+        var alpacaBars = await _alpacaRepository.GetHistoricalBars(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
+
+
+        var bars = new List<BarModel>();
+
+        // Group trades by minute and create bars
+        var groupedTrades = trades.GroupBy(t => new DateTime(t.TimestampUtc.Year, t.TimestampUtc.Month, t.TimestampUtc.Day, t.TimestampUtc.Hour, t.TimestampUtc.Minute, 0));
+
+        foreach (var group in groupedTrades)
+        {
+            var firstTrade = group.First();
+            var bar = new BarModel
+            {
+                Asset = symbol,
+                TimestampUtc = group.Key,
+                Open = firstTrade.Price,
+                High = group.Max(t => t.Price),
+                Low = group.Min(t => t.Price),
+                Close = group.Last().Price,
+                Volume = group.Sum(t => t.Size),
+                NumberOfTrades = group.Count()
+            };
+            bars.Add(bar);
+        }
+
+
+        return Ok(bars);
+    }
+
     [HttpGet("historical-bars/{symbol}")]
     public async Task<IActionResult> GetHistoricalBarsBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {

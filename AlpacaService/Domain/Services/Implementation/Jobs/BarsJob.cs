@@ -43,7 +43,6 @@ public class BarsJob : IJob
             _logger.LogInformation("UpdateHistoricalBars Asset: " + symbol);
 
             var latestBarFromDb = await _alpacaRepository.GetLatestBar(symbol);
-            var latestBarFromAlpaca = await _alpacaDataService.GetLatestBarBySymbol(symbol);
             if (latestBarFromDb == null)
             {
                 _logger.LogInformation("UpdateHistoricalBars Asset: " + symbol + " no latestBar ");
@@ -51,7 +50,7 @@ public class BarsJob : IJob
 
             var startDate = latestBarFromDb == null ? new DateTime(2024, 1, 1) : latestBarFromDb.T;
 
-            while (startDate < latestBarFromAlpaca.T)
+            while (startDate < DateTime.UtcNow)
             {
                 var endDate = startDate.AddDays(1);
                 var bars = await _alpacaDataService.GetHistoricalBarsBySymbol(symbol, startDate, endDate, BarTimeFrame.Minute);
