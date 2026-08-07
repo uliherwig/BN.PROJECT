@@ -23,12 +23,7 @@ public class BarsJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        JobKey key = context.JobDetail.Key;
-        var executionEnabled = _configuration.GetValue<bool>("BarsEnabled:Enabled");
-        if (!executionEnabled)
-        {
-            return;
-        }   
+        JobKey key = context.JobDetail.Key;       
 
         var assetsAsString = _configuration.GetValue<string>("Alpaca:TRADED_ASSETS") ?? string.Empty;
         var assetsSelection = assetsAsString.Split(",").ToList();

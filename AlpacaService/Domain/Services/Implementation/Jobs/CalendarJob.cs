@@ -28,17 +28,9 @@ public class CalendarJob : IJob
     {
         JobKey key = context.JobDetail.Key;
 
-        var executionEnabled = _configuration.GetValue<bool>("CalendarEnabled:Enabled");
-        if (!executionEnabled)
-        {
-            return;
-        }
-
         var assetsAsString = _configuration.GetValue<string>("Alpaca:TRADED_ASSETS") ?? string.Empty;
         if (string.IsNullOrEmpty(assetsAsString))
             throw new Exception("No assets defined in configuration");
-
-
 
         var assetsSelection = assetsAsString.Split(",").ToList();
         _logger.LogInformation("Instance " + key + " Calendar Job start");

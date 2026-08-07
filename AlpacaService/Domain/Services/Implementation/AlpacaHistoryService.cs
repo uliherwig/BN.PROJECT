@@ -7,18 +7,25 @@ public class AlpacaHistoryService : IHostedService
 
     public AlpacaHistoryService(IServiceProvider serviceProvider, IConfiguration configuration)
     {
-        _serviceProvider = serviceProvider;
-        _configuration = configuration;
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        var historyJobSection = _configuration.GetSection("HistoryJob");
+        if (!historyJobSection.Exists())
+        {
+            throw new InvalidOperationException("Missing configuration section: HistoryJob");
+        }
+
         using (var scope = _serviceProvider.CreateScope())
         {
-            var executionEnabled = _configuration.GetValue<bool>("HistoryJob:CalendarEnabled");
+            var executionEnabled = historyJobSection.GetValue<bool>("CalendarEnabled");
             if (executionEnabled)
             {
-                var interval = _configuration.GetValue<int>("HistoryJob:CalendarIntervalDays");
+                var calendarInterval = historyJobSection.GetValue<int>("CalendarIntervalDays");         
+
                 var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
                 var scheduler = await schedulerFactory.GetScheduler();
 
@@ -31,7 +38,7 @@ public class AlpacaHistoryService : IHostedService
                     .WithIdentity("calendarTrigger", "alpacaGroup")
                     .StartNow()
                     .WithSimpleSchedule(x => x
-                        .WithIntervalInMinutes(interval * 24 * 60) // Convert days to minutes
+                        .WithIntervalInMinutes(calendarInterval * 24 * 60) // Convert days to minutes
                         .RepeatForever())
                     .Build();
 
@@ -41,10 +48,11 @@ public class AlpacaHistoryService : IHostedService
 
         using (var scope = _serviceProvider.CreateScope())
         {
-            var executionEnabled = _configuration.GetValue<bool>("HistoryJob:BarsEnabled");
+            var executionEnabled = historyJobSection.GetValue<bool>("BarsEnabled");
             if (executionEnabled)
             {
-                var interval = _configuration.GetValue<int>("HistoryJob:BarsIntervalMinutes");
+                var barsInterval = historyJobSection.GetValue<int>("BarsIntervalMinutes");  
+
                 var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
                 var scheduler = await schedulerFactory.GetScheduler();
                 var job = JobBuilder.Create<BarsJob>()
@@ -56,7 +64,7 @@ public class AlpacaHistoryService : IHostedService
                    .WithIdentity("historyBarsTrigger", "alpacaGroup")
                    .StartNow()
                    .WithSimpleSchedule(x => x
-                       .WithIntervalInMinutes(interval)
+                       .WithIntervalInMinutes(barsInterval)
                        .RepeatForever())
                    .Build();
 
