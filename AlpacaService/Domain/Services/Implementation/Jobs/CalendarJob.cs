@@ -44,7 +44,8 @@ public class CalendarJob : IJob
 
     private async Task UpdateCalendar()
     {
-        var startDate = new DateOnly(2024, 1, 1);
+        var s = _configuration.GetValue<DateTime>("HistoryJob:StartDate");
+        var startDate = DateOnly.FromDateTime(s);
         // get the date of the end of the current month
         var now = DateOnly.FromDateTime(DateTime.UtcNow);
         DateOnly endOfMonth = new DateOnly(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));

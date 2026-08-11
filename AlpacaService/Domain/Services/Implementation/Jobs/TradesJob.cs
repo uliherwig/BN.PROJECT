@@ -45,8 +45,8 @@ public class TradesJob : IJob
 
             var latestTradeFromDb = await _alpacaRepository.GetLatestTrade(symbol);
 
-
-            var startDate = latestTradeFromDb == null ? new DateTime(2024, 1, 1) : latestTradeFromDb.TimestampUtc;
+            var s = _configuration.GetValue<DateTime>("HistoryJob:StartDate");
+            var startDate = latestTradeFromDb == null ? s : latestTradeFromDb.TimestampUtc;
             var endDate = DateTime.UtcNow;
 
             while (startDate < endDate)

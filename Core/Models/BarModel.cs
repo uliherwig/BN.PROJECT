@@ -9,5 +9,5 @@ public class BarModel
     public decimal Low { get; set; }
     public decimal Close { get; set; }
     public decimal Volume { get; set; }
-    public int? NumberOfTrades { get; set; }
+    public long? NumberOfTrades { get; set; }
 }

@@ -124,7 +124,7 @@ public class StrategyTestService : IStrategyTestService
     }
     public async Task StoreBarsToRedis(string asset)
     {      
-        var stamp = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);       
+        var stamp = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);       
         var alpacaBars = await _alpacaRepository.GetHistoricalBars(asset, stamp, DateTime.UtcNow); 
 
         // convert AlpacaBars to BarModel
@@ -136,7 +136,8 @@ public class StrategyTestService : IStrategyTestService
             High = b.H,
             Low = b.L,
             Close = b.C,
-            Volume = b.V
+            Volume = b.V,
+            NumberOfTrades = (long?)b.N
         }).ToList();
 
         // group bars by day and store in Redis with key pattern "bars:{symbol}:{date}"
@@ -148,11 +149,9 @@ public class StrategyTestService : IStrategyTestService
         {
             var date = kvp.Key;
             var barsForDay = kvp.Value;
-            var barsKey = RedisUtilities.GetBarsKey(asset, date);
-            if (!_redisDatabase.KeyExists(barsKey))
-            {
-                _redisDatabase.StringSet(barsKey, barsForDay.ToJson(), TimeSpan.FromDays(100));
-            }
+            var barsKey = RedisUtilities.GetBarsKey(asset, date);       
+            _redisDatabase.StringSet(barsKey, barsForDay.ToJson(), TimeSpan.FromDays(100));
+            
         }   
     }
 }

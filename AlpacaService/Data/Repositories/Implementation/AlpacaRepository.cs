@@ -14,7 +14,7 @@ public class AlpacaRepository : IAlpacaRepository
     {
         if (startDate == default)
         {
-            startDate = new DateOnly(2024, 1, 1);
+            startDate = new DateOnly(2020, 1, 1);
         }
         if (endDate == default)
         {
@@ -62,7 +62,7 @@ public class AlpacaRepository : IAlpacaRepository
     }
     public async Task<List<AlpacaBar>> GetHistoricalBars(string symbol, DateTime startDate, DateTime endDate)
     {
-        return await _context.Bars.Where(b => b.Symbol == symbol && b.T > startDate && b.T < endDate).OrderBy(b => b.T).ToListAsync();
+        return await _context.Bars.Where(b => b.Symbol == symbol && b.T > startDate && b.T <= endDate).OrderBy(b => b.T).ToListAsync();
     }
     public async Task AddBarsAsync(List<AlpacaBar> bars)
     {

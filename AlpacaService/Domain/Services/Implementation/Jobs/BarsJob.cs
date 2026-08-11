@@ -42,8 +42,8 @@ public class BarsJob : IJob
             {
                 _logger.LogInformation("UpdateHistoricalBars Asset: " + symbol + " no latestBar ");
             }
-
-            var startDate = latestBarFromDb == null ? new DateTime(2024, 1, 1) : latestBarFromDb.T;
+            var s = _configuration.GetValue<DateTime>("HistoryJob:StartDate");
+            var startDate = latestBarFromDb == null ? s : latestBarFromDb.T;
 
             while (startDate < DateTime.UtcNow)
             {
