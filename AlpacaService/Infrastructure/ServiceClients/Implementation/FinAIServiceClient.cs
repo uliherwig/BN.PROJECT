@@ -70,4 +70,38 @@ public class FinAIServiceClient : IFinAIServiceClient
         }
     }
 
+    public async Task<string?> StartAlpacaPaperTradingAsync(string strategyName)
+    {
+        try
+        {
+            var json = JsonConvert.SerializeObject(new { StrategyName = strategyName });
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"/api/v1/start-paper-trading", content);
+
+            var result = await response.Content.ReadAsStringAsync();
+            return result;
+
+
+
+        }
+        catch (Exception e)
+        {
+            return e.Message;
+        }
+    }
+
+    public async Task<string?> StopAlpacaPaperTradingAsync()
+    {
+        try
+        {
+            var response = await _httpClient.PostAsync($"/api/v1/stop-paper-trading", null);
+            var result = await response.Content.ReadAsStringAsync();
+            return result;
+        }
+        catch (Exception e)
+        {
+            return e.Message;
+        }
+    }
+
 }

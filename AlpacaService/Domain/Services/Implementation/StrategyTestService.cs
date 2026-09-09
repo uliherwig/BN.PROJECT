@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace BN.PROJECT.AlpacaService;
+﻿namespace BN.PROJECT.AlpacaService;
 
 public class StrategyTestService : IStrategyTestService
 {
@@ -79,7 +77,6 @@ public class StrategyTestService : IStrategyTestService
             Settings = testSettings
         };
 
-        //await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
         await _publisher.PublishAsync("strategy", message.ToJson());
 
     }
@@ -92,15 +89,10 @@ public class StrategyTestService : IStrategyTestService
             UserId = userId,
             StrategyId = strategyId
         };
-        //await _kafkaProducer.SendMessageAsync("strategy", message.ToJson());
-        await _publisher.PublishAsync("strategy", message.ToJson());
 
     }
     public async Task CreateAlpacaOrder(OrderMessage orderMessage)
-    {
-        _logger.LogInformation($"Run Alpaca Execution");
-
-        var userId = orderMessage.UserId;
+    {  
         var symbol = orderMessage.Position.Symbol;
         var qty = (int)orderMessage.Position.Quantity;
         var side = orderMessage.Position.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell;
@@ -111,15 +103,7 @@ public class StrategyTestService : IStrategyTestService
 
         var orderType = OrderType.Market;
         var timeInForce = TimeInForce.Day;
-
-        var userSettings = await _alpacaRepository.GetUserSettingsAsync(userId.ToString());
-        if (userSettings == null)
-        {
-            _logger.LogError($"User settings not found for userId: {userId}");
-            return;
-        }
-
-        await _alpacaTradingService.CreateOrderAsync(userSettings, symbol, qty, side, orderType, timeInForce);
+        await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, orderType, timeInForce);
 
     }
     public async Task StoreBarsToRedis(string asset)

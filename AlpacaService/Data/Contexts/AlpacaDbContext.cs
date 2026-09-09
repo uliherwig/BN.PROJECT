@@ -10,7 +10,6 @@ public class AlpacaDbContext : DbContext
     public virtual DbSet<AlpacaQuote> Quotes { get; set; }
     public virtual DbSet<AlpacaTrade> Trades { get; set; }
     public virtual DbSet<UserSettingsModel> UserSettings { get; set; }
-    public virtual DbSet<AlpacaExecutionModel> Executions { get; set; }
 
     public AlpacaDbContext()
     { }

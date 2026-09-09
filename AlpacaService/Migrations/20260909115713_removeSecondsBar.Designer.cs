@@ -3,6 +3,7 @@ using System;
 using BN.PROJECT.AlpacaService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.AlpacaService.Migrations
 {
     [DbContext(typeof(AlpacaDbContext))]
-    partial class AlpacaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260909115713_removeSecondsBar")]
+    partial class removeSecondsBar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,6 +117,36 @@ namespace BN.PROJECT.AlpacaService.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Calendars");
+                });
+
+            modelBuilder.Entity("BN.PROJECT.AlpacaService.AlpacaExecutionModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Assets")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("StrategyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("StrategyType")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Executions");
                 });
 
             modelBuilder.Entity("BN.PROJECT.AlpacaService.AlpacaOrder", b =>

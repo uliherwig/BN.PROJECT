@@ -2,6 +2,12 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2026.9.1
+
+- get trades every 5 sec
+- start/stop paper trading endpoint
+- cleanup execution
+
 ## Version 2026.8.5
 
 - history startdate configurable

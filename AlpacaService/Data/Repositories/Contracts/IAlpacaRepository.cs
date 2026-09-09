@@ -32,25 +32,5 @@ public interface IAlpacaRepository
     Task<AlpacaOrder?> GetOrderAsync(int id);
 
     Task UpdateOrderAsync(AlpacaOrder order);
-
-    Task AddUserSettingsAsync(UserSettingsModel userSettings);
-
-    Task<UserSettingsModel?> GetUserSettingsAsync(string userId);
-
-    Task UpdateUserSettingsAsync(UserSettingsModel userSettings);
-
-    Task DeleteUserSettingsAsync(UserSettingsModel userSettings);
-
-    Task AddAlpacaExecutionAsync(AlpacaExecutionModel execution);
-
-    Task UpdateAlpacaExecutionAsync(AlpacaExecutionModel execution);
-    
-    Task<AlpacaExecutionModel> GetAlpacaExecutionAsync(Guid id);
-
-    Task<List<AlpacaExecutionModel>?> GetActiveAlpacaExecutionsAsync();
-    Task<AlpacaExecutionModel?> GetActiveAlpacaExecutionByUserIdAsync(Guid userId);
-    Task DeleteAlpacaExecutionsAsync(Guid userId);
-
-
-
+    Task DeleteOrderAsync(AlpacaOrder order);
 }

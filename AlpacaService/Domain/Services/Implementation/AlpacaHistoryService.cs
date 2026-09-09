@@ -71,6 +71,32 @@ public class AlpacaHistoryService : IHostedService
                 await scheduler.ScheduleJob(job, trigger);
             }
         }
+
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            var executionEnabled = historyJobSection.GetValue<bool>("TradesEnabled");
+            if (executionEnabled)
+            {
+                var tradesInterval = historyJobSection.GetValue<int>("TradesIntervalSeconds");
+
+                var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
+                var scheduler = await schedulerFactory.GetScheduler();
+                var job = JobBuilder.Create<TradesJob>()
+                    .WithIdentity("historyTradesJob", "alpacaGroup")
+                    .SetJobData(new JobDataMap { { "key", "TradesJob" } })
+                    .Build();
+
+                var trigger = TriggerBuilder.Create()
+                   .WithIdentity("historyTradesTrigger", "alpacaGroup")
+                   .StartNow()
+                   .WithSimpleSchedule(x => x
+                       .WithIntervalInSeconds(tradesInterval)
+                       .RepeatForever())
+                   .Build();
+
+                await scheduler.ScheduleJob(job, trigger);
+            }
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

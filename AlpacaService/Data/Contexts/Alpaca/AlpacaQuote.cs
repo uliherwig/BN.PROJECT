@@ -1,5 +1,13 @@
 ﻿namespace BN.PROJECT.AlpacaService;
 
+// Represents a quote for a specific symbol at a given timestamp, including bid and ask prices and sizes.
+// Includes information about the tape from which the quote originated.
+// A (NYSE)
+// B (NASDAQ)
+// C (NYSE ARCA)
+// etc.
+// Tape codes indicate the exchange from which the quote originated.
+
 public class AlpacaQuote
 {
     [Key]

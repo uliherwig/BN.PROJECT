@@ -106,10 +106,10 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     // Register both the interface and the concrete type so DI can resolve either.
     services.AddSingleton<IConnectionMultiplexer>(redis);
 
+
     // Register publisher/subscriber services
     services.AddScoped<IRedisPublisher, RedisPublisher>();
     services.AddScoped<IRedisSubscriber, RedisSubscriber>();
-
 
     services.AddSignalR()
     .AddStackExchangeRedis(redisConnection, options =>
@@ -125,10 +125,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
         opt.WaitForJobsToComplete = true;
     });
 
-
-    //  services.AddHostedService<SendQuoteTaskService>();
     services.AddHostedService<AlpacaHistoryService>();
-
 
     services.AddCors(options =>
     {

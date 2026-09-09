@@ -33,51 +33,48 @@ public class TradesJob : IJob
     }
     private async Task UpdateHistoricalTrades(List<string> assetsSelection)
     {
-        var calendar = await _alpacaRepository.GetCalendarAsync();
+        DateOnly startDate = DateOnly.Parse("2026-09-04");
+        var calendar = await _alpacaRepository.GetCalendarAsync(startDate);
         if (calendar == null || calendar.Count == 0)
         {
             _logger.LogError("No calendar data found in the database.");
             return;
         }
-        foreach (var symbol in assetsSelection)
+        // TradingOpen/TradingClose are stored in Eastern Time; convert to UTC to compare against stamp (UTC).
+        var easternZone = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+        var tradingDate = calendar.First().TradingDate;
+        var tradingOpen = TimeZoneInfo.ConvertTimeToUtc(
+            tradingDate.ToDateTime(TimeOnly.FromTimeSpan(calendar.First().TradingOpen), DateTimeKind.Unspecified),
+            easternZone).TimeOfDay;
+        var tradingClose = TimeZoneInfo.ConvertTimeToUtc(
+            tradingDate.ToDateTime(TimeOnly.FromTimeSpan(calendar.First().TradingClose), DateTimeKind.Unspecified),
+            easternZone).TimeOfDay;
+        foreach (var symbol in new[] { "SPY" })
         {
             _logger.LogInformation("UpdateHistoricalTrades Asset: " + symbol);
 
             var latestTradeFromDb = await _alpacaRepository.GetLatestTrade(symbol);
-
-            var s = _configuration.GetValue<DateTime>("HistoryJob:StartDate");
-            var startDate = latestTradeFromDb == null ? s : latestTradeFromDb.TimestampUtc;
+      
+            var stamp = latestTradeFromDb == null ? startDate.ToDateTime(TimeOnly.MinValue) : latestTradeFromDb.TimestampUtc;
             var endDate = DateTime.UtcNow;
 
-            while (startDate < endDate)
+            while (stamp < endDate)
             {
-                DateOnly currentDate = DateOnly.FromDateTime(startDate);
-                TimeSpan currentTime = startDate.TimeOfDay;
-                var calendarEntry = calendar.FirstOrDefault(c => c.TradingDate == currentDate);
-                if (calendarEntry == null)
-                {
-                    // Skip to the next day if the market is closed
-                    startDate = startDate.AddDays(1).Date;
-                    continue;
-                }
-                var intervalDate = startDate.AddMinutes(10);
-                if (currentTime < calendarEntry.SessionOpen || currentTime >= calendarEntry.SessionClose)
-                {
-                    startDate = intervalDate;
-                    continue;
-                }
+                var intervalStamp = stamp.AddSeconds(5);
 
-                
-                var trades = await _alpacaDataService.GetTradesBySymbol(symbol, startDate, intervalDate);
+                if (stamp.TimeOfDay < tradingOpen || stamp.TimeOfDay >= tradingClose)
+                {
+                    stamp = intervalStamp;
+                    continue;
+                }
+                var trades = await _alpacaDataService.GetTradesBySymbol(symbol, stamp, intervalStamp);
 
                 if (trades.Count > 0)
                 {
                     await _alpacaRepository.AddTradesAsync(trades);
                 }
-                startDate = intervalDate;
-
+                stamp = intervalStamp;
             }
-
         }
     }
 }

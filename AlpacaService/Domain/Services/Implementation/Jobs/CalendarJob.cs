@@ -57,7 +57,7 @@ public class CalendarJob : IJob
         }
         while (startDate < endOfMonth)
         {
-            var endDate = startDate.AddMonths(1);
+            var endDate = startDate.AddMonths(2);
 
             var calendarList = await _alpacaTradingService.ListIntervalCalendarAsync(startDate, endDate);
 

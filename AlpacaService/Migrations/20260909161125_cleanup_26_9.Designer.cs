@@ -3,6 +3,7 @@ using System;
 using BN.PROJECT.AlpacaService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BN.PROJECT.AlpacaService.Migrations
 {
     [DbContext(typeof(AlpacaDbContext))]
-    partial class AlpacaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260909161125_cleanup_26_9")]
+    partial class cleanup_26_9
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,9 +84,6 @@ namespace BN.PROJECT.AlpacaService.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Symbol", "T")
-                        .IsUnique();
 
                     b.ToTable("Bars");
                 });

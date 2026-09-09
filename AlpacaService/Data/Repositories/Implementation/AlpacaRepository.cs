@@ -136,63 +136,10 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
-    // User Settings
-    public async Task AddUserSettingsAsync(UserSettingsModel userSettings)
+    public async Task DeleteOrderAsync(AlpacaOrder order)
     {
-        await _context.UserSettings.AddAsync(userSettings);
+        _context.Orders.Remove(order);
         await _context.SaveChangesAsync();
     }
-    public async Task<UserSettingsModel?> GetUserSettingsAsync(string userId)
-    {
-        return await _context.UserSettings.FirstOrDefaultAsync(u => u.UserId == userId);
-    }
-    public async Task UpdateUserSettingsAsync(UserSettingsModel userSettings)
-    {
-        _context.UserSettings.Update(userSettings);
-        await _context.SaveChangesAsync();
-    }
-    public async Task DeleteUserSettingsAsync(UserSettingsModel userSettings)
-    {
-        _context.UserSettings.Remove(userSettings);
-        await _context.SaveChangesAsync();
-    }
-
-    // Executions
-    public async Task AddAlpacaExecutionAsync(AlpacaExecutionModel execution)
-    {
-        await _context.Executions.AddAsync(execution);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateAlpacaExecutionAsync(AlpacaExecutionModel execution)
-    {
-        _context.Executions.Update(execution);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task<AlpacaExecutionModel?> GetAlpacaExecutionAsync(Guid id)
-    {
-        var execution = await _context.Executions.FindAsync(id);
-        return execution;
-    }
-
-    public async Task<List<AlpacaExecutionModel>?> GetActiveAlpacaExecutionsAsync()
-    {
-        return await _context.Executions
-               .Where(e => e.EndDate == DateTime.MinValue)
-               .ToListAsync();
-    }
-
-    public async Task<AlpacaExecutionModel?> GetActiveAlpacaExecutionByUserIdAsync(Guid userId)
-    {
-        var execution = await _context.Executions.FirstOrDefaultAsync(e => e.UserId == userId && e.EndDate == DateTime.MinValue);
-        return execution;
-    }
-
-    public async Task DeleteAlpacaExecutionsAsync(Guid userId)
-    {
-        var executions = await _context.Executions.Where(e => e.UserId == userId).ToListAsync();
-        _context.Executions.RemoveRange(executions);
-        await _context.SaveChangesAsync();
-    }
+ 
 }
