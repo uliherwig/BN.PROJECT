@@ -116,7 +116,14 @@ public class AlpacaRepository : IAlpacaRepository
     }
     public async Task AddTradesAsync(List<AlpacaTrade> trades)
     {
-        await _context.Trades.AddRangeAsync(trades);
+        foreach (var trade in trades)
+        {
+            var existingTrade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == trade.Id);
+            if (existingTrade == null)
+            {
+                await _context.Trades.AddAsync(trade);
+            }
+        }
         await _context.SaveChangesAsync();
     }
 

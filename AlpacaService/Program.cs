@@ -98,6 +98,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
     services.AddScoped<IStrategyTestService, StrategyTestService>();
+    services.AddScoped<IStartUpService, StartUpService>();
     services.AddHostedService<MessageConsumerService>();
 
     var redisConnection = configuration["RedisConnection"];
@@ -110,6 +111,8 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     // Register publisher/subscriber services
     services.AddScoped<IRedisPublisher, RedisPublisher>();
     services.AddScoped<IRedisSubscriber, RedisSubscriber>();
+    services.AddScoped<IRedisStreamPublisher, RedisStreamPublisher>();
+    services.AddScoped<IRedisService, RedisService>();
 
     services.AddSignalR()
     .AddStackExchangeRedis(redisConnection, options =>

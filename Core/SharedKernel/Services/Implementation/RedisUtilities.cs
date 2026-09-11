@@ -11,4 +11,8 @@ public static class RedisUtilities
 
     public static string GetBarsKey(string asset, DateTime stamp) => $"bars:{asset}:{stamp:yyyy-MM-dd}";
 
+    public static string GetTradesStreamKey(string asset) => $"trades:stream:{asset}";
+
+    public static string GetFeatureFlagKey(string name) => $"flags:{name}";
+
 }

@@ -13,6 +13,16 @@ public class AlpacaHistoryService : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        var assetsAsString = _configuration.GetValue<string>("Alpaca:TRADED_ASSETS") ?? string.Empty;
+        var assetsSelection = assetsAsString.Split(",").ToList();
+        assetsSelection = new[] { "SPY" }.ToList();
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            var _startUpService = scope.ServiceProvider.GetRequiredService<IStartUpService>();
+            await _startUpService.InitializeTradesStorage(assetsSelection);
+        }
+
+
         var historyJobSection = _configuration.GetSection("HistoryJob");
         if (!historyJobSection.Exists())
         {

@@ -10,45 +10,46 @@ public class AlpacaTradingController : ControllerBase
     private readonly IStrategyTestService _strategyTestService;
     private readonly IStrategyServiceClient _strategyServiceClient;
     private readonly IFinAIServiceClient _finAIServiceClient;
+    private readonly IRedisService _redisService;
+
 
     public AlpacaTradingController(
         IAlpacaTradingService alpacaTradingService, 
         IAlpacaRepository alpacaRepository, 
         IStrategyTestService strategyTestService, 
         IStrategyServiceClient strategyServiceClient,
-        IFinAIServiceClient finAIServiceClient)
+        IFinAIServiceClient finAIServiceClient,
+        IRedisService redisService)
     {
         _alpacaTradingService = alpacaTradingService;
         _alpacaRepository = alpacaRepository;
         _strategyTestService = strategyTestService;
         _strategyServiceClient = strategyServiceClient;
         _finAIServiceClient = finAIServiceClient;
-    }
-
-    public AlpacaTradingController(
-        IAlpacaTradingService alpacaTradingService, 
-        IAlpacaRepository alpacaRepository, 
-        IStrategyTestService strategyTestService, 
-        IStrategyServiceClient strategyServiceClient)
-    {
-        _alpacaTradingService = alpacaTradingService;
-        _alpacaRepository = alpacaRepository;
-        _strategyTestService = strategyTestService;
-        _strategyServiceClient = strategyServiceClient;
+        _redisService = redisService;
     }
 
     [HttpPost("start-execution/{strategyName}")]
     public async Task<IActionResult> StartAlpacaExecution(string strategyName)
     {
-        var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategyName);
+        // var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategyName);
+        var flagKey = RedisUtilities.GetFeatureFlagKey("push-trades-to-stream");
+        await _redisService.SetStringAsync(flagKey, "true");
+
+
+        var trades = await _alpacaRepository.GetHistoricalTrades("SPY", DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+
+        await _redisService.PublishTradesToStream("SPY", trades, 100000);
+
         return Ok();
     }
 
     [HttpPut("stop-execution")]
     public async Task<IActionResult> StopAlpacaExecution()
     {
-        var result = await _finAIServiceClient.StopAlpacaPaperTradingAsync();
-
+        // var result = await _finAIServiceClient.StopAlpacaPaperTradingAsync();
+        var flagKey = RedisUtilities.GetFeatureFlagKey("push-trades-to-stream");
+        await _redisService.SetStringAsync(flagKey, "false");
         return Ok();
     }
 
