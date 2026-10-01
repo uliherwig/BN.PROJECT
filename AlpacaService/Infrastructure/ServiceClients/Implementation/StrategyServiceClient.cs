@@ -10,7 +10,8 @@ public class StrategyServiceClient : IStrategyServiceClient
     {
         _configuration = configuration;
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(_configuration["StrategyServiceClient"]);
+        _httpClient.BaseAddress = new Uri(_configuration["StrategyServiceClient"]
+            ?? throw new InvalidOperationException("Missing configuration: StrategyServiceClient"));
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
     }

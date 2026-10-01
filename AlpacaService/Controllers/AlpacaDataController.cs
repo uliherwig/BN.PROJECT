@@ -5,10 +5,42 @@ namespace BN.PROJECT.AlpacaService;
 public class AlpacaDataController : ControllerBase
 {
     private readonly IAlpacaDataService _alpacaDataService;
+    private readonly IAlpacaRepository _alpacaRepository;
+    private readonly IStrategyTestService _strategyTestService;
 
-    public AlpacaDataController(IAlpacaDataService alpacaDataService)
+    public AlpacaDataController(IAlpacaDataService alpacaDataService, IAlpacaRepository alpacaRepository, IStrategyTestService strategyTestService)
     {
         _alpacaDataService = alpacaDataService;
+        _alpacaRepository = alpacaRepository;
+        _strategyTestService = strategyTestService;
+    }
+
+    [HttpGet("clock")]
+    public async Task<IActionResult> GetClockAsync()
+    {
+        var result = await _alpacaDataService.GetClockAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("interval-calendar")]
+    public async Task<IActionResult> ListIntervalCalendarAsync(DateOnly startDate, DateOnly endDate = default)
+    {
+        var result = await _alpacaDataService.ListIntervalCalendarAsync(startDate, endDate == default ? DateOnly.FromDateTime(DateTime.UtcNow) : endDate);
+        return Ok(result);
+    }
+
+    [HttpGet("assets")]
+    public async Task<IActionResult> GetAssets()
+    {
+        var assets = await _alpacaRepository.GetAssets();
+        return Ok(assets);
+    }
+
+    [HttpGet("asset/{symbol}")]
+    public async Task<IActionResult> GetAssetBySymbol(string symbol)
+    {
+        var asset = await _alpacaDataService.GetAssetBySymbolAsync(symbol);
+        return Ok(asset);
     }
 
     [HttpGet("historical-bars/{symbol}")]
@@ -53,4 +85,24 @@ public class AlpacaDataController : ControllerBase
         var trade = await _alpacaDataService.GetLatestTradeBySymbol(symbol);
         return Ok(trade);
     }
+
+
+    [HttpPost("store-to-redis")]
+    public async Task<IActionResult> StoreToRedis([FromBody] string asset)
+    {
+        await _strategyTestService.StoreBarsToRedis(asset);
+        return Ok();
+    }
+
+    [HttpGet("save-assets")]
+    public async Task<IActionResult> SaveAssets(string newAssets)
+    { 
+        var assets = JsonConvert.DeserializeObject<List<AlpacaAsset>>(newAssets);
+        if (assets != null)
+        {
+            await _alpacaRepository.AddAssetsAsync(assets);
+        }
+        return Ok();
+    }
+
 }

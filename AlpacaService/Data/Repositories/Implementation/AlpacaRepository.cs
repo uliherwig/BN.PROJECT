@@ -148,5 +148,47 @@ public class AlpacaRepository : IAlpacaRepository
         _context.Orders.Remove(order);
         await _context.SaveChangesAsync();
     }
- 
+
+    // Position tracking
+    public async Task<List<AlpacaPositionTracking>> GetAllOpenPositionTrackings()
+    {
+        return await _context.PositionTrackings.Where(p => p.ClosedAtUtc == null).ToListAsync();
+    }
+
+    public async Task<AlpacaPositionTracking?> GetLatestOpenPositionTracking(string symbol)
+    {
+        return await _context.PositionTrackings
+            .Where(p => p.Symbol == symbol && p.ClosedAtUtc == null)
+            .OrderByDescending(p => p.OpenedAtUtc)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task AddPositionTrackingAsync(AlpacaPositionTracking tracking)
+    {
+        await _context.PositionTrackings.AddAsync(tracking);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task ClosePositionTrackingAsync(string symbol)
+    {
+        var openTrackings = await _context.PositionTrackings
+            .Where(p => p.Symbol == symbol && p.ClosedAtUtc == null)
+            .ToListAsync();
+        foreach (var tracking in openTrackings)
+        {
+            tracking.ClosedAtUtc = DateTime.UtcNow;
+        }
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task CloseAllPositionTrackingsAsync()
+    {
+        var openTrackings = await _context.PositionTrackings.Where(p => p.ClosedAtUtc == null).ToListAsync();
+        foreach (var tracking in openTrackings)
+        {
+            tracking.ClosedAtUtc = DateTime.UtcNow;
+        }
+        await _context.SaveChangesAsync();
+    }
+
 }

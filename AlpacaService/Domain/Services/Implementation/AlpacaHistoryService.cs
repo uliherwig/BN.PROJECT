@@ -15,13 +15,6 @@ public class AlpacaHistoryService : IHostedService
     {
         var assetsAsString = _configuration.GetValue<string>("Alpaca:TRADED_ASSETS") ?? string.Empty;
         var assetsSelection = assetsAsString.Split(",").ToList();
-        assetsSelection = new[] { "SPY" }.ToList();
-        using (var scope = _serviceProvider.CreateScope())
-        {
-            var _startUpService = scope.ServiceProvider.GetRequiredService<IStartUpService>();
-            await _startUpService.InitializeTradesStorage(assetsSelection);
-        }
-
 
         var historyJobSection = _configuration.GetSection("HistoryJob");
         if (!historyJobSection.Exists())
@@ -87,7 +80,7 @@ public class AlpacaHistoryService : IHostedService
             var executionEnabled = historyJobSection.GetValue<bool>("TradesEnabled");
             if (executionEnabled)
             {
-                var tradesInterval = historyJobSection.GetValue<int>("TradesIntervalSeconds");
+                var tradesInterval = historyJobSection.GetValue<int>("TradesIntervalDays");
 
                 var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
                 var scheduler = await schedulerFactory.GetScheduler();
@@ -100,7 +93,7 @@ public class AlpacaHistoryService : IHostedService
                    .WithIdentity("historyTradesTrigger", "alpacaGroup")
                    .StartNow()
                    .WithSimpleSchedule(x => x
-                       .WithIntervalInSeconds(tradesInterval)
+                       .WithIntervalInMinutes(tradesInterval * 24 * 60) // Convert days to minutes
                        .RepeatForever())
                    .Build();
 

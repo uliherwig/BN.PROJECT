@@ -28,8 +28,13 @@ public class MessageConsumerService : IHostedService
                 }
 
                 redisSubscriber.Subscribe(topicName, (channel, msg) =>
-                {                    
-                    ConsumeMessage(msg);
+                {
+                    var payload = msg.ToString();
+                    if (string.IsNullOrEmpty(payload))
+                    {
+                        return;
+                    }
+                    ConsumeMessage(payload);
                 });
             }
         }

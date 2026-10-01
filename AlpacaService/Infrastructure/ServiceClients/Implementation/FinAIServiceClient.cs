@@ -13,7 +13,8 @@ public class FinAIServiceClient : IFinAIServiceClient
     {
         _configuration = configuration;
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(_configuration["FinAIServiceClient"]); 
+        _httpClient.BaseAddress = new Uri(_configuration["FinAIServiceClient"]
+            ?? throw new InvalidOperationException("Missing configuration: FinAIServiceClient")); 
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
      
     }
@@ -74,15 +75,12 @@ public class FinAIServiceClient : IFinAIServiceClient
     {
         try
         {
-            var json = JsonConvert.SerializeObject(new { StrategyName = strategyName });
+            var json = JsonConvert.SerializeObject(new { StrategyName = strategyName});
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync($"/api/v1/start-paper-trading", content);
 
             var result = await response.Content.ReadAsStringAsync();
             return result;
-
-
-
         }
         catch (Exception e)
         {

@@ -16,7 +16,7 @@ public class StartUpService : IStartUpService
     {
 
         var now = DateTime.UtcNow;
-        var interval = TimeSpan.FromSeconds(20);
+        var interval = TimeSpan.FromMinutes(1);
        
         var calendar = await _alpacaRepository.GetCalendarAsync(DateOnly.FromDateTime(now));
         if (calendar == null || calendar.Count == 0)

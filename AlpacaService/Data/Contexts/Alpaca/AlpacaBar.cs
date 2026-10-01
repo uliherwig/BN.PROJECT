@@ -7,7 +7,7 @@ public class AlpacaBar
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
 
-    public string Symbol { get; set; }
+    public string Symbol { get; set; } = string.Empty;
     public decimal C { get; set; } // Close
     public decimal H { get; set; } // High
     public decimal L { get; set; } // Low

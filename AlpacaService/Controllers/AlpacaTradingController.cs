@@ -11,15 +11,17 @@ public class AlpacaTradingController : ControllerBase
     private readonly IStrategyServiceClient _strategyServiceClient;
     private readonly IFinAIServiceClient _finAIServiceClient;
     private readonly IRedisService _redisService;
+    private readonly IPositionLifecycleService _positionLifecycleService;
 
 
     public AlpacaTradingController(
-        IAlpacaTradingService alpacaTradingService, 
-        IAlpacaRepository alpacaRepository, 
-        IStrategyTestService strategyTestService, 
+        IAlpacaTradingService alpacaTradingService,
+        IAlpacaRepository alpacaRepository,
+        IStrategyTestService strategyTestService,
         IStrategyServiceClient strategyServiceClient,
         IFinAIServiceClient finAIServiceClient,
-        IRedisService redisService)
+        IRedisService redisService,
+        IPositionLifecycleService positionLifecycleService)
     {
         _alpacaTradingService = alpacaTradingService;
         _alpacaRepository = alpacaRepository;
@@ -27,59 +29,8 @@ public class AlpacaTradingController : ControllerBase
         _strategyServiceClient = strategyServiceClient;
         _finAIServiceClient = finAIServiceClient;
         _redisService = redisService;
-    }
-
-    [HttpPost("start-execution/{strategyName}")]
-    public async Task<IActionResult> StartAlpacaExecution(string strategyName)
-    {
-        // var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategyName);
-        var flagKey = RedisUtilities.GetFeatureFlagKey("push-trades-to-stream");
-        await _redisService.SetStringAsync(flagKey, "true");
-
-
-        var trades = await _alpacaRepository.GetHistoricalTrades("SPY", DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
-
-        await _redisService.PublishTradesToStream("SPY", trades, 100000);
-
-        return Ok();
-    }
-
-    [HttpPut("stop-execution")]
-    public async Task<IActionResult> StopAlpacaExecution()
-    {
-        // var result = await _finAIServiceClient.StopAlpacaPaperTradingAsync();
-        var flagKey = RedisUtilities.GetFeatureFlagKey("push-trades-to-stream");
-        await _redisService.SetStringAsync(flagKey, "false");
-        return Ok();
-    }
-
-    [HttpGet("clock")]
-    public async Task<IActionResult> GetClockAsync()
-    {
-        var result = await _alpacaTradingService.GetClockAsync();
-        return Ok(result);
-    }
-
-    [HttpGet("interval-calendar")]
-    public async Task<IActionResult> ListIntervalCalendarAsync(DateOnly startDate, DateOnly endDate = default)
-    {
-        var result = await _alpacaTradingService.ListIntervalCalendarAsync(startDate, endDate == default ? DateOnly.FromDateTime(DateTime.UtcNow) : endDate);
-        return Ok(result);
-    }
-
-    [HttpGet("assets")]
-    public async Task<IActionResult> GetAssets()
-    {
-        var assets = await _alpacaRepository.GetAssets();
-        return Ok(assets);
-    }
-
-    [HttpGet("asset/{symbol}")]
-    public async Task<IActionResult> GetAssetBySymbol(string symbol)
-    {
-        var asset = await _alpacaTradingService.GetAssetBySymbolAsync(symbol);
-        return Ok(asset);
-    }
+        _positionLifecycleService = positionLifecycleService;
+    } 
 
     [HttpGet("orders")]
     public async Task<IActionResult> GetAllOrders(OrderStatusFilter orderStatusFilter)
@@ -92,6 +43,25 @@ public class AlpacaTradingController : ControllerBase
     public async Task<IActionResult> GetOrderById(string orderId)
     {
         var order = await _alpacaTradingService.GetOrderByIdAsync(orderId);
+        return Ok(order);
+    }
+
+    [HttpPost("order")]
+    public async Task<IActionResult> CreateMarketOrder(OrderRequest orderRequest)
+    {
+
+        var symbol = orderRequest.Symbol;
+        var qty = (int)orderRequest.Quantity;
+        var side = orderRequest.Side == "Buy" ? OrderSide.Buy : OrderSide.Sell;
+        //  if (orderRequest.PriceClose > 0)
+        //  {
+        //      side = orderRequest.Side == "Sell" ? OrderSide.Buy : OrderSide.Sell;
+        //  }
+
+        var orderType = OrderType.Market;
+        var timeInForce = TimeInForce.Day;
+
+        var order = await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, orderType, timeInForce);
         return Ok(order);
     }
 
@@ -116,15 +86,99 @@ public class AlpacaTradingController : ControllerBase
 
     [HttpGet("position/{symbol}")]
     public async Task<IActionResult> GetPositionsBySymbol(string symbol)
-    {  
+    {
         var position = await _alpacaTradingService.GetPositionsBySymbol(symbol);
         return Ok(position);
     }
 
     [HttpDelete("position/{symbol}")]
-    public async Task<IActionResult> ClosePosition(string symbol)
+    public async Task<IActionResult> ClosePositionBySymbol(string symbol)
     {
         var result = await _alpacaTradingService.ClosePositionOrder(symbol);
         return Ok(result);
     }
+
+    [HttpDelete("positions")]
+    public async Task<IActionResult> CloseAllPositions()
+    {
+        var result = await _alpacaTradingService.CloseAllPositions();
+        return Ok(result);
+    }
+
+    [HttpPost("positions/close-expired")]
+    public async Task<IActionResult> CloseExpiredPositions([FromQuery] int maxHoldingMinutes = 60)
+    {
+        await _positionLifecycleService.CloseExpiredPositionsAsync(TimeSpan.FromMinutes(maxHoldingMinutes));
+        return Ok();
+    }
+
+    [HttpPost("positions/close-eod")]
+    public async Task<IActionResult> CloseEndOfDayPositions()
+    {
+        await _positionLifecycleService.CloseAllPositionsEndOfDayAsync();
+        return Ok();
+    }
+
+    [HttpPost("ai-market-test-order")]
+    public async Task<IActionResult> CreateAIMarketTestOrder(TestOrderRequest orderRequest)
+    {
+        // Check if AI market order for this symbol has already been executed   - only one AI market order per symbol is allowed
+        var isPositionAlreadyExecuted = await _alpacaRepository.GetLatestOpenPositionTracking(orderRequest.Symbol);
+
+        if (isPositionAlreadyExecuted != null)
+        {
+            return BadRequest("AI market order for this symbol has already been executed.");
+        }
+
+        orderRequest.Symbol = orderRequest.Symbol.ToUpper();
+        orderRequest.Side = orderRequest.Side.ToUpper();
+        // Value is already UTC; only the Kind needs fixing (Npgsql rejects Unspecified for timestamptz).
+        orderRequest.OpenedAtUtc = DateTime.SpecifyKind(orderRequest.OpenedAtUtc, DateTimeKind.Utc);
+        orderRequest.OrderType = "Market";
+        orderRequest.TimeInForce = "Day";
+
+ 
+        var positionTracking = new AlpacaPositionTracking
+        {
+            Symbol = orderRequest.Symbol,
+            OpenedAtUtc = orderRequest.OpenedAtUtc,
+            ClosedAtUtc = null
+
+        };
+        await _alpacaRepository.AddPositionTrackingAsync(positionTracking);
+        return Ok(positionTracking);
+    }
+
+    [HttpPost("ai-market-order")]
+    public async Task<IActionResult> CreateAIMarketOrder(OrderRequest orderRequest)
+    {
+        // Check if AI market order for this symbol has already been executed   - only one AI market order per symbol is allowed
+        var isPositionAlreadyExecuted = await _alpacaRepository.GetLatestOpenPositionTracking(orderRequest.Symbol);
+
+        if (isPositionAlreadyExecuted != null)
+        {
+            return BadRequest("AI market order for this symbol has already been executed.");
+        }
+
+        orderRequest.Symbol = orderRequest.Symbol.ToUpper();
+        orderRequest.Side = orderRequest.Side.ToUpper();
+        orderRequest.OrderType = "Market";
+        orderRequest.TimeInForce = "Day";
+
+        var alpacaOrder = await _alpacaTradingService.CreateOrderAsync(orderRequest.Symbol, (int)orderRequest.Quantity, orderRequest.Side == "Buy" ? OrderSide.Buy : OrderSide.Sell, OrderType.Market, TimeInForce.Day);
+        if(alpacaOrder == null || alpacaOrder.CreatedAtUtc == null)
+        {
+            return BadRequest("Failed to create AI market order.");
+        }
+        var positionTracking = new AlpacaPositionTracking
+        {
+            Symbol = orderRequest.Symbol,
+            OpenedAtUtc = (DateTime)alpacaOrder.CreatedAtUtc,
+            ClosedAtUtc = null
+
+        };
+        await _alpacaRepository.AddPositionTrackingAsync(positionTracking);
+        return Ok(alpacaOrder);
+    }
+
 }

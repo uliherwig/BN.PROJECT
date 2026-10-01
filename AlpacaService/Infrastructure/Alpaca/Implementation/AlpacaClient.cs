@@ -29,4 +29,13 @@ public class AlpacaClient : IAlpacaClient
         var alpacaSecret = userSettings.AlpacaSecret;
         return Alpaca.Markets.Environments.Paper.GetAlpacaTradingClient(new SecretKey(alpacaId, alpacaSecret));
     }
+
+    public IAlpacaDataStreamingClient GetStreamingClient()
+    {
+        var alpacaId = _configuration.GetValue<string>("Alpaca:KEY_ID") ?? string.Empty;
+        var alpacaSecret = _configuration.GetValue<string>("Alpaca:SECRET_KEY") ?? string.Empty;
+        return Alpaca.Markets.Environments.Paper.GetAlpacaDataStreamingClient(new SecretKey(alpacaId, alpacaSecret));
+    }
+
+
 }

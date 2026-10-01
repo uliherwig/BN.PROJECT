@@ -8,6 +8,8 @@ namespace BN.PROJECT.AlpacaService.Tests
     {
         private readonly Mock<IAlpacaClient> _mockAlpacaClient;
         private readonly Mock<IAlpacaTradingClient> _mockAlpacaTradingClient;
+        private readonly Mock<IAlpacaDataService> _mockAlpacaDataService;
+        private readonly AlpacaDataService _alpacaDataService;
 
         private readonly Mock<ILogger<AlpacaTradingService>> _mockLogger;
         private readonly AlpacaTradingService _alpacaTradingService;
@@ -25,7 +27,9 @@ namespace BN.PROJECT.AlpacaService.Tests
                  .Returns(_mockAlpacaTradingClient.Object);
 
             _mockLogger = new Mock<ILogger<AlpacaTradingService>>();
+            _mockAlpacaDataService = new Mock<IAlpacaDataService>();
             _alpacaTradingService = new AlpacaTradingService(_mockAlpacaClient.Object, _mockLogger.Object);
+            _alpacaDataService = new AlpacaDataService(_mockAlpacaClient.Object, _mockLogger.Object);
         }
 
         [Fact]

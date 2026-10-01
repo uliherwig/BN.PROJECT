@@ -99,9 +99,11 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
     services.AddScoped<IStrategyTestService, StrategyTestService>();
     services.AddScoped<IStartUpService, StartUpService>();
+    services.AddScoped<IPositionLifecycleService, PositionLifecycleService>();
     services.AddHostedService<MessageConsumerService>();
 
-    var redisConnection = configuration["RedisConnection"];
+    var redisConnection = configuration["RedisConnection"]
+        ?? throw new InvalidOperationException("Missing configuration: RedisConnection");
     var redis = ConnectionMultiplexer.Connect(redisConnection);
 
     // Register both the interface and the concrete type so DI can resolve either.
@@ -118,7 +120,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     .AddStackExchangeRedis(redisConnection, options =>
     {
         options.Configuration.AbortOnConnectFail = false;
-        options.Configuration.ChannelPrefix = "SignalR";
+        options.Configuration.ChannelPrefix = RedisChannel.Literal("SignalR");
     });
 
     // Quartz-Services
@@ -129,6 +131,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     });
 
     services.AddHostedService<AlpacaHistoryService>();
+    services.AddHostedService<PositionManagementService>();
 
     services.AddCors(options =>
     {

@@ -27,7 +27,7 @@ public class AlpacaOrder
 
     public Guid AssetId { get; set; }
 
-    public String Symbol { get; set; }
+    public String Symbol { get; set; } = string.Empty;
 
     public Decimal? Notional { get; set; }
 

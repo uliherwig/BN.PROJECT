@@ -7,4 +7,6 @@ public interface IAlpacaClient
     IAlpacaTradingClient GetCommonTradingClient();
 
     IAlpacaTradingClient? GetPrivateTradingClient(UserSettingsModel userSettings);
+
+    IAlpacaDataStreamingClient GetStreamingClient();
 }

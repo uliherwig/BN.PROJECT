@@ -33,4 +33,11 @@ public interface IAlpacaRepository
 
     Task UpdateOrderAsync(AlpacaOrder order);
     Task DeleteOrderAsync(AlpacaOrder order);
+
+    // Position tracking
+    Task<List<AlpacaPositionTracking>> GetAllOpenPositionTrackings();
+    Task<AlpacaPositionTracking?> GetLatestOpenPositionTracking(string symbol);
+    Task AddPositionTrackingAsync(AlpacaPositionTracking tracking);
+    Task ClosePositionTrackingAsync(string symbol);
+    Task CloseAllPositionTrackingsAsync();
 }

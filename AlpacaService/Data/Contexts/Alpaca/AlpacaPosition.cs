@@ -6,7 +6,7 @@ public class AlpacaPosition
     public Guid AssetId { get; set; }
 
     public Guid UserId { get; set; }
-    public string Symbol { get; set; }
+    public string Symbol { get; set; } = string.Empty;
     public Exchange Exchange { get; set; }
     public AssetClass AssetClass { get; set; }
     public decimal AverageEntryPrice { get; set; }

@@ -23,7 +23,8 @@ public class RedisService : IRedisService
     }
     public async Task<string> GetStringAsync(string key)
     {
-        return await _redisDatabase.StringGetAsync(key);
+        RedisValue value = await _redisDatabase.StringGetAsync(key);
+        return value.IsNullOrEmpty ? string.Empty : value.ToString();
     }
     public async Task SetStringAsync(string key, string value)
     {

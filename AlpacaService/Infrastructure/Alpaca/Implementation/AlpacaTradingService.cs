@@ -1,7 +1,3 @@
-
-
-using Alpaca.Markets.Extensions;
-
 namespace BN.PROJECT.AlpacaService
 {
     public class AlpacaTradingService : IAlpacaTradingService
@@ -16,33 +12,6 @@ namespace BN.PROJECT.AlpacaService
             _logger = logger;
         }
 
-        // Check if markets are open
-        public async Task<IClock> GetClockAsync()
-        {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            return await tradingClient.GetClockAsync();
-        }
-
-        public async Task<List<AlpacaCalendar>?> ListIntervalCalendarAsync(DateOnly startDate, DateOnly endDate = default)
-        {
-            var alpacaCalendar = new List<AlpacaCalendar>();
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-
-            CalendarRequest req = new(
-                startDate,
-                endDate == default ? DateOnly.FromDateTime(DateTime.UtcNow) : endDate);
-
-            var calendarList = await tradingClient.ListIntervalCalendarAsync(req);
-            foreach (var calendar in calendarList)
-            {
-                alpacaCalendar.Add(calendar.ToAlpacaCalendar());
-            }
-
-            return alpacaCalendar;
-        }
-
-
-
         public async Task<IAccount?> GetAccountAsync(UserSettingsModel userSettings)
         {
             try
@@ -55,21 +24,6 @@ namespace BN.PROJECT.AlpacaService
                 _logger.LogError(ex, $"Error getting account for user id {userSettings.UserId}");
             }
             return null;
-        }
-
-        public async Task<List<AlpacaAsset>> GetAssetsAsync()
-        {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var req = new AssetsRequest();
-            req.AssetClass = AssetClass.UsEquity;
-            var assets = await tradingClient.ListAssetsAsync(req);
-            return assets.Select(a => a.ToAlpacaAsset()).ToList();
-        }
-
-        public async Task<IAsset> GetAssetBySymbolAsync(string symbol)
-        {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            return await tradingClient.GetAssetAsync(symbol);
         }
 
         public async Task<List<AlpacaOrder>> GetAllOrdersAsync(OrderStatusFilter orderStatusFilter)
@@ -126,6 +80,12 @@ namespace BN.PROJECT.AlpacaService
             var deletePositionRequest = new DeletePositionRequest(symbol);
             var order = await tradingClient.DeletePositionAsync(deletePositionRequest);
             return order.ToAlpacaOrder();
+        }
+        public async Task<bool> CloseAllPositions()
+        {
+            var tradingClient = _alpacaClient.GetCommonTradingClient();
+            var closed = await tradingClient.DeleteAllPositionsAsync();
+            return true;
         }
     }
 }

@@ -14,13 +14,13 @@ public class CalendarJob : IJob
         ILogger<CalendarJob> logger,
         IConfiguration configuration,
         IAlpacaDataService alpacaDataService,
-        IAlpacaTradingService alpacaTradingService,
+        IAlpacaTradingService alpacaTradingService,  
         IAlpacaRepository alpacaRepository)
     {
         _logger = logger;
         _configuration = configuration;
         _alpacaDataService = alpacaDataService;
-        _alpacaTradingService = alpacaTradingService;
+        _alpacaTradingService = alpacaTradingService;   
         _alpacaRepository = alpacaRepository;
     }
 
@@ -59,7 +59,7 @@ public class CalendarJob : IJob
         {
             var endDate = startDate.AddMonths(2);
 
-            var calendarList = await _alpacaTradingService.ListIntervalCalendarAsync(startDate, endDate);
+            var calendarList = await _alpacaDataService.ListIntervalCalendarAsync(startDate, endDate);
 
             if (calendarList != null && calendarList.Count > 0)
             {
@@ -71,7 +71,7 @@ public class CalendarJob : IJob
 
     private async Task UpdateAssets(List<string> assetsSelection)
     {
-        var assets = await _alpacaTradingService.GetAssetsAsync();
+        var assets = await _alpacaDataService.GetAssetsAsync();
         var assetsDb = await _alpacaRepository.GetAssets();
         var alpacaAssets = new List<AlpacaAsset>();
         foreach (var symbol in assetsSelection)

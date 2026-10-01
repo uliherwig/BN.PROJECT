@@ -2,15 +2,8 @@ namespace BN.PROJECT.AlpacaService
 {
     public interface IAlpacaTradingService
     {
-        Task<IClock> GetClockAsync();
 
-        Task<List<AlpacaCalendar>?> ListIntervalCalendarAsync(DateOnly startDate, DateOnly endDate = default);
-        
         Task<IAccount?> GetAccountAsync(UserSettingsModel userSettings);
-
-        Task<List<AlpacaAsset>> GetAssetsAsync();
-
-        Task<IAsset> GetAssetBySymbolAsync(string symbol);
 
         Task<List<AlpacaOrder>> GetAllOrdersAsync(OrderStatusFilter orderStatusFilter);
 
@@ -25,5 +18,7 @@ namespace BN.PROJECT.AlpacaService
         Task<AlpacaPosition> GetPositionsBySymbol(string symbol);
 
         Task<AlpacaOrder> ClosePositionOrder(string symbol);
+        
+        Task<bool> CloseAllPositions();
     }
 }

@@ -30,7 +30,7 @@ public class AlpacaHub : Hub, IAlpacaHub
         var connectionId = await _redisDatabase.StringGetAsync(qm.UserId.ToString());
         if (!string.IsNullOrEmpty(connectionId.ToString()))
         {
-            await Clients.Client(connectionId).SendAsync("ReceiveQuote", quoteMessage);
+            await Clients.Client(connectionId.ToString()).SendAsync("ReceiveQuote", quoteMessage);
         }
     }
 }

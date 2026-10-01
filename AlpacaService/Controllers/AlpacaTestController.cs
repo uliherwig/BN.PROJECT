@@ -12,7 +12,11 @@ public class AlpacaTestController : ControllerBase
     private readonly IFinAIServiceClient _finAIServiceClient;
     private readonly ILogger<AlpacaTestController> _logger;
     private readonly IRedisPublisher _publisher;
- 
+    private readonly IRedisService _redisService;
+    private readonly IAlpacaDataService _alpacaDataService;
+
+
+
 
     public AlpacaTestController(
         IWebHostEnvironment env,
@@ -21,7 +25,9 @@ public class AlpacaTestController : ControllerBase
         IStrategyServiceClient strategyServiceClient,
         IFinAIServiceClient finAIServiceClient,
         ILogger<AlpacaTestController> logger,
-        IRedisPublisher redisPublisher)
+        IRedisPublisher redisPublisher,
+        IRedisService redisService,
+        IAlpacaDataService alpacaDataService)
     {
         _env = env;
         _alpacaRepository = alpacaRepository;
@@ -30,67 +36,102 @@ public class AlpacaTestController : ControllerBase
         _finAIServiceClient = finAIServiceClient;
         _logger = logger;
         _publisher = redisPublisher;     
+        _redisService = redisService;
+        _alpacaDataService = alpacaDataService;
     }
 
-    [HttpGet("create-bars/{symbol}")]
-    public async Task<IActionResult> CreateBarsFromTrades(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+
+    [HttpPost("test-execution")]
+    public async Task<IActionResult> TestAlpacaExecution(string symbol)
     {
-        List<AlpacaTrade> trades = await _alpacaRepository.GetHistoricalTrades(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
-        var alpacaBars = await _alpacaRepository.GetHistoricalBars(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
 
+        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
 
-        var bars = new List<BarModel>();
-
-        // Group trades by minute and create bars
-        var groupedTrades = trades.GroupBy(t => new DateTime(t.TimestampUtc.Year, t.TimestampUtc.Month, t.TimestampUtc.Day, t.TimestampUtc.Hour, t.TimestampUtc.Minute, 0));
-
-        foreach (var group in groupedTrades)
+        var flagValue = await _redisService.GetStringAsync(flagKey);
+        if (flagValue == "true")
         {
-            var firstTrade = group.First();
-            var bar = new BarModel
-            {
-                Asset = symbol,
-                TimestampUtc = group.Key,
-                Open = firstTrade.Price,
-                High = group.Max(t => t.Price),
-                Low = group.Min(t => t.Price),
-                Close = group.Last().Price,
-                Volume = group.Sum(t => t.Size),
-                NumberOfTrades = group.Count()
-            };
-            bars.Add(bar);
+            return BadRequest("AI test stream is already running.");
+        }
+        await _redisService.SetStringAsync(flagKey, "true");
+
+        var tenDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-20));
+        var yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+
+        var calendars = await _alpacaRepository.GetCalendarAsync(tenDaysAgo, yesterday);
+
+        var lastTradingDay = calendars.LastOrDefault();
+        if (lastTradingDay == null)
+        {
+            return BadRequest("No trading day found in the last 20 days.");
         }
 
+        var startDate = DateTime.SpecifyKind(tenDaysAgo.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);;
+        var endDate = DateTime.SpecifyKind(lastTradingDay.TradingDate.ToDateTime(TimeOnly.MaxValue), DateTimeKind.Utc);
 
-        return Ok(bars);
+        var trades = await _alpacaRepository.GetHistoricalTrades(symbol, startDate, endDate);
+
+        await _redisService.PublishTradesToStream(symbol, trades, 100000);
+        return Ok();
     }
 
-    [HttpGet("historical-bars/{symbol}")]
-    public async Task<IActionResult> GetHistoricalBarsBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    [HttpPost("start-execution/{strategyName}")]
+    public async Task<IActionResult> StartAlpacaExecution(string strategyName, string symbol)
     {
-        var bars = await _alpacaRepository.GetHistoricalBars(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
-        return Ok(bars);
-    }
+        
+        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
 
-    [HttpGet("historical-quotes/{symbol}")]
-    public async Task<ActionResult<IEnumerable<PriceQuote>>> GetHistoricalQuotesBySymbol(string symbol, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
-    {
-        var bars = await _alpacaRepository.GetHistoricalBars(symbol, startDate.ToUniversalTime(), endDate.ToUniversalTime());
-
-        var quotes = new List<PriceQuote>();
-        foreach (var bar in bars)
+        var flagValue = await _redisService.GetStringAsync(flagKey);
+        if (flagValue == "true")
         {
-            var q = new PriceQuote
-            {
-                Symbol = symbol,
-                AskPrice = bar.C + 0.1m,
-                BidPrice = bar.C - 0.1m,
-                TimestampUtc = bar.T.ToUniversalTime(),
-                Volume = bar.V
-            };
-            quotes.Add(q);
+            return BadRequest("AI test stream is already running.");
         }
-        return quotes;
+        await _redisService.SetStringAsync(flagKey, "true");
+
+        var tenDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10));
+        var yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+   
+        var calendars = await _alpacaRepository.GetCalendarAsync(tenDaysAgo, yesterday);
+
+        var lastTradingDay = calendars.LastOrDefault();
+        if(lastTradingDay == null)
+        {
+            return BadRequest("No trading day found in the last 10 days.");
+        }
+
+        var startDate = DateTime.SpecifyKind(lastTradingDay.TradingDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+        var endDate = DateTime.SpecifyKind(lastTradingDay.TradingDate.ToDateTime(TimeOnly.MaxValue), DateTimeKind.Utc);
+
+        var trades = await _alpacaRepository.GetHistoricalTrades(symbol, startDate, endDate);
+
+        await _redisService.PublishTradesToStream(symbol, trades, 100000);
+        var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategyName);
+        await _alpacaDataService.SubscribeToTradeUpdates(symbol);
+
+
+        return Ok();
+    }
+
+    [HttpPut("stop-execution")]
+    public async Task<IActionResult> StopAlpacaExecution()
+    {
+        // var result = await _finAIServiceClient.StopAlpacaPaperTradingAsync();
+        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
+        await _redisService.SetStringAsync(flagKey, "false");
+        return Ok();
+    }
+
+    [HttpPut("subscribe-trade-updates/{symbol}")]
+    public async Task<IActionResult> SubscribeToTradeUpdates(string symbol)
+    {
+        await _alpacaDataService.SubscribeToTradeUpdates(symbol);
+        return Ok();
+    }
+
+    [HttpPut("unsubscribe-trade-updates/{symbol}")]
+    public async Task<IActionResult> UnSubscribeFromTradeUpdates(string symbol)
+    {
+        await _alpacaDataService.UnSubscribeFromTradeUpdates(symbol);
+        return Ok();
     }
 
     [HttpPost("run-test")]
@@ -109,8 +150,6 @@ public class AlpacaTestController : ControllerBase
         settings.StampStart = DateTime.UtcNow.ToUniversalTime();
         settings.StampEnd = DateTimeExtension.PostgresMinValue().ToUniversalTime();
         await _strategyTestService.StoreBarsToRedis(settings.Asset);
-
-
 
         var startResponse = await _strategyServiceClient.StartStrategyAsync(settings);
         if (startResponse == "true")
@@ -161,31 +200,5 @@ public class AlpacaTestController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("store-to-redis")]
-    public async Task<IActionResult> StoreToRedis([FromBody] string asset)
-    {
-        await _strategyTestService.StoreBarsToRedis(asset);
-        return Ok();
-    }
 
-    [HttpGet("save-assets")]
-    public async Task<IActionResult> SaveAssets()
-    {
-        string path = Path.Combine(_env.ContentRootPath, "Assets", "alpaca-assets.json");
-
-        using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
-        {
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                var jsonString = await reader.ReadToEndAsync();
-
-                var assets = JsonConvert.DeserializeObject<List<AlpacaAsset>>(jsonString);
-                if (assets != null)
-                {
-                    await _alpacaRepository.AddAssetsAsync(assets);
-                }
-                return Ok();
-            }
-        }
-    }
 }

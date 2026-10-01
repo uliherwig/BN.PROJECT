@@ -92,7 +92,12 @@ public class StrategyTestService : IStrategyTestService
 
     }
     public async Task CreateAlpacaOrder(OrderMessage orderMessage)
-    {  
+    {
+        if (orderMessage.Position == null)
+        {
+            return;
+        }
+
         var symbol = orderMessage.Position.Symbol;
         var qty = (int)orderMessage.Position.Quantity;
         var side = orderMessage.Position.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell;
