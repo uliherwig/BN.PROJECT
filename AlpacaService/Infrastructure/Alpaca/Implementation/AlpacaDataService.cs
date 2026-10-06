@@ -163,7 +163,8 @@ public class AlpacaDataService : IAlpacaDataService
             var alpacaTrade = trade.ToAlpacaTrade();
             _logger.LogInformation("Received trade update: {@AlpacaTrade}", alpacaTrade);
 
-            _redisService.PublishTradesToStream(streamKey, new List<AlpacaTrade> { alpacaTrade }, 100000);
+            _redisService.PublishTradesToStream(symbol, new List<AlpacaTrade> { alpacaTrade }, 100000);
+            //   await _redisService.PublishTradesToStream(strategySettings.Asset, trades, 100000);
         };
 
         await client.SubscribeAsync(tradeSubscription);

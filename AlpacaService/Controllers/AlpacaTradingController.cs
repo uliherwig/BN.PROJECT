@@ -127,7 +127,14 @@ public class AlpacaTradingController : ControllerBase
 
         if (isPositionAlreadyExecuted != null)
         {
-            return BadRequest("AI market order for this symbol has already been executed.");
+            // Not an error: skipping a duplicate AI order for an already-open symbol is expected behavior.
+            return Ok(new
+            {
+                skipped = true,
+                message = "AI market order for this symbol has already been executed.",
+                symbol = isPositionAlreadyExecuted.Symbol,
+                openedAtUtc = isPositionAlreadyExecuted.OpenedAtUtc
+            });
         }
 
         orderRequest.Symbol = orderRequest.Symbol.ToUpper();
@@ -157,7 +164,14 @@ public class AlpacaTradingController : ControllerBase
 
         if (isPositionAlreadyExecuted != null)
         {
-            return BadRequest("AI market order for this symbol has already been executed.");
+            // Not an error: skipping a duplicate AI order for an already-open symbol is expected behavior.
+            return Ok(new
+            {
+                skipped = true,
+                message = "AI market order for this symbol has already been executed.",
+                symbol = isPositionAlreadyExecuted.Symbol,
+                openedAtUtc = isPositionAlreadyExecuted.OpenedAtUtc
+            });
         }
 
         orderRequest.Symbol = orderRequest.Symbol.ToUpper();

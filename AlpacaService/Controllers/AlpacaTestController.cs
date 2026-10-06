@@ -41,16 +41,28 @@ public class AlpacaTestController : ControllerBase
     }
 
 
+    [HttpGet("ai-strategies")]
+    public async Task<IActionResult> GetAiStrategies()
+    {
+        var models = await _finAIServiceClient.GetAiStrategies();
+        if (models == null)
+        {
+            return NotFound();
+        }
+        return Ok(models);
+    }
+
+
     [HttpPost("test-execution")]
-    public async Task<IActionResult> TestAlpacaExecution(string symbol)
+    public async Task<IActionResult> TestAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
 
         var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
-
+    
         var flagValue = await _redisService.GetStringAsync(flagKey);
         if (flagValue == "true")
         {
-            return BadRequest("AI test stream is already running.");
+            return Conflict("AI test stream is already running.");
         }
         await _redisService.SetStringAsync(flagKey, "true");
 
@@ -68,14 +80,17 @@ public class AlpacaTestController : ControllerBase
         var startDate = DateTime.SpecifyKind(tenDaysAgo.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);;
         var endDate = DateTime.SpecifyKind(lastTradingDay.TradingDate.ToDateTime(TimeOnly.MaxValue), DateTimeKind.Utc);
 
-        var trades = await _alpacaRepository.GetHistoricalTrades(symbol, startDate, endDate);
+        var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategySettings);
+        var trades = await _alpacaRepository.GetHistoricalTrades(strategySettings.Asset, startDate, endDate);
 
-        await _redisService.PublishTradesToStream(symbol, trades, 100000);
+        // Fire-and-forget: errors are logged inside PublishTradesToStream, client doesn't need to wait for it.
+        _ = _redisService.PublishTradesToStream(strategySettings.Asset, trades, 300000);
+
         return Ok();
     }
 
-    [HttpPost("start-execution/{strategyName}")]
-    public async Task<IActionResult> StartAlpacaExecution(string strategyName, string symbol)
+    [HttpPost("start-execution")]
+    public async Task<IActionResult> StartAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
         
         var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
@@ -101,22 +116,28 @@ public class AlpacaTestController : ControllerBase
         var startDate = DateTime.SpecifyKind(lastTradingDay.TradingDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
         var endDate = DateTime.SpecifyKind(lastTradingDay.TradingDate.ToDateTime(TimeOnly.MaxValue), DateTimeKind.Utc);
 
-        var trades = await _alpacaRepository.GetHistoricalTrades(symbol, startDate, endDate);
+        var trades = await _alpacaRepository.GetHistoricalTrades(strategySettings.Asset, startDate, endDate);
+        var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategySettings);
 
-        await _redisService.PublishTradesToStream(symbol, trades, 100000);
-        var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategyName);
-        await _alpacaDataService.SubscribeToTradeUpdates(symbol);
-
+        _ = _redisService.PublishTradesToStream(strategySettings.Asset, trades, 100000);
+        await _alpacaDataService.SubscribeToTradeUpdates(strategySettings.Asset);
 
         return Ok();
     }
 
     [HttpPut("stop-execution")]
-    public async Task<IActionResult> StopAlpacaExecution()
+    public async Task<IActionResult> StopAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
-        // var result = await _finAIServiceClient.StopAlpacaPaperTradingAsync();
+       
         var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
         await _redisService.SetStringAsync(flagKey, "false");
+        await _finAIServiceClient.StopAlpacaPaperTradingAsync(strategySettings);
+
+        if (strategySettings.StrategyType == StrategyEnum.PaperTrading)
+        {
+            await _alpacaDataService.UnSubscribeFromTradeUpdates(strategySettings.Asset);    
+        }
+        
         return Ok();
     }
 

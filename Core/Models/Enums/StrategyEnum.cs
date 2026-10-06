@@ -6,4 +6,7 @@ public enum StrategyEnum
     IndicatorBased,
     MachineLearningBased,
 
+    LocalTest,
+    PaperTrading,
+
 }

@@ -15,8 +15,17 @@ public class FinAIServiceClient : IFinAIServiceClient
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri(_configuration["FinAIServiceClient"]
             ?? throw new InvalidOperationException("Missing configuration: FinAIServiceClient")); 
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-     
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));     
+    }
+
+    public async Task<StrategySettingsDTO[]> GetAiStrategies()
+    {
+        var response = await _httpClient.GetAsync($"/api/v1/ai-strategies");
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadAsStringAsync();
+        var strategySettings = JsonConvert.DeserializeObject<StrategySettingsDTO[]>(result);
+        return strategySettings ?? Array.Empty<StrategySettingsDTO>();
     }
 
     public async Task<string?> TestOptimizationAsync()
@@ -71,11 +80,11 @@ public class FinAIServiceClient : IFinAIServiceClient
         }
     }
 
-    public async Task<string?> StartAlpacaPaperTradingAsync(string strategyName)
+    public async Task<string?> StartAlpacaPaperTradingAsync(StrategySettingsDTO strategySettings)
     {
         try
         {
-            var json = JsonConvert.SerializeObject(new { StrategyName = strategyName});
+            var json = JsonConvert.SerializeObject(new { StrategyName = strategySettings.Name, IsTest = strategySettings.StrategyType == StrategyEnum.LocalTest });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync($"/api/v1/start-paper-trading", content);
 
@@ -88,11 +97,13 @@ public class FinAIServiceClient : IFinAIServiceClient
         }
     }
 
-    public async Task<string?> StopAlpacaPaperTradingAsync()
+    public async Task<string?> StopAlpacaPaperTradingAsync(StrategySettingsDTO strategySettings)
     {
         try
         {
-            var response = await _httpClient.PostAsync($"/api/v1/stop-paper-trading", null);
+            var json = JsonConvert.SerializeObject(new { StrategyName = strategySettings.Name, IsTest = strategySettings.StrategyType == StrategyEnum.LocalTest });
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"/api/v1/stop-paper-trading", content);
             var result = await response.Content.ReadAsStringAsync();
             return result;
         }

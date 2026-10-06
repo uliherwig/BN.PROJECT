@@ -16,7 +16,7 @@ public class PositionLifecycleService : IPositionLifecycleService
         _logger = logger;
     }
 
-    public async Task CloseExpiredPositionsAsync(TimeSpan maxHoldingPeriod)
+    public async Task CloseExpiredPositionsAsync(TimeSpan maxHoldingPeriod, bool testMode = false)
     {
         // Open-time comes from tracking records written when a position is opened (e.g. CreateAIMarketOrder); no need to poll Alpaca.
         var trackedPositions = await _alpacaRepository.GetAllOpenPositionTrackings();
@@ -24,14 +24,16 @@ public class PositionLifecycleService : IPositionLifecycleService
 
         foreach (var tracking in trackedPositions)
         {
-            if (now - tracking.OpenedAtUtc < maxHoldingPeriod)
-            {
-                continue;
-            }
-
             try
             {
-                await _alpacaTradingService.ClosePositionOrder(tracking.Symbol);
+                if (!testMode)
+                {
+                    if (now - tracking.OpenedAtUtc < maxHoldingPeriod)
+                    {
+                        continue;
+                    }
+                    await _alpacaTradingService.ClosePositionOrder(tracking.Symbol);
+                }
                 await _alpacaRepository.ClosePositionTrackingAsync(tracking.Symbol);
                 _logger.LogInformation("Closed position {Symbol} after exceeding max holding period of {Minutes} min", tracking.Symbol, maxHoldingPeriod.TotalMinutes);
             }

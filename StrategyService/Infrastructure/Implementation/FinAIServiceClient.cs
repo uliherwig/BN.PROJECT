@@ -16,12 +16,14 @@ public class FinAIServiceClient : IFinAIServiceClient
 
     }
 
-    public async Task<string?> GetLgbModels()
+    public async Task<StrategySettingsDTO[]> GetLgbModels()
     {
-        var response = await _httpClient.GetAsync($"/api/v1/get-lgb-models");
+        var response = await _httpClient.GetAsync($"/api/v1/ai-strategies");
         response.EnsureSuccessStatusCode();
+
         var result = await response.Content.ReadAsStringAsync();
-        return result;
+        var strategySettings = JsonConvert.DeserializeObject<StrategySettingsDTO[]>(result);
+        return strategySettings ?? Array.Empty<StrategySettingsDTO>();
     }
 
     public async Task<string?> GetLgbModelById(string id)

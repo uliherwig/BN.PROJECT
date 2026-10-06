@@ -24,17 +24,19 @@ public class PositionTimeoutJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var clock = await _alpacaDataService.GetClockAsync();
-        if (!clock.IsOpen)
-        {
-            return;
-        }
         var maxHoldingMinutes = _configuration.GetValue<int>("PositionManagement:MaxHoldingMinutes");
         if (maxHoldingMinutes <= 0)
         {
             return;
         }
+        var testMode = _configuration.GetValue<bool>("PositionManagement:TestMode");
+        
+        var clock = await _alpacaDataService.GetClockAsync();
+        if (!testMode && !clock.IsOpen)
+        {
+            return;
+        }
 
-        await _positionLifecycleService.CloseExpiredPositionsAsync(TimeSpan.FromMinutes(maxHoldingMinutes));
+        await _positionLifecycleService.CloseExpiredPositionsAsync(TimeSpan.FromMinutes(maxHoldingMinutes), testMode);
     }
 }
