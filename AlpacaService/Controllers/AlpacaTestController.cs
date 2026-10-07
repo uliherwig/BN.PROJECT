@@ -74,7 +74,7 @@ public class AlpacaTestController : ControllerBase
         var lastTradingDay = calendars.LastOrDefault();
         if (lastTradingDay == null)
         {
-            return BadRequest("No trading day found in the last 20 days.");
+            return Conflict("No trading day found in the last 20 days.");
         }
 
         var startDate = DateTime.SpecifyKind(tenDaysAgo.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);;
@@ -98,7 +98,7 @@ public class AlpacaTestController : ControllerBase
         var flagValue = await _redisService.GetStringAsync(flagKey);
         if (flagValue == "true")
         {
-            return BadRequest("AI test stream is already running.");
+            return Conflict("AI test stream is already running.");
         }
         await _redisService.SetStringAsync(flagKey, "true");
 
@@ -110,7 +110,7 @@ public class AlpacaTestController : ControllerBase
         var lastTradingDay = calendars.LastOrDefault();
         if(lastTradingDay == null)
         {
-            return BadRequest("No trading day found in the last 10 days.");
+            return Conflict("No trading day found in the last 10 days.");
         }
 
         var startDate = DateTime.SpecifyKind(lastTradingDay.TradingDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
@@ -220,6 +220,4 @@ public class AlpacaTestController : ControllerBase
         }
         return Ok(result);
     }
-
-
 }
