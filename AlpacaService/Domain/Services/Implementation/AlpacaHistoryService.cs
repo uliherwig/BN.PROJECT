@@ -4,11 +4,14 @@ public class AlpacaHistoryService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AlpacaHistoryService> _logger;
 
-    public AlpacaHistoryService(IServiceProvider serviceProvider, IConfiguration configuration)
+
+    public AlpacaHistoryService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<AlpacaHistoryService> logger)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -27,7 +30,12 @@ public class AlpacaHistoryService : IHostedService
             var executionEnabled = historyJobSection.GetValue<bool>("CalendarEnabled");
             if (executionEnabled)
             {
-                var calendarInterval = historyJobSection.GetValue<int>("CalendarIntervalDays");         
+                var calendarInterval = historyJobSection.GetValue<int>("CalendarIntervalDays");     
+                if (calendarInterval <= 0)
+                {
+                    _logger.LogWarning("CalendarIntervalDays must be greater than 0. Using default value of 1 day.");
+                    calendarInterval = 1; // Set a default value if the interval is less than or equal to 0
+                }
 
                 var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
                 var scheduler = await schedulerFactory.GetScheduler();
@@ -55,6 +63,11 @@ public class AlpacaHistoryService : IHostedService
             if (executionEnabled)
             {
                 var barsInterval = historyJobSection.GetValue<int>("BarsIntervalMinutes");  
+                if (barsInterval <= 0)
+                {
+                    _logger.LogWarning("BarsIntervalMinutes must be greater than 0. Using default value of 1 minute.");
+                    barsInterval = 10; // Set a default value if the interval is less than or equal to 0
+                }
 
                 var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
                 var scheduler = await schedulerFactory.GetScheduler();
@@ -81,6 +94,11 @@ public class AlpacaHistoryService : IHostedService
             if (executionEnabled)
             {
                 var tradesInterval = historyJobSection.GetValue<int>("TradesIntervalDays");
+                if (tradesInterval <= 0)
+                {
+                    _logger.LogWarning("TradesIntervalDays must be greater than 0. Using default value of 1 day.");
+                    tradesInterval = 1; // Set a default value if the interval is less than or equal to 0
+                }
 
                 var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
                 var scheduler = await schedulerFactory.GetScheduler();

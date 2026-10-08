@@ -27,6 +27,10 @@ public class PositionManagementService : IHostedService
         using (var scope = _serviceProvider.CreateScope())
         {
             var timeoutCheckIntervalMinutes = positionManagementSection.GetValue<int>("TimeoutCheckIntervalMinutes");
+            if (timeoutCheckIntervalMinutes <= 0)
+            {
+               timeoutCheckIntervalMinutes = 1; // Set a default value if the interval is less than or equal to 0
+            }
 
             var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
             var scheduler = await schedulerFactory.GetScheduler();
@@ -50,6 +54,10 @@ public class PositionManagementService : IHostedService
         using (var scope = _serviceProvider.CreateScope())
         {
             var eodCheckIntervalMinutes = positionManagementSection.GetValue<int>("EodCheckIntervalMinutes");
+            if (eodCheckIntervalMinutes <= 0)
+            {
+                eodCheckIntervalMinutes = 1; // Set a default value if the interval is less than or equal to 0
+            }
 
             var schedulerFactory = scope.ServiceProvider.GetRequiredService<ISchedulerFactory>();
             var scheduler = await schedulerFactory.GetScheduler();
