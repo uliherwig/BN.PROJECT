@@ -191,4 +191,46 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
+    // Strategy tracking
+    public async Task<List<AlpacaStrategyTracking>> GetAllActiveStrategyTrackings()
+    {
+        return await _context.StrategyTrackings.Where(s => s.StoppedAtUtc == null).ToListAsync();
+    }
+
+    public async Task<AlpacaStrategyTracking?> GetLatestActiveStrategyTracking(string name)
+    {
+        return await _context.StrategyTrackings
+            .Where(s => s.Name == name && s.StoppedAtUtc == null)
+            .OrderByDescending(s => s.StartedAtUtc)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task AddStrategyTrackingAsync(AlpacaStrategyTracking tracking)
+    {
+        await _context.StrategyTrackings.AddAsync(tracking);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task StopStrategyTrackingAsync(string name)
+    {
+        var activeTrackings = await _context.StrategyTrackings
+            .Where(s => s.Name == name && s.StoppedAtUtc == null)
+            .ToListAsync();
+        foreach (var tracking in activeTrackings)
+        {
+            tracking.StoppedAtUtc = DateTime.UtcNow;
+        }
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task StopAllStrategyTrackingsAsync()
+    {
+        var activeTrackings = await _context.StrategyTrackings.Where(s => s.StoppedAtUtc == null).ToListAsync();
+        foreach (var tracking in activeTrackings)
+        {
+            tracking.StoppedAtUtc = DateTime.UtcNow;
+        }
+        await _context.SaveChangesAsync();
+    }
+
 }

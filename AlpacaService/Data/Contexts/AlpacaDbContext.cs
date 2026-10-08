@@ -11,6 +11,8 @@ public class AlpacaDbContext : DbContext
     public virtual DbSet<AlpacaTrade> Trades { get; set; }
     public virtual DbSet<UserSettingsModel> UserSettings { get; set; }
     public virtual DbSet<AlpacaPositionTracking> PositionTrackings { get; set; }
+    public virtual DbSet<AlpacaStrategyTracking> StrategyTrackings { get; set; }
+
 
     public AlpacaDbContext()
     { }

@@ -5,7 +5,9 @@ public class AlpacaDataService : IAlpacaDataService
     private readonly ILogger<AlpacaDataService> _logger;
     private readonly IAlpacaClient _alpacaClient;
     private readonly IRedisService _redisService;
-
+    private readonly SemaphoreSlim _streamConnectLock = new(1, 1);
+    private readonly ConcurrentDictionary<string, IAlpacaDataSubscription<ITrade>> _tradeSubscriptions = new();
+    private bool _streamConnected;
 
     public AlpacaDataService(IAlpacaClient alpacaClient, ILogger<AlpacaDataService> logger, IRedisService redisService)
     {
@@ -150,31 +152,89 @@ public class AlpacaDataService : IAlpacaDataService
         return _alpacaClient.GetStreamingClient();
     }
 
+    private async Task<IAlpacaDataStreamingClient> GetConnectedStreamingClientAsync()
+    {
+        var client = GetStreamingClient();
+        if (_streamConnected)
+        {
+            return client;
+        }
+
+        await _streamConnectLock.WaitAsync();
+        try
+        {
+            if (!_streamConnected)
+            {
+                // Alpaca allows only one live streaming connection per API key; a second
+                // process/environment connecting with the same key will force this one shut.
+                client.SocketClosed += () =>
+                {
+                    _streamConnected = false;
+                    _logger.LogWarning("Alpaca streaming socket closed unexpectedly (another connection with the same API key may have taken over)");
+                };
+                client.OnError += ex => _logger.LogError(ex, "Alpaca streaming connection error");
+                client.OnWarning += message => _logger.LogWarning("Alpaca streaming warning: {Message}", message);
+
+                await client.ConnectAndAuthenticateAsync();
+                _streamConnected = true;
+            }
+        }
+        finally
+        {
+            _streamConnectLock.Release();
+        }
+
+        return client;
+    }
+
     public async Task SubscribeToTradeUpdates(string symbol)
     {
-        var streamKey = RedisUtilities.GetTradesStreamKey(symbol);
+        var client = await GetConnectedStreamingClientAsync();
 
-        var client = GetStreamingClient();
-        await client.ConnectAndAuthenticateAsync();
-        var tradeSubscription = client.GetTradeSubscription(symbol);
-
-        tradeSubscription.Received += (trade) =>
+        // Reuse the existing subscription object per symbol so unsubscribe targets the same instance.
+        var tradeSubscription = _tradeSubscriptions.GetOrAdd(symbol, s =>
         {
-            var alpacaTrade = trade.ToAlpacaTrade();
-            _logger.LogInformation("Received trade update: {@AlpacaTrade}", alpacaTrade);
+            var subscription = client.GetTradeSubscription(s);
+            subscription.Received += trade =>
+            {
+                var alpacaTrade = trade.ToAlpacaTrade();
+                _logger.LogInformation("Received trade update: {@AlpacaTrade}", alpacaTrade);
 
-            _redisService.PublishTradesToStream(symbol, new List<AlpacaTrade> { alpacaTrade }, 100000);
-            //   await _redisService.PublishTradesToStream(strategySettings.Asset, trades, 100000);
-        };
+                _ = _redisService.PublishTradesToStream(s, new List<AlpacaTrade> { alpacaTrade }, 100000);
+            };
+            return subscription;
+        });
 
         await client.SubscribeAsync(tradeSubscription);
     }
 
     public async Task UnSubscribeFromTradeUpdates(string symbol)
     {
+        if (!_tradeSubscriptions.TryRemove(symbol, out var tradeSubscription))
+        {
+            _logger.LogWarning("No active trade subscription found for {Symbol}", symbol);
+            return;
+        }
+
         var client = GetStreamingClient();
-        var tradeSubscription = client.GetTradeSubscription(symbol);
         await client.UnsubscribeAsync(tradeSubscription);
-        await client.DisconnectAsync();
+
+        // Keep the shared connection alive while other symbols are still subscribed.
+        if (_tradeSubscriptions.IsEmpty)
+        {
+            await _streamConnectLock.WaitAsync();
+            try
+            {
+                if (_tradeSubscriptions.IsEmpty && _streamConnected)
+                {
+                    await client.DisconnectAsync();
+                    _streamConnected = false;
+                }
+            }
+            finally
+            {
+                _streamConnectLock.Release();
+            }
+        }
     }
 }

@@ -2,6 +2,11 @@
 
 BN.PROJECT is a platform which combines brokerage operations with algorithmic trading.
 
+## Version 2026.10.4
+
+- StrategyExecutionTracking added
+- alpaca data stream websocket fixed and improved
+
 ## Version 2026.10.3
 
 - Small Improvement

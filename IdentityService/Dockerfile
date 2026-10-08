@@ -33,8 +33,14 @@ RUN chown -R appuser:appgroup /app
 USER appuser
 
 EXPOSE 5044
+EXPOSE 7010
 
-# Define environment variables
-ENV ASPNETCORE_URLS=http://+:5044
+# Define environment variables (http + https, wie in launchSettings.json)
+ENV ASPNETCORE_URLS=http://+:5044;https://+:7010
+# HTTPS-Zertifikat zur Laufzeit per Volume + Env-Variablen bereitstellen, z.B.:
+#   docker run -v "%USERPROFILE%\.aspnet\https:/https/" ^
+#     -e ASPNETCORE_Kestrel__Certificates__Default__Password=<password> ^
+#     -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx ...
+# Zertifikat zuvor lokal exportieren: dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p <password>
 
 ENTRYPOINT ["dotnet", "IdentityService.dll"]

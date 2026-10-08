@@ -44,12 +44,15 @@ public class AlpacaTestController : ControllerBase
     [HttpGet("ai-strategies")]
     public async Task<IActionResult> GetAiStrategies()
     {
-        var models = await _finAIServiceClient.GetAiStrategies();
-        if (models == null)
-        {
-            return NotFound();
-        }
+        var models = await _finAIServiceClient.GetAiStrategies();    
         return Ok(models);
+    }
+
+    [HttpGet("running-execution")]
+    public async Task<IActionResult> GetAlpacaExecution()
+    {
+        var strategyTrackings = await _alpacaRepository.GetAllActiveStrategyTrackings();  
+        return Ok(strategyTrackings);
     }
 
 
@@ -57,7 +60,7 @@ public class AlpacaTestController : ControllerBase
     public async Task<IActionResult> TestAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
 
-        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
+        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-strategy");
     
         var flagValue = await _redisService.GetStringAsync(flagKey);
         if (flagValue == "true")
@@ -92,15 +95,19 @@ public class AlpacaTestController : ControllerBase
     [HttpPost("start-execution")]
     public async Task<IActionResult> StartAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
-        
-        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
 
-        var flagValue = await _redisService.GetStringAsync(flagKey);
-        if (flagValue == "true")
+        var strategyTracking = await _alpacaRepository.GetLatestActiveStrategyTracking(strategySettings.Name);  
+        if (strategyTracking != null)
         {
-            return Conflict("AI test stream is already running.");
+            return Conflict("Strategy is already being tracked.");
         }
-        await _redisService.SetStringAsync(flagKey, "true");
+        await _alpacaRepository.AddStrategyTrackingAsync(new AlpacaStrategyTracking
+        {
+            Name = strategySettings.Name,
+            StartedAtUtc = DateTime.UtcNow,
+            StrategyType = strategySettings.StrategyType,
+            Asset = strategySettings.Asset
+        });
 
         var tenDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10));
         var yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
@@ -128,9 +135,15 @@ public class AlpacaTestController : ControllerBase
     [HttpPut("stop-execution")]
     public async Task<IActionResult> StopAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
-       
-        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream");
-        await _redisService.SetStringAsync(flagKey, "false");
+
+        var strategyTracking = await _alpacaRepository.GetLatestActiveStrategyTracking(strategySettings.Name);
+        if (strategyTracking == null)
+        {
+            return Conflict("No active strategy tracking found.");
+        }
+
+        await _alpacaRepository.StopStrategyTrackingAsync(strategySettings.Name);
+
         await _finAIServiceClient.StopAlpacaPaperTradingAsync(strategySettings);
 
         if (strategySettings.StrategyType == StrategyEnum.PaperTrading)

@@ -42,7 +42,7 @@ public class RedisService : IRedisService
 
     public async Task PublishTradesToStream(string symbol, List<AlpacaTrade> trades, int? maxLength)
     {
-        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-test-stream"); 
+        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-strategy"); 
         var streamKey = RedisUtilities.GetTradesStreamKey(symbol);
         foreach (var trade in trades)
         {

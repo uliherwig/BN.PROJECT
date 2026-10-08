@@ -40,4 +40,11 @@ public interface IAlpacaRepository
     Task AddPositionTrackingAsync(AlpacaPositionTracking tracking);
     Task ClosePositionTrackingAsync(string symbol);
     Task CloseAllPositionTrackingsAsync();
+
+    // strategy tracking
+    Task<List<AlpacaStrategyTracking>> GetAllActiveStrategyTrackings();
+    Task<AlpacaStrategyTracking?> GetLatestActiveStrategyTracking(string name);
+    Task AddStrategyTrackingAsync(AlpacaStrategyTracking tracking);
+    Task StopStrategyTrackingAsync(string name);
+    Task StopAllStrategyTrackingsAsync();   
 }

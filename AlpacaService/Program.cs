@@ -93,9 +93,10 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHttpClient<IStrategyServiceClient, StrategyServiceClient>();
     services.AddHttpClient<IFinAIServiceClient, FinAIServiceClient>();
 
-    services.AddScoped<IAlpacaClient, AlpacaClient>();
+    // Singleton: the Alpaca streaming connection and its subscriptions must persist across requests.
+    services.AddSingleton<IAlpacaClient, AlpacaClient>();
     services.AddScoped<IAlpacaRepository, AlpacaRepository>();
-    services.AddScoped<IAlpacaDataService, AlpacaDataService>();
+    services.AddSingleton<IAlpacaDataService, AlpacaDataService>();
     services.AddScoped<IAlpacaTradingService, AlpacaTradingService>();
     services.AddScoped<IStrategyTestService, StrategyTestService>();
     services.AddScoped<IStartUpService, StartUpService>();
@@ -113,8 +114,9 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     // Register publisher/subscriber services
     services.AddScoped<IRedisPublisher, RedisPublisher>();
     services.AddScoped<IRedisSubscriber, RedisSubscriber>();
-    services.AddScoped<IRedisStreamPublisher, RedisStreamPublisher>();
-    services.AddScoped<IRedisService, RedisService>();
+    // Singleton: only wraps the singleton IConnectionMultiplexer, and is consumed by the singleton IAlpacaDataService.
+    services.AddSingleton<IRedisStreamPublisher, RedisStreamPublisher>();
+    services.AddSingleton<IRedisService, RedisService>();
 
     services.AddSignalR()
     .AddStackExchangeRedis(redisConnection, options =>
