@@ -6,7 +6,6 @@ public class AlpacaHistoryService : IHostedService
     private readonly IConfiguration _configuration;
     private readonly ILogger<AlpacaHistoryService> _logger;
 
-
     public AlpacaHistoryService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<AlpacaHistoryService> logger)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -14,8 +13,20 @@ public class AlpacaHistoryService : IHostedService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public async Task InitializeAsync()
+    {
+        _logger.LogInformation("Initializing AlpacaHistoryService...");
+
+        foreach (var kvp in _configuration.AsEnumerable())
+        {
+            _logger.LogInformation($"###################################   {kvp.Key}: {kvp.Value}");
+        }
+        
+    }
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        await InitializeAsync();
         var assetsAsString = _configuration.GetValue<string>("Alpaca:TRADED_ASSETS") ?? string.Empty;
         var assetsSelection = assetsAsString.Split(",").ToList();
 

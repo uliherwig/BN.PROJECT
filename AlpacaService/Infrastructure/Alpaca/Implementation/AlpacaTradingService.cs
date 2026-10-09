@@ -51,13 +51,49 @@ namespace BN.PROJECT.AlpacaService
             return await tradingClient.CancelOrderAsync(orderId);
         }
 
-        public async Task<AlpacaOrder> CreateOrderAsync(string symbol, OrderQuantity qty, OrderSide side, OrderType orderType, TimeInForce timeInForce)
+        public async Task<bool> CreateOrderAsync(OrderRequest orderRequest)
         {
             var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var req = new NewOrderRequest(symbol, qty, side, orderType, timeInForce);
-            var order = await tradingClient.PostOrderAsync(req);
-            var alpacaOrder = order.ToAlpacaOrder();
-            return alpacaOrder;
+            var dataClient = _alpacaClient.GetAlpacaDataClient();
+
+            // check if market is open
+            var clock = await tradingClient.GetClockAsync();
+            if (clock == null || !clock.IsOpen)
+            {
+                _logger.LogWarning($"Market is closed");
+                return false;
+            }
+
+            var quote = await dataClient.GetLatestQuoteAsync(new LatestMarketDataRequest(orderRequest.Symbol)
+            {
+                Feed = MarketDataFeed.Iex
+            });
+            var asset = orderRequest.Symbol;
+            var qty = (int)orderRequest.Quantity;
+            var side = orderRequest.Side == "Buy" ? OrderSide.Buy : OrderSide.Sell;        
+
+            if (side == OrderSide.Sell)
+            {       
+                var order = MarketOrder.Sell(asset, qty)
+                    .WithDuration(TimeInForce.Gtc)
+                    .Bracket(
+                        stopLossStopPrice: quote.AskPrice * (1 - orderRequest.StopLossPercent / 100),
+                        takeProfitLimitPrice: quote.AskPrice * (1 + orderRequest.TakeProfitPercent / 100)
+                    );
+                await tradingClient.PostOrderAsync(order);
+            }
+            else
+            {
+                var order = MarketOrder.Buy(asset, qty)
+                    .WithDuration(TimeInForce.Gtc)
+                    .Bracket(
+                        stopLossStopPrice: quote.BidPrice * (1 - orderRequest.StopLossPercent / 100),
+                        takeProfitLimitPrice: quote.BidPrice * (1 + orderRequest.TakeProfitPercent / 100)
+                    );
+                await tradingClient.PostOrderAsync(order);
+            }
+
+            return true;
         }
 
         public async Task<List<AlpacaPosition>> GetAllOpenPositions()

@@ -48,21 +48,10 @@ public class AlpacaTradingController : ControllerBase
 
     [HttpPost("order")]
     public async Task<IActionResult> CreateMarketOrder(OrderRequest orderRequest)
-    {
+    { 
 
-        var symbol = orderRequest.Symbol;
-        var qty = (int)orderRequest.Quantity;
-        var side = orderRequest.Side == "Buy" ? OrderSide.Buy : OrderSide.Sell;
-        //  if (orderRequest.PriceClose > 0)
-        //  {
-        //      side = orderRequest.Side == "Sell" ? OrderSide.Buy : OrderSide.Sell;
-        //  }
-
-        var orderType = OrderType.Market;
-        var timeInForce = TimeInForce.Day;
-
-        var order = await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, orderType, timeInForce);
-        return Ok(order);
+        var result = await _alpacaTradingService.CreateOrderAsync(orderRequest);
+        return Ok(result);
     }
 
     [HttpDelete("order/{orderId}")]
@@ -140,11 +129,7 @@ public class AlpacaTradingController : ControllerBase
         orderRequest.Symbol = orderRequest.Symbol.ToUpper();
         orderRequest.Side = orderRequest.Side.ToUpper();
         // Value is already UTC; only the Kind needs fixing (Npgsql rejects Unspecified for timestamptz).
-        orderRequest.OpenedAtUtc = DateTime.SpecifyKind(orderRequest.OpenedAtUtc, DateTimeKind.Utc);
-        orderRequest.OrderType = "Market";
-        orderRequest.TimeInForce = "Day";
-
- 
+        orderRequest.OpenedAtUtc = DateTime.SpecifyKind(orderRequest.OpenedAtUtc, DateTimeKind.Utc); 
         var positionTracking = new AlpacaPositionTracking
         {
             Symbol = orderRequest.Symbol,
@@ -172,27 +157,22 @@ public class AlpacaTradingController : ControllerBase
                 symbol = isPositionAlreadyExecuted.Symbol,
                 openedAtUtc = isPositionAlreadyExecuted.OpenedAtUtc
             });
-        }
+        }  
 
-        orderRequest.Symbol = orderRequest.Symbol.ToUpper();
-        orderRequest.Side = orderRequest.Side.ToUpper();
-        orderRequest.OrderType = "Market";
-        orderRequest.TimeInForce = "Day";
-
-        var alpacaOrder = await _alpacaTradingService.CreateOrderAsync(orderRequest.Symbol, (int)orderRequest.Quantity, orderRequest.Side == "Buy" ? OrderSide.Buy : OrderSide.Sell, OrderType.Market, TimeInForce.Day);
-        if(alpacaOrder == null || alpacaOrder.CreatedAtUtc == null)
+        var result = await _alpacaTradingService.CreateOrderAsync(orderRequest );
+        if(result == false)
         {
             return BadRequest("Failed to create AI market order.");
         }
         var positionTracking = new AlpacaPositionTracking
         {
             Symbol = orderRequest.Symbol,
-            OpenedAtUtc = (DateTime)alpacaOrder.CreatedAtUtc,
+            OpenedAtUtc = DateTime.UtcNow,
             ClosedAtUtc = null
 
         };
         await _alpacaRepository.AddPositionTrackingAsync(positionTracking);
-        return Ok(alpacaOrder);
+        return Ok(result);
     }
 
 }

@@ -98,17 +98,17 @@ public class StrategyTestService : IStrategyTestService
             return;
         }
 
-        var symbol = orderMessage.Position.Symbol;
-        var qty = (int)orderMessage.Position.Quantity;
-        var side = orderMessage.Position.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell;
-        if (orderMessage.Position.PriceClose > 0)
+        OrderRequest orderRequest = new()
         {
-            side = orderMessage.Position.Side == SideEnum.Sell ? OrderSide.Buy : OrderSide.Sell;
-        }
+            Symbol = orderMessage.Position.Symbol,
+            Quantity = (int)orderMessage.Position.Quantity,
+            Side = orderMessage.Position.Side == SideEnum.Buy ? "Buy" : "Sell",
+            StopLossPercent = orderMessage.Position.StopLoss,
+            TakeProfitPercent = orderMessage.Position.TakeProfit
+        };
 
-        var orderType = OrderType.Market;
-        var timeInForce = TimeInForce.Day;
-        await _alpacaTradingService.CreateOrderAsync(symbol, qty, side, orderType, timeInForce);
+        
+        await _alpacaTradingService.CreateOrderAsync(orderRequest);
 
     }
     public async Task StoreBarsToRedis(string asset)

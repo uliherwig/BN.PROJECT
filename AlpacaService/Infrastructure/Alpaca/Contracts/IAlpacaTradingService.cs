@@ -11,7 +11,7 @@ namespace BN.PROJECT.AlpacaService
 
         Task<bool> CancelOrderByIdAsync(Guid orderId);
 
-        Task<AlpacaOrder> CreateOrderAsync(string symbol, OrderQuantity qty, OrderSide side, OrderType orderType, TimeInForce timeInForce);
+        Task<bool> CreateOrderAsync(OrderRequest orderRequest);
 
         Task<List<AlpacaPosition>> GetAllOpenPositions();
 

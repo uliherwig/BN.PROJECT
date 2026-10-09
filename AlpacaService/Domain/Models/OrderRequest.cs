@@ -8,9 +8,9 @@ public class OrderRequest
 
     public string Side { get; set; } = "Buy";
 
-    public string OrderType { get; set; } = "Market";
+    public decimal StopLossPercent { get; set; } = 0;
 
-    public string TimeInForce { get; set; } = "Day";
+    public decimal TakeProfitPercent { get; set; } = 0;   
 
 }
 
@@ -23,9 +23,9 @@ public class TestOrderRequest
 
     public string Side { get; set; } = "Buy";
 
-    public string OrderType { get; set; } = "Market";
+    public decimal StopLoss { get; set; } = 0;
 
-    public string TimeInForce { get; set; } = "Day";
+    public decimal TakeProfit { get; set; } = 0;
 
     public DateTime OpenedAtUtc { get; set; } = DateTime.UtcNow;
 
