@@ -158,7 +158,7 @@ public class AlpacaRepository : IAlpacaRepository
     public async Task<AlpacaPositionTracking?> GetLatestOpenPositionTracking(string symbol)
     {
         return await _context.PositionTrackings
-            .Where(p => p.Symbol == symbol && p.ClosedAtUtc == null)
+            .Where(p => p.Asset == symbol && p.ClosedAtUtc == null)
             .OrderByDescending(p => p.OpenedAtUtc)
             .FirstOrDefaultAsync();
     }
@@ -169,10 +169,16 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task UpdatePositionTrackingAsync(AlpacaPositionTracking tracking)
+    {
+        _context.PositionTrackings.Update(tracking);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task ClosePositionTrackingAsync(string symbol)
     {
         var openTrackings = await _context.PositionTrackings
-            .Where(p => p.Symbol == symbol && p.ClosedAtUtc == null)
+            .Where(p => p.Asset == symbol && p.ClosedAtUtc == null)
             .ToListAsync();
         foreach (var tracking in openTrackings)
         {
@@ -192,6 +198,31 @@ public class AlpacaRepository : IAlpacaRepository
     }
 
     // Strategy tracking
+    public async Task<bool> IsStrategyTrackingActiveAsync(string name, string asset, StrategyEnum strategyType)
+    {
+        var activeTrackings = await _context.StrategyTrackings
+            .Where(s => s.Name == name && s.Asset == asset && s.StrategyType == strategyType && s.StoppedAtUtc == null)
+            .ToListAsync();
+
+        if(activeTrackings.Count == 0)
+        {
+            await AddStrategyTrackingAsync(new AlpacaStrategyTracking
+            {
+                Name = name,
+                StartedAtUtc = DateTime.UtcNow,
+                StrategyType = strategyType, // Replace with appropriate value if needed
+                Asset = asset
+            });
+        }
+
+        return activeTrackings.Count > 0;
+    }
+
+    public async Task<List<AlpacaStrategyTracking>> GetStrategyTrackings()
+    {
+        return await _context.StrategyTrackings.ToListAsync();
+    }
+
     public async Task<List<AlpacaStrategyTracking>> GetAllActiveStrategyTrackings()
     {
         return await _context.StrategyTrackings.Where(s => s.StoppedAtUtc == null).ToListAsync();
@@ -233,4 +264,28 @@ public class AlpacaRepository : IAlpacaRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<List<PositionModel>> GetPositionsByStrategyIdAsync(Guid strategyId)
+    {
+        var tracks =  await _context.PositionTrackings.Where(p => p.StrategyId == strategyId).ToListAsync();
+        tracks = tracks.Where(p => p.ClosePrice > 0).OrderBy(p => p.OpenedAtUtc).ToList();
+        var positions = new List<PositionModel>();
+
+        foreach (var tracking in tracks)
+        {
+            var p = new PositionModel
+            {
+                StrategyId = tracking.StrategyId,
+                Symbol = tracking.Asset,
+                Quantity = tracking.Quantity,
+                Side = tracking.Side,
+                PriceOpen = tracking.OpenPrice,
+                PriceClose = tracking.ClosePrice,
+                ProfitLoss = (tracking.ClosePrice - tracking.OpenPrice) * tracking.Quantity,
+                StampOpened = tracking.OpenedAtUtc,
+                StampClosed = tracking.ClosedAtUtc ?? DateTime.MinValue
+            };
+            positions.Add(p);
+        }
+        return positions;
+    }
 }

@@ -38,13 +38,17 @@ public interface IAlpacaRepository
     Task<List<AlpacaPositionTracking>> GetAllOpenPositionTrackings();
     Task<AlpacaPositionTracking?> GetLatestOpenPositionTracking(string symbol);
     Task AddPositionTrackingAsync(AlpacaPositionTracking tracking);
+    Task UpdatePositionTrackingAsync(AlpacaPositionTracking tracking);
     Task ClosePositionTrackingAsync(string symbol);
     Task CloseAllPositionTrackingsAsync();
 
     // strategy tracking
+    Task<List<AlpacaStrategyTracking>> GetStrategyTrackings();
+    Task<bool> IsStrategyTrackingActiveAsync(string name, string asset, StrategyEnum strategyType);
     Task<List<AlpacaStrategyTracking>> GetAllActiveStrategyTrackings();
     Task<AlpacaStrategyTracking?> GetLatestActiveStrategyTracking(string name);
     Task AddStrategyTrackingAsync(AlpacaStrategyTracking tracking);
     Task StopStrategyTrackingAsync(string name);
-    Task StopAllStrategyTrackingsAsync();   
+    Task StopAllStrategyTrackingsAsync();
+    Task<List<PositionModel>> GetPositionsByStrategyIdAsync(Guid strategyId);
 }

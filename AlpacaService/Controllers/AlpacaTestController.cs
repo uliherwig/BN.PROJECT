@@ -35,39 +35,76 @@ public class AlpacaTestController : ControllerBase
         _strategyServiceClient = strategyServiceClient;
         _finAIServiceClient = finAIServiceClient;
         _logger = logger;
-        _publisher = redisPublisher;     
+        _publisher = redisPublisher;
         _redisService = redisService;
         _alpacaDataService = alpacaDataService;
     }
 
 
-    [HttpGet("ai-strategies")]
-    public async Task<IActionResult> GetAiStrategies()
+    [HttpGet("ai-models")]
+    public async Task<IActionResult> GetAiModels()
     {
-        var models = await _finAIServiceClient.GetAiStrategies();    
+        var models = await _finAIServiceClient.GetAiModels();
         return Ok(models);
     }
 
-    [HttpGet("running-execution")]
-    public async Task<IActionResult> GetAlpacaExecution()
+    [HttpGet("strategy-trackings")]
+    public async Task<IActionResult> GetStrategyTrackings()
     {
-        var strategyTrackings = await _alpacaRepository.GetAllActiveStrategyTrackings();  
+        var strategyTrackings = await _alpacaRepository.GetStrategyTrackings();
         return Ok(strategyTrackings);
     }
 
+    [HttpGet("positions/{strategyId}")]
+    public async Task<IActionResult> GetPositionsByStrategyId(Guid strategyId)
+    {
+        var positions = await _alpacaRepository.GetPositionsByStrategyIdAsync(strategyId);
+        return Ok(positions);
+    }
+
+    [HttpGet("results/{strategyId}")]
+    public async Task<IActionResult> GetTestResultsByStrategyId(Guid strategyId)
+    {
+        var testResult = new TestResult();
+        var positions = await _alpacaRepository.GetPositionsByStrategyIdAsync(strategyId);
+        if (positions.Count == 0)
+        {
+            return Ok(testResult);
+        }
+
+        var startDate = (DateTime)positions.First().StampOpened;
+        var endDate = (DateTime)positions.Last().StampOpened;
+
+        var sr = FinancialOperations.CalculateSharpeRatio(positions, startDate, endDate);
+        decimal avgProfitLoss = positions.Count > 0 ? positions.Sum(p => p.ProfitLoss) / positions.Count : 0;
+
+        testResult = new TestResult
+        {
+            Id = strategyId,
+            Asset = positions.First().Symbol,
+            StartDate = startDate,
+            EndDate = endDate,
+            NumberOfPositions = positions.Count,
+            NumberOfBuyPositions = positions.Count(p => p.Side == SideEnum.Buy),
+            NumberOfSellPositions = positions.Count(p => p.Side == SideEnum.Sell),
+            TotalProfitLoss = positions.Sum(p => p.ProfitLoss),
+            BuyProfitLoss = positions.Where(p => p.Side == SideEnum.Buy).Sum(p => p.ProfitLoss),
+            SellProfitLoss = positions.Where(p => p.Side == SideEnum.Sell).Sum(p => p.ProfitLoss),
+            AverageProfitLossPerPosition = avgProfitLoss,
+            SharpeRatio = sr
+        };
+        return Ok(testResult);
+    }
 
     [HttpPost("test-execution")]
     public async Task<IActionResult> TestAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
 
-        var flagKey = RedisUtilities.GetFeatureFlagKey("ai-strategy");
-    
-        var flagValue = await _redisService.GetStringAsync(flagKey);
-        if (flagValue == "true")
+        var isStrategyTrackingActive = await _alpacaRepository.IsStrategyTrackingActiveAsync(strategySettings.Name, strategySettings.Asset, strategySettings.StrategyType);
+        if (isStrategyTrackingActive == true)
         {
-            return Conflict("AI test stream is already running.");
+            return Conflict("Strategy is already being tracked.");
         }
-        await _redisService.SetStringAsync(flagKey, "true");
 
         var tenDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-20));
         var yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
@@ -80,7 +117,7 @@ public class AlpacaTestController : ControllerBase
             return Conflict("No trading day found in the last 20 days.");
         }
 
-        var startDate = DateTime.SpecifyKind(tenDaysAgo.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);;
+        var startDate = DateTime.SpecifyKind(tenDaysAgo.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc); ;
         var endDate = DateTime.SpecifyKind(lastTradingDay.TradingDate.ToDateTime(TimeOnly.MaxValue), DateTimeKind.Utc);
 
         var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategySettings);
@@ -96,26 +133,19 @@ public class AlpacaTestController : ControllerBase
     public async Task<IActionResult> StartAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
 
-        var strategyTracking = await _alpacaRepository.GetLatestActiveStrategyTracking(strategySettings.Name);  
-        if (strategyTracking != null)
+        var isStrategyTrackingActive = await _alpacaRepository.IsStrategyTrackingActiveAsync(strategySettings.Name, strategySettings.Asset, strategySettings.StrategyType);
+        if (isStrategyTrackingActive == true)
         {
             return Conflict("Strategy is already being tracked.");
         }
-        await _alpacaRepository.AddStrategyTrackingAsync(new AlpacaStrategyTracking
-        {
-            Name = strategySettings.Name,
-            StartedAtUtc = DateTime.UtcNow,
-            StrategyType = strategySettings.StrategyType,
-            Asset = strategySettings.Asset
-        });
 
         var tenDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10));
         var yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
-   
+
         var calendars = await _alpacaRepository.GetCalendarAsync(tenDaysAgo, yesterday);
 
         var lastTradingDay = calendars.LastOrDefault();
-        if(lastTradingDay == null)
+        if (lastTradingDay == null)
         {
             return Conflict("No trading day found in the last 10 days.");
         }
@@ -127,7 +157,10 @@ public class AlpacaTestController : ControllerBase
         var result = await _finAIServiceClient.StartAlpacaPaperTradingAsync(strategySettings);
 
         _ = _redisService.PublishTradesToStream(strategySettings.Asset, trades, 100000);
-        await _alpacaDataService.SubscribeToTradeUpdates(strategySettings.Asset);
+        if (strategySettings.StrategyType == StrategyEnum.PaperTrading)
+        {
+            await _alpacaDataService.SubscribeToTradeUpdates(strategySettings.Asset);
+        }
 
         return Ok();
     }
@@ -135,22 +168,17 @@ public class AlpacaTestController : ControllerBase
     [HttpPut("stop-execution")]
     public async Task<IActionResult> StopAlpacaExecution([FromBody] StrategySettingsDTO strategySettings)
     {
-
+        if (strategySettings.StrategyType == StrategyEnum.PaperTrading)
+        {
+            await _alpacaDataService.UnSubscribeFromTradeUpdates(strategySettings.Asset);
+        }
         var strategyTracking = await _alpacaRepository.GetLatestActiveStrategyTracking(strategySettings.Name);
         if (strategyTracking == null)
         {
             return Conflict("No active strategy tracking found.");
         }
-
         await _alpacaRepository.StopStrategyTrackingAsync(strategySettings.Name);
-
         await _finAIServiceClient.StopAlpacaPaperTradingAsync(strategySettings);
-
-        if (strategySettings.StrategyType == StrategyEnum.PaperTrading)
-        {
-            await _alpacaDataService.UnSubscribeFromTradeUpdates(strategySettings.Asset);    
-        }
-        
         return Ok();
     }
 

@@ -100,11 +100,9 @@ public class StrategyTestService : IStrategyTestService
 
         OrderRequest orderRequest = new()
         {
-            Symbol = orderMessage.Position.Symbol,
+            Asset = orderMessage.Position.Symbol,
             Quantity = (int)orderMessage.Position.Quantity,
-            Side = orderMessage.Position.Side == SideEnum.Buy ? "Buy" : "Sell",
-            StopLossPercent = orderMessage.Position.StopLoss,
-            TakeProfitPercent = orderMessage.Position.TakeProfit
+            Side = orderMessage.Position.Side
         };
 
         

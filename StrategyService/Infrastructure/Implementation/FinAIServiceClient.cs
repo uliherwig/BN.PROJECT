@@ -18,7 +18,7 @@ public class FinAIServiceClient : IFinAIServiceClient
 
     public async Task<StrategySettingsDTO[]> GetLgbModels()
     {
-        var response = await _httpClient.GetAsync($"/api/v1/ai-strategies");
+        var response = await _httpClient.GetAsync($"/api/v1/ai-models");
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadAsStringAsync();

@@ -2,31 +2,18 @@ namespace BN.PROJECT.AlpacaService;
 
 public class OrderRequest
 {
-    public string Symbol { get; set; } = "SPY";
-
+    public string Asset { get; set; } = "SPY";
     public decimal Quantity { get; set; } = 1;
-
-    public string Side { get; set; } = "Buy";
-
-    public decimal StopLossPercent { get; set; } = 0;
-
-    public decimal TakeProfitPercent { get; set; } = 0;   
-
+    public SideEnum Side { get; set; } = SideEnum.Buy;
 }
 
 
 public class TestOrderRequest
 {
-    public string Symbol { get; set; } = "SPY";
-
+    public string Asset { get; set; } = "SPY";
+    public decimal Price { get; set; } = 0;
     public decimal Quantity { get; set; } = 1;
-
-    public string Side { get; set; } = "Buy";
-
-    public decimal StopLoss { get; set; } = 0;
-
-    public decimal TakeProfit { get; set; } = 0;
-
-    public DateTime OpenedAtUtc { get; set; } = DateTime.UtcNow;
+    public SideEnum Side { get; set; } = SideEnum.Buy;
+    public DateTime StampUtc { get; set; } = DateTime.UtcNow;
 
 }

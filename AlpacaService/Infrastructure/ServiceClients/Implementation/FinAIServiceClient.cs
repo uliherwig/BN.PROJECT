@@ -18,9 +18,9 @@ public class FinAIServiceClient : IFinAIServiceClient
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));     
     }
 
-    public async Task<StrategySettingsDTO[]> GetAiStrategies()
+    public async Task<StrategySettingsDTO[]> GetAiModels()
     {
-        var response = await _httpClient.GetAsync($"/api/v1/ai-strategies");
+        var response = await _httpClient.GetAsync($"/api/v1/ai-models");
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadAsStringAsync();

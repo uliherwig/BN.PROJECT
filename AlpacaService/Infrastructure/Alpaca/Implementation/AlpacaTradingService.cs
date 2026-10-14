@@ -64,36 +64,10 @@ namespace BN.PROJECT.AlpacaService
                 return false;
             }
 
-            var quote = await dataClient.GetLatestQuoteAsync(new LatestMarketDataRequest(orderRequest.Symbol)
-            {
-                Feed = MarketDataFeed.Iex
-            });
-            var asset = orderRequest.Symbol;
-            var qty = (int)orderRequest.Quantity;
-            var side = orderRequest.Side == "Buy" ? OrderSide.Buy : OrderSide.Sell;        
-
-            if (side == OrderSide.Sell)
-            {       
-                var order = MarketOrder.Sell(asset, qty)
-                    .WithDuration(TimeInForce.Gtc)
-                    .Bracket(
-                        stopLossStopPrice: quote.AskPrice * (1 - orderRequest.StopLossPercent / 100),
-                        takeProfitLimitPrice: quote.AskPrice * (1 + orderRequest.TakeProfitPercent / 100)
-                    );
-                await tradingClient.PostOrderAsync(order);
-            }
-            else
-            {
-                var order = MarketOrder.Buy(asset, qty)
-                    .WithDuration(TimeInForce.Gtc)
-                    .Bracket(
-                        stopLossStopPrice: quote.BidPrice * (1 - orderRequest.StopLossPercent / 100),
-                        takeProfitLimitPrice: quote.BidPrice * (1 + orderRequest.TakeProfitPercent / 100)
-                    );
-                await tradingClient.PostOrderAsync(order);
-            }
-
-            return true;
+            var req = new NewOrderRequest(orderRequest.Asset, (int)orderRequest.Quantity, orderRequest.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell, OrderType.Market, TimeInForce.Gtc);
+            var order = await tradingClient.PostOrderAsync(req);
+            var isFilled = order.FilledAtUtc != null && order.FilledQuantity == orderRequest.Quantity;   
+            return isFilled;
         }
 
         public async Task<List<AlpacaPosition>> GetAllOpenPositions()

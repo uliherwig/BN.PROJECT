@@ -293,15 +293,30 @@ namespace BN.PROJECT.AlpacaService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Asset")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("ClosePrice")
+                        .HasColumnType("numeric");
+
                     b.Property<DateTime?>("ClosedAtUtc")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("OpenPrice")
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("OpenedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Side")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("StrategyId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 

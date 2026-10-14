@@ -2,7 +2,7 @@
 {
     public interface IFinAIServiceClient
     {
-        Task<StrategySettingsDTO[]> GetAiStrategies();
+        Task<StrategySettingsDTO[]> GetAiModels();
         Task<string?> TestOptimizationAsync();
         Task<string?> CreateDataframeAsync(StrategySettingsModel testSettings);
         Task<string> StartOptimizerAsync(StrategySettingsModel testSettings);

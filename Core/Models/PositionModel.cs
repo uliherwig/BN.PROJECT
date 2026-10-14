@@ -7,7 +7,7 @@ public class PositionModel
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid StrategyId { get; set; }
     public Guid ExecutionId { get; set; } = Guid.Empty;
-    public string Symbol { get; set; }
+    public string Symbol { get; set; } = string.Empty;
     public decimal Quantity { get; set; }
     public SideEnum Side { get; set; }
     public decimal PriceOpen { get; set; }

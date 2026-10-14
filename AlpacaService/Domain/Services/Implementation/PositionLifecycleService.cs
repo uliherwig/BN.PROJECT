@@ -32,14 +32,14 @@ public class PositionLifecycleService : IPositionLifecycleService
                     {
                         continue;
                     }
-                    await _alpacaTradingService.ClosePositionOrder(tracking.Symbol);
+                    await _alpacaTradingService.ClosePositionOrder(tracking.Asset);
                 }
-                await _alpacaRepository.ClosePositionTrackingAsync(tracking.Symbol);
-                _logger.LogInformation("Closed position {Symbol} after exceeding max holding period of {Minutes} min", tracking.Symbol, maxHoldingPeriod.TotalMinutes);
+                await _alpacaRepository.ClosePositionTrackingAsync(tracking.Asset);
+                _logger.LogInformation("Closed position {Symbol} after exceeding max holding period of {Minutes} min", tracking.Asset, maxHoldingPeriod.TotalMinutes);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to close expired position {Symbol}", tracking.Symbol);
+                _logger.LogError(ex, "Failed to close expired position {Symbol}", tracking.Asset);
             }
         }
     }

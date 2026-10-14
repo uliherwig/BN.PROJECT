@@ -30,7 +30,7 @@ public class AlpacaTradingController : ControllerBase
         _finAIServiceClient = finAIServiceClient;
         _redisService = redisService;
         _positionLifecycleService = positionLifecycleService;
-    } 
+    }
 
     [HttpGet("orders")]
     public async Task<IActionResult> GetAllOrders(OrderStatusFilter orderStatusFilter)
@@ -48,7 +48,7 @@ public class AlpacaTradingController : ControllerBase
 
     [HttpPost("order")]
     public async Task<IActionResult> CreateMarketOrder(OrderRequest orderRequest)
-    { 
+    {
 
         var result = await _alpacaTradingService.CreateOrderAsync(orderRequest);
         return Ok(result);
@@ -64,12 +64,7 @@ public class AlpacaTradingController : ControllerBase
     [HttpGet("positions")]
     public async Task<IActionResult> GetPositions()
     {
-        var positions = await _alpacaTradingService.GetAllOpenPositions();
-        foreach (var position in positions)
-        {
-            position.Symbol = position.Symbol.ToUpper();
-        }
-
+        var positions = await _alpacaTradingService.GetAllOpenPositions();  
         return Ok(positions);
     }
 
@@ -111,31 +106,58 @@ public class AlpacaTradingController : ControllerBase
     [HttpPost("ai-market-test-order")]
     public async Task<IActionResult> CreateAIMarketTestOrder(TestOrderRequest orderRequest)
     {
-        // Check if AI market order for this symbol has already been executed   - only one AI market order per symbol is allowed
-        var isPositionAlreadyExecuted = await _alpacaRepository.GetLatestOpenPositionTracking(orderRequest.Symbol);
+        var strategy = (await _alpacaRepository.GetStrategyTrackings())
+            .FirstOrDefault(s => s.Asset == orderRequest.Asset && s.StoppedAtUtc != null);
 
-        if (isPositionAlreadyExecuted != null)
+        if (strategy == null)
         {
-            // Not an error: skipping a duplicate AI order for an already-open symbol is expected behavior.
-            return Ok(new
-            {
-                skipped = true,
-                message = "AI market order for this symbol has already been executed.",
-                symbol = isPositionAlreadyExecuted.Symbol,
-                openedAtUtc = isPositionAlreadyExecuted.OpenedAtUtc
-            });
+            return BadRequest("No active strategy found for this asset");
         }
 
-        orderRequest.Symbol = orderRequest.Symbol.ToUpper();
-        orderRequest.Side = orderRequest.Side.ToUpper();
+        // Check if AI market order for this symbol has already been executed   - only one AI market order per symbol is allowed
+        var position = await _alpacaRepository.GetLatestOpenPositionTracking(orderRequest.Asset);
+
+        if (position != null)
+        {
+
+            if (position.Side ==orderRequest.Side)
+            {
+
+                // Not an error: skipping a duplicate AI order for an already-open symbol is expected behavior.
+                return Ok(new
+                {
+                    skipped = true,
+                    message = "AI market order for this symbol has already been executed.",
+                    symbol = position.Asset,
+                    openedAtUtc = position.OpenedAtUtc
+                });
+            }
+            else
+            {
+                position.ClosedAtUtc = orderRequest.StampUtc;
+                position.ClosePrice = orderRequest.Price;
+                await _alpacaRepository.UpdatePositionTrackingAsync(position);
+                return Ok(new
+                {
+                    skipped = true,
+                    message = "Position closed",
+                    symbol = position.Asset,
+                    openedAtUtc = position.ClosedAtUtc
+                });
+            }
+
+        }
         // Value is already UTC; only the Kind needs fixing (Npgsql rejects Unspecified for timestamptz).
-        orderRequest.OpenedAtUtc = DateTime.SpecifyKind(orderRequest.OpenedAtUtc, DateTimeKind.Utc); 
+        orderRequest.StampUtc = DateTime.SpecifyKind(orderRequest.StampUtc, DateTimeKind.Utc);
         var positionTracking = new AlpacaPositionTracking
         {
-            Symbol = orderRequest.Symbol,
-            OpenedAtUtc = orderRequest.OpenedAtUtc,
+            StrategyId = strategy.Id,
+            Asset = orderRequest.Asset,
+            Quantity = (int)orderRequest.Quantity,
+            Side = orderRequest.Side,
+            OpenPrice = orderRequest.Price,
+            OpenedAtUtc = orderRequest.StampUtc,
             ClosedAtUtc = null
-
         };
         await _alpacaRepository.AddPositionTrackingAsync(positionTracking);
         return Ok(positionTracking);
@@ -145,7 +167,7 @@ public class AlpacaTradingController : ControllerBase
     public async Task<IActionResult> CreateAIMarketOrder(OrderRequest orderRequest)
     {
         // Check if AI market order for this symbol has already been executed   - only one AI market order per symbol is allowed
-        var isPositionAlreadyExecuted = await _alpacaRepository.GetLatestOpenPositionTracking(orderRequest.Symbol);
+        var isPositionAlreadyExecuted = await _alpacaRepository.GetLatestOpenPositionTracking(orderRequest.Asset);
 
         if (isPositionAlreadyExecuted != null)
         {
@@ -154,25 +176,36 @@ public class AlpacaTradingController : ControllerBase
             {
                 skipped = true,
                 message = "AI market order for this symbol has already been executed.",
-                symbol = isPositionAlreadyExecuted.Symbol,
+                symbol = isPositionAlreadyExecuted.Asset,
                 openedAtUtc = isPositionAlreadyExecuted.OpenedAtUtc
             });
-        }  
+        }
 
-        var result = await _alpacaTradingService.CreateOrderAsync(orderRequest );
-        if(result == false)
+        var strategy = (await _alpacaRepository.GetAllActiveStrategyTrackings())
+            .FirstOrDefault(s => s.Asset == orderRequest.Asset);
+
+        if (strategy == null)
+        {
+            return BadRequest("No active strategy found for this asset");
+        }
+
+        var result = await _alpacaTradingService.CreateOrderAsync(orderRequest);
+        if (result == false)
         {
             return BadRequest("Failed to create AI market order.");
         }
         var positionTracking = new AlpacaPositionTracking
         {
-            Symbol = orderRequest.Symbol,
+            StrategyId = strategy.Id,
+            Asset = orderRequest.Asset,
+            Quantity = (int)orderRequest.Quantity,
+            Side = orderRequest.Side,
+            OpenPrice = 0,
             OpenedAtUtc = DateTime.UtcNow,
             ClosedAtUtc = null
-
         };
         await _alpacaRepository.AddPositionTrackingAsync(positionTracking);
-        return Ok(result);
+        return Ok(positionTracking);
     }
 
 }
