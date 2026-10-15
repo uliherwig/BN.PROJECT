@@ -36,7 +36,7 @@ public interface IAlpacaRepository
 
     // Position tracking
     Task<List<AlpacaPositionTracking>> GetAllOpenPositionTrackings();
-    Task<AlpacaPositionTracking?> GetLatestOpenPositionTracking(string symbol);
+    Task<AlpacaPositionTracking?> GetLatestOpenPositionTracking(string symbol,Guid strategyId);
     Task AddPositionTrackingAsync(AlpacaPositionTracking tracking);
     Task UpdatePositionTrackingAsync(AlpacaPositionTracking tracking);
     Task ClosePositionTrackingAsync(string symbol);

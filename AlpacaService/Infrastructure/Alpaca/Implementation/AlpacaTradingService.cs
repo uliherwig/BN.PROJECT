@@ -1,23 +1,16 @@
 namespace BN.PROJECT.AlpacaService
 {
-    public class AlpacaTradingService : IAlpacaTradingService
+    public class AlpacaTradingService(IAlpacaClient alpacaClient,
+        ILogger<AlpacaTradingService> logger) : IAlpacaTradingService
     {
-        private readonly IAlpacaClient _alpacaClient;
-        private readonly ILogger<AlpacaTradingService> _logger;
-
-        public AlpacaTradingService(IAlpacaClient alpacaClient,
-            ILogger<AlpacaTradingService> logger)
-        {
-            _alpacaClient = alpacaClient;
-            _logger = logger;
-        }
+        private readonly ILogger<AlpacaTradingService> _logger = logger;
+        private readonly IAlpacaTradingClient _tradingClient = alpacaClient.GetCommonTradingClient();
 
         public async Task<IAccount?> GetAccountAsync(UserSettingsModel userSettings)
         {
             try
             {
-                var tradingClient = _alpacaClient.GetPrivateTradingClient(userSettings);
-                return tradingClient != null ? await tradingClient.GetAccountAsync() : null;
+                return await _tradingClient.GetAccountAsync();
             }
             catch (Exception ex)
             {
@@ -28,73 +21,62 @@ namespace BN.PROJECT.AlpacaService
 
         public async Task<List<AlpacaOrder>> GetAllOrdersAsync(OrderStatusFilter orderStatusFilter)
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
             var req = new ListOrdersRequest
             {
                 OrderStatusFilter = orderStatusFilter
             };
 
-            var orders = await tradingClient.ListOrdersAsync(req);
+            var orders = await _tradingClient.ListOrdersAsync(req);
             return orders.Select(order => order.ToAlpacaOrder()).ToList();
         }
 
         public async Task<AlpacaOrder> GetOrderByIdAsync(string orderId)
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var order = await tradingClient.GetOrderAsync(orderId);
+            var order = await _tradingClient.GetOrderAsync(orderId);
             return order.ToAlpacaOrder();
         }
 
         public async Task<bool> CancelOrderByIdAsync(Guid orderId)
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            return await tradingClient.CancelOrderAsync(orderId);
+            return await _tradingClient.CancelOrderAsync(orderId);
         }
 
-        public async Task<bool> CreateOrderAsync(OrderRequest orderRequest)
+        public async Task<IOrder?> CreateOrderAsync(OrderRequest orderRequest)
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var dataClient = _alpacaClient.GetAlpacaDataClient();
-
             // check if market is open
-            var clock = await tradingClient.GetClockAsync();
+            var clock = await _tradingClient.GetClockAsync();
             if (clock == null || !clock.IsOpen)
             {
                 _logger.LogWarning($"Market is closed");
-                return false;
+                return null;
             }
 
             var req = new NewOrderRequest(orderRequest.Asset, (int)orderRequest.Quantity, orderRequest.Side == SideEnum.Buy ? OrderSide.Buy : OrderSide.Sell, OrderType.Market, TimeInForce.Gtc);
-            var order = await tradingClient.PostOrderAsync(req);
-            var isFilled = order.FilledAtUtc != null && order.FilledQuantity == orderRequest.Quantity;   
-            return isFilled;
+            var order = await _tradingClient.PostOrderAsync(req);
+            return order;
         }
 
         public async Task<List<AlpacaPosition>> GetAllOpenPositions()
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var positions = await tradingClient.ListPositionsAsync();
+            var positions = await _tradingClient.ListPositionsAsync();
             return positions.Select(p => p.ToAlpacaPosition()).ToList();
         }
 
         public async Task<AlpacaPosition> GetPositionsBySymbol(string symbol)
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var pos = await tradingClient.GetPositionAsync(symbol);
+            var pos = await _tradingClient.GetPositionAsync(symbol);
             return pos.ToAlpacaPosition();
         }
 
         public async Task<AlpacaOrder> ClosePositionOrder(string symbol)
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
             var deletePositionRequest = new DeletePositionRequest(symbol);
-            var order = await tradingClient.DeletePositionAsync(deletePositionRequest);
+            var order = await _tradingClient.DeletePositionAsync(deletePositionRequest);
             return order.ToAlpacaOrder();
         }
         public async Task<bool> CloseAllPositions()
         {
-            var tradingClient = _alpacaClient.GetCommonTradingClient();
-            var closed = await tradingClient.DeleteAllPositionsAsync();
+            var closed = await _tradingClient.DeleteAllPositionsAsync();
             return true;
         }
     }

@@ -48,7 +48,7 @@ public class CalendarJob : IJob
         var startDate = DateOnly.FromDateTime(s);
         // get the date of the end of the current month
         var now = DateOnly.FromDateTime(DateTime.UtcNow);
-        DateOnly endOfMonth = new DateOnly(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+        DateOnly endOfMonth = new(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
 
         var lastCalendarFromDb = await _alpacaRepository.GetLatestCalendar();
         if (lastCalendarFromDb != null)

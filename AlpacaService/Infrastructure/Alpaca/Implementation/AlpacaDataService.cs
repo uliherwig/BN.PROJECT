@@ -7,6 +7,8 @@ public class AlpacaDataService : IAlpacaDataService
     private readonly IRedisService _redisService;
     private readonly SemaphoreSlim _streamConnectLock = new(1, 1);
     private readonly ConcurrentDictionary<string, IAlpacaDataSubscription<ITrade>> _tradeSubscriptions = new();
+    private readonly IAlpacaDataClient _dataClient;
+    private readonly IAlpacaTradingClient _tradingClient;
     private bool _streamConnected;
 
     public AlpacaDataService(IAlpacaClient alpacaClient, ILogger<AlpacaDataService> logger, IRedisService redisService)
@@ -14,26 +16,26 @@ public class AlpacaDataService : IAlpacaDataService
         _alpacaClient = alpacaClient;
         _logger = logger;
         _redisService = redisService;
+        _dataClient = alpacaClient.GetAlpacaDataClient();
+        _tradingClient = alpacaClient.GetCommonTradingClient();
     }
 
     // Check if markets are open
     public async Task<IClock> GetClockAsync()
     {
-        var tradingClient = _alpacaClient.GetCommonTradingClient();
-        var clock = await tradingClient.GetClockAsync();
+        var clock = await _tradingClient.GetClockAsync();
         return clock;
     }
 
     public async Task<List<AlpacaCalendar>?> ListIntervalCalendarAsync(DateOnly startDate, DateOnly endDate = default)
     {
         var alpacaCalendar = new List<AlpacaCalendar>();
-        var tradingClient = _alpacaClient.GetCommonTradingClient();
 
         CalendarRequest req = new(
             startDate,
             endDate == default ? DateOnly.FromDateTime(DateTime.UtcNow) : endDate);
 
-        var calendarList = await tradingClient.ListIntervalCalendarAsync(req);
+        var calendarList = await _tradingClient.ListIntervalCalendarAsync(req);
         foreach (var calendar in calendarList)
         {
             alpacaCalendar.Add(calendar.ToAlpacaCalendar());
@@ -43,29 +45,26 @@ public class AlpacaDataService : IAlpacaDataService
     }
     public async Task<List<AlpacaAsset>> GetAssetsAsync()
     {
-        var tradingClient = _alpacaClient.GetCommonTradingClient();
         var req = new AssetsRequest();
         req.AssetClass = AssetClass.UsEquity;
-        var assets = await tradingClient.ListAssetsAsync(req);
+        var assets = await _tradingClient.ListAssetsAsync(req);
         return assets.Select(a => a.ToAlpacaAsset()).ToList();
     }
     public async Task<IAsset> GetAssetBySymbolAsync(string symbol)
     {
-        var tradingClient = _alpacaClient.GetCommonTradingClient();
-        return await tradingClient.GetAssetAsync(symbol);
+        return await _tradingClient.GetAssetAsync(symbol);
     }
     // Bars   
 
     public async Task<List<AlpacaBar>> GetHistoricalBarsBySymbol(string symbol, DateTime startDate, DateTime endDate, BarTimeFrame timeFrame)
     {
         var result = new List<AlpacaBar>();
-        var client = _alpacaClient.GetAlpacaDataClient();
 
         var req = new HistoricalBarsRequest(symbol, startDate, endDate, timeFrame)
         {
             Feed = MarketDataFeed.Iex
         };
-        var barSet = await client.ListHistoricalBarsAsync(req);
+        var barSet = await _dataClient.ListHistoricalBarsAsync(req);
 
         foreach (var bar in barSet.Items)
         {
@@ -78,13 +77,11 @@ public class AlpacaDataService : IAlpacaDataService
     // get latest bar for symbol
     public async Task<AlpacaBar> GetLatestBarBySymbol(string symbol)
     {
-        var client = _alpacaClient.GetAlpacaDataClient();
-
         var req = new LatestMarketDataRequest(symbol)
         {
             Feed = MarketDataFeed.Iex,
         };
-        var latestBar = await client.GetLatestBarAsync(req);
+        var latestBar = await _dataClient.GetLatestBarAsync(req);
 
         return latestBar.ToAlpacaBar(symbol);
     }
@@ -93,34 +90,29 @@ public class AlpacaDataService : IAlpacaDataService
 
     public async Task<List<AlpacaTrade>> GetTradesBySymbol(string symbol, DateTime startDate, DateTime endDate)
     {
-        var client = _alpacaClient.GetAlpacaDataClient();
-
         var tradesRequest = new HistoricalTradesRequest(symbol, startDate, endDate)
         {
             Feed = MarketDataFeed.Iex
         };
-        var tradeSet = await client.GetHistoricalTradesAsync(tradesRequest);
+        var tradeSet = await _dataClient.GetHistoricalTradesAsync(tradesRequest);
         var trades = tradeSet.Items[symbol].Select(t => t.ToAlpacaTrade()).ToList();
         return trades;
     }
 
     public async Task<AlpacaTrade> GetLatestTradeBySymbol(string symbol)
     {
-        var client = _alpacaClient.GetAlpacaDataClient();
         var req = new LatestMarketDataRequest(symbol)
         {
             Feed = MarketDataFeed.Iex,
         };
-        var trade = await client.GetLatestTradeAsync(req);
+        var trade = await _dataClient.GetLatestTradeAsync(req);
         return trade.ToAlpacaTrade();
     }
 
     // Quotes
     public async Task<AlpacaQuote> GetLatestQuoteBySymbol(string symbol)
     {
-        var client = _alpacaClient.GetAlpacaDataClient();
-
-        var quote = await client.GetLatestQuoteAsync(new LatestMarketDataRequest(symbol)
+        var quote = await _dataClient.GetLatestQuoteAsync(new LatestMarketDataRequest(symbol)
         {
             Feed = MarketDataFeed.Iex
         });
@@ -130,13 +122,11 @@ public class AlpacaDataService : IAlpacaDataService
     public async Task<List<AlpacaQuote>> GetQuotesBySymbol(string symbol, DateTime startDate, DateTime endDate)
     {
         var result = new List<AlpacaQuote>();
-        var client = _alpacaClient.GetAlpacaDataClient();
-
         var quotesRequest = new HistoricalQuotesRequest(symbol, startDate, endDate)
         {
             Feed = MarketDataFeed.Iex,
         };
-        var quoteSet = await client.GetHistoricalQuotesAsync(quotesRequest);
+        var quoteSet = await _dataClient.GetHistoricalQuotesAsync(quotesRequest);
         var quotes = quoteSet.Items;
 
         foreach (var quote in quotes[symbol].ToList())

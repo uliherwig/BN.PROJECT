@@ -49,9 +49,10 @@ public class TradesJob : IJob
         }
         // find the last trading day from the calendar
         calendar = calendar.OrderByDescending(c => c.TradingDate).Take(1).ToList();
+        await _redisService.SetStringAsync("calendar", calendar.First().ToJson());
+
 
         var lastTrade = await _alpacaRepository.GetLatestTrade("SPY");
-
         if (lastTrade != null && DateOnly.FromDateTime(lastTrade.TimestampUtc) == calendar.First().TradingDate)
         {
             return;
@@ -71,19 +72,12 @@ public class TradesJob : IJob
                 tradingDate.ToDateTime(TimeOnly.FromTimeSpan(day.SessionClose), DateTimeKind.Unspecified),
                 easternZone);
 
-
             foreach (var symbol in assetsSelection)
             {
-
-               
                 var stamp = tradingOpen;
-
-                // iterate through each minute of the trading day from tradingOpen to tradingClose
-
                 while (stamp < tradingClose)
                 {
                     var intervalStamp = stamp.AddMinutes(5);
-
                     if (stamp < tradingOpen || stamp > tradingClose)
                     {
                         stamp = intervalStamp;
@@ -91,7 +85,6 @@ public class TradesJob : IJob
                     }
 
                     var trades = await _alpacaDataService.GetTradesBySymbol(symbol, stamp, intervalStamp);
-
                     if (trades.Count > 0)
                     {
                         await _alpacaRepository.AddTradesAsync(trades);
@@ -99,40 +92,7 @@ public class TradesJob : IJob
 
                     stamp = intervalStamp;
                 }
-
-
-                // var stamp = calendar.First().TradingDate.ToDateTime(TimeOnly.FromTimeSpan(day.TradingOpen), DateTimeKind.Unspecified);
-                // stamp = TimeZoneInfo.ConvertTimeToUtc(stamp, easternZone);
-
-                // var intervalStamp = stamp.AddMinutes(1);
-
-                // if (stamp.TimeOfDay < tradingOpen || stamp.TimeOfDay > tradingClose)
-                // {
-                //     continue;
-                // }
-                // var trades = await _alpacaDataService.GetTradesBySymbol(symbol, stamp, intervalStamp);
-
-                // if (trades.Count > 0)
-                // {
-                //     await _alpacaRepository.AddTradesAsync(trades);
-
-                // }
             }
-
-
-
-
-
-
-
-
         }
-
-
-
-
-
-
     }
-
 }

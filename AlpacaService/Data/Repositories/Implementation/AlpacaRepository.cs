@@ -155,10 +155,10 @@ public class AlpacaRepository : IAlpacaRepository
         return await _context.PositionTrackings.Where(p => p.ClosedAtUtc == null).ToListAsync();
     }
 
-    public async Task<AlpacaPositionTracking?> GetLatestOpenPositionTracking(string symbol)
+    public async Task<AlpacaPositionTracking?> GetLatestOpenPositionTracking(string symbol, Guid strategyId)
     {
         return await _context.PositionTrackings
-            .Where(p => p.Asset == symbol && p.ClosedAtUtc == null)
+            .Where(p => p.Asset == symbol && p.StrategyId == strategyId && p.ClosedAtUtc == null)
             .OrderByDescending(p => p.OpenedAtUtc)
             .FirstOrDefaultAsync();
     }
